@@ -1,10 +1,9 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Pages index{% endblock %}
+{% block title %}Articles index{% endblock %}
 
 {% block body %}
-    <h1>Les pages</h1>
-
+    <h1>Les articles</h1>
     <table class="table">
         <thead>
             <tr>
@@ -15,15 +14,15 @@
             </tr>
         </thead>
         <tbody>
-        {% for page in pages %}
+        {% for article in articles %}
             <tr>
-                <td>{{ page.title }}</td>
+                <td>{{ article.title }}</td>
                 <td>
-                    <img src={{page.imgHeaderJpg}} alt="imgHeader" width="100px">
+                    <img src={{article.imgThumbnail}} alt="imgHeader" width="100px">
                 </td>
                 <td>
-                    <a href="{{ path('app_back_pages_show', {'id': page.id}) }}">show</a>
-                    <a href="{{ path('app_back_pages_edit', {'id': page.id}) }}">edit</a>
+                    <a href="{{ path('app_back_articles_show', {'id': article.id}) }}">show</a>
+                    <a href="{{ path('app_back_articles_edit', {'id': article.id}) }}">edit</a>
                 </td>
             </tr>
         {% else %}
@@ -34,5 +33,5 @@
         </tbody>
     </table>
 
-    <a href="{{ path('app_back_pages_new') }}">Create new</a>
+    <a href="{{ path('app_back_articles_new') }}">Create new</a>
 {% endblock %}
