@@ -75,9 +75,11 @@ class Articles
         private ?string $imgThumbnailJpg = null;
     
         #[ORM\Column(length: 70, nullable: true)]
+        #[Groups(['api_articles_read'])]
         private ?string $subtitle2 = null;
     
         #[ORM\Column(length: 750, nullable: true)]
+        #[Groups(['api_articles_read'])]
         private ?string $contents3 = null;
     
     

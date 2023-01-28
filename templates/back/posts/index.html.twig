@@ -16,7 +16,7 @@
         {% for post in posts %}
             <tr>
                 <td>{{ post.title }}</td>
-                <td> <img src={{post.imgThumbnail}} alt="imgHeader" width="100px"></td>
+                <td> <img src={{post.imgPost.path}} alt="imgHeader" width="100px"></td>
                 <td>
                     <a href="{{ path('app_back_posts_edit', {'id': post.id}) }}" class="button is-info">Modifier</a>
                 </td>

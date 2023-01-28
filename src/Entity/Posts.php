@@ -43,7 +43,7 @@ class Posts
     private ?string $slug = null;
 
     #[ORM\Column]
-    #[Groups(['api_posts_read'])]
+    #[Groups(['api_posts_read', 'api_posts_browse'])]
     private ?array $imgPost =[];
 
     #[ORM\Column(length: 500, nullable: true)]
@@ -58,10 +58,6 @@ class Posts
     #[Groups(['api_posts_read'])]
     private ?array $imgPost4 = null;
 
-    #[ORM\Column(length: 500)]
-    #[Groups(['api_posts_thumbnail', 'api_posts_browse'])]
-    private ?string $imgThumbnail = null;
-
     #[ORM\Column]
     #[Groups(['api_posts_read'])]
     private ?\DateTime $createdAt = null;
@@ -70,14 +66,13 @@ class Posts
     #[Groups(['api_posts_read'])]
     private ?\DateTime $updatedAt = null;
 
-    #[ORM\Column(length: 500)]
-    #[Groups(['api_posts_thumbnail'])]
-    private ?string $imgThumbnailJpg = null;
 
     #[ORM\Column(length: 70, nullable: true)]
+    #[Groups(['api_posts_read'])]
     private ?string $subtitle2 = null;
 
     #[ORM\Column(length: 750, nullable: true)]
+    #[Groups(['api_posts_read'])]
     private ?string $contents3 = null;
 
 
@@ -193,17 +188,6 @@ class Posts
 
     }
 
-    public function getImgThumbnail(): ?string
-    {
-        return $this->imgThumbnail;
-    }
-
-    public function setImgThumbnail(string $imgThumbnail): self
-    {
-        $this->imgThumbnail = $imgThumbnail;
-
-        return $this;
-    }
 
     public function getCreatedAt(): ?\DateTime
     {
@@ -225,18 +209,6 @@ class Posts
     public function setUpdatedAt(?\DateTime $updatedAt): self
     {
         $this->updatedAt = $updatedAt;
-
-        return $this;
-    }
-
-    public function getImgThumbnailJpg(): ?string
-    {
-        return $this->imgThumbnailJpg;
-    }
-
-    public function setImgThumbnailJpg(string $imgThumbnailJpg): self
-    {
-        $this->imgThumbnailJpg = $imgThumbnailJpg;
 
         return $this;
     }

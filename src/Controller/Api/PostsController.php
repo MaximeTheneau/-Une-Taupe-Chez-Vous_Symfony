@@ -30,7 +30,7 @@ class PostsController extends ApiController
     public function browse(PostsRepository $postsRepository ): JsonResponse
     {
     
-        $allPosts = $postsRepository->findLastPosts();
+        $allPosts = $postsRepository->findAll();
 
         return $this->json(
             $allPosts,

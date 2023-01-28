@@ -15,7 +15,7 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
-use App\Services\ImageOptimizer;
+use App\Service\ImageOptimizer;
 
 #[Route('/articles')]
 class ArticlesController extends AbstractController
@@ -63,21 +63,17 @@ class ArticlesController extends AbstractController
 
             // IMAGE 1
             $this->imageOptimizer->setPicture($form->get('imgPost')->getData(), $article, 'setImgPost', $slug );
-            $this->imageOptimizer->setThumbnail($form->get('imgPost')->getData(), $article, 'setImgThumbnail', $slug );
-            $this->imageOptimizer->setThumbnailJpg($form->get('imgPost')->getData(), $article, 'setImgThumbnailJpg', $slug );
-
-
 
             //IMAGE 2
             if ($form->get('imgPost2')->getData() != null) {
                 $this->imageOptimizer->setPicture($form->get('imgPost2')->getData(), $article, 'setImgPost2', $slug );
             }
 
-
             // IMAGE 3
             if ($form->get('imgPost3')->getData() != null) {
             $this->imageOptimizer->setPicture($form->get('imgPost3')->getData(), $article, 'setImgPost3', $slug.'-3');
             }
+            
             // IMAGE 4
             if ($form->get('imgPost4')->getData() != null) {
                 $this->imageOptimizer->setPicture($form->get('imgPost4')->getData(), $article, 'setImgPost4', $slug.'-4');

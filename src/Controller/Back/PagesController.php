@@ -15,7 +15,7 @@ use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\HttpFoundation\File\File;
 
 use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
-use App\Services\ImageOptimizer;
+use App\Service\ImageOptimizer;
 
 #[Route('/pages')]
 class PagesController extends AbstractController
@@ -63,9 +63,11 @@ class PagesController extends AbstractController
 
             // IMAGE 1
             $this->imageOptimizer->setPicture($form->get('imgHeader')->getData(), $page, 'setImgHeader', $slug );
-            $this->imageOptimizer->setThumbnailJpg($form->get('imgHeader')->getData(), $page, 'setImgHeaderJpg', $slug );
 
-
+            // IMAGE 2
+            if ($form->get('imgHeader2')->getData() != null) {
+                $this->imageOptimizer->setPicture($form->get('imgHeader2')->getData(), $page, 'setImgHeader2', $slug );
+            }
         
             $pagesRepository->save($page, true);
             
@@ -102,9 +104,12 @@ class PagesController extends AbstractController
             // IMAGE 1
             if ($form->get('imgHeader')->getData() != null) {
                 $this->imageOptimizer->setPicture($form->get('imgHeader')->getData(), $page, 'setImgHeader', $slug );
-                $this->imageOptimizer->setThumbnail($form->get('imgHeader')->getData(), $page, 'setImgThumbnail', $slug );
                 $this->imageOptimizer->setThumbnailJpg($form->get('imgHeader')->getData(), $page, 'setImgHeaderJpg', $slug );
-            
+            }
+
+            // IMAGE 2
+            if ($form->get('imgHeader2')->getData() != null) {
+                $this->imageOptimizer->setPicture($form->get('imgHeader2')->getData(), $page, 'setImgHeader2', $slug.'-2' );
             }
 
 

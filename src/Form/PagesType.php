@@ -18,7 +18,13 @@ class PagesType extends AbstractType
     {
         $builder
             ->add('title')
-            ->add('subtitle')
+            ->add('subtitle', TextareaType::class, [
+                'required' => false,
+                'attr' => [
+                    'class' => 'textarea',
+                    'placeholder' => 'Le contenu est optionnel',
+                ]
+            ])
             ->add('contents', TextareaType::class, [
                 'label' => 'Contenu de l\'article ',
                 'required' => false,
@@ -38,7 +44,26 @@ class PagesType extends AbstractType
             ->add('imgHeader',
                 FileType::class,
                 [
-                    'label' => 'Image de couverture',
+                    'label' => 'Image de couverture *',
+                    'mapped' => false,
+                    'required' => false,
+                    'constraints' => [
+                        new File([
+                            'maxSize' => '5M',
+                            'mimeTypes' => [
+                                'image/jpeg',
+                                'image/webp',
+                                'image/png',
+                            ],
+                            'mimeTypesMessage' => 'Veuillez uploader une image valide', 
+                        ])
+                    ],
+                ],
+            )
+            ->add('imgHeader2',
+                FileType::class,
+                [
+                    'label' => 'Image 2',
                     'mapped' => false,
                     'required' => false,
                     'constraints' => [
