@@ -66,7 +66,7 @@ class ArticlesController extends AbstractController
 
             //IMAGE 2
             if ($form->get('imgPost2')->getData() != null) {
-                $this->imageOptimizer->setPicture($form->get('imgPost2')->getData(), $article, 'setImgPost2', $slug );
+                $this->imageOptimizer->setPicture($form->get('imgPost2')->getData(), $article, 'setImgPost2', $slug.'-2');
             }
 
             // IMAGE 3
@@ -102,12 +102,37 @@ class ArticlesController extends AbstractController
     #[Route('/{id}/edit', name: 'app_back_articles_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Articles $article, ArticlesRepository $articlesRepository): Response
     {
+        
         $form = $this->createForm(ArticlesType::class, $article);
         $form->handleRequest($request);
-
+        
         if ($form->isSubmitted() && $form->isValid()) {
-            $articlesRepository->save($article, true);
+            $slug = $this->slugger->slug($article->getTitle());
+            $article->setSlug($slug);
+            
+            
+            // IMAGE 1
+            if ($form->get('imgPost')->getData() != null) {
+                $this->imageOptimizer->setPicture($form->get('imgPost')->getData(), $article, 'setImgPost', $slug );
+            }
 
+            //IMAGE 2
+            if ($form->get('imgPost2')->getData() != null) {
+                $this->imageOptimizer->setPicture($form->get('imgPost2')->getData(), $article, 'setImgPost2', $slug.'-2' );
+            }
+
+            // IMAGE 3
+            if ($form->get('imgPost3')->getData() != null) {
+            $this->imageOptimizer->setPicture($form->get('imgPost3')->getData(), $article, 'setImgPost3', $slug.'-3');
+            }
+
+            // IMAGE 4
+            if ($form->get('imgPost4')->getData() != null) {
+                $this->imageOptimizer->setPicture($form->get('imgPost4')->getData(), $article, 'setImgPost4', $slug.'-4');
+            }
+                
+            $articlesRepository->save($article, true);
+            
             return $this->redirectToRoute('app_back_articles_index', [], Response::HTTP_SEE_OTHER);
         }
 

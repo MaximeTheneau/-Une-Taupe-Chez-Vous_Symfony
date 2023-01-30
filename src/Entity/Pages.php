@@ -44,15 +44,12 @@ class Pages
     private ?string $slug = null;
 
     #[ORM\Column()]
-    #[Groups(['api_pages_read'])]
     private ?array $imgHeader = null;
 
     #[ORM\Column()]
-    #[Groups(['api_pages_read'])]
     private ?string $imgHeaderJpg = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['api_pages_read'])]
     private ?array $imgHeader2 = null;
 
     public function getId(): ?int

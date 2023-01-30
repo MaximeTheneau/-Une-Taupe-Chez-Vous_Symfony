@@ -43,19 +43,15 @@ class Posts
     private ?string $slug = null;
 
     #[ORM\Column]
-    #[Groups(['api_posts_read', 'api_posts_browse'])]
     private ?array $imgPost =[];
 
     #[ORM\Column(length: 500, nullable: true)]
-    #[Groups(['api_posts_read'])]
     private ?array $imgPost2 = null;
 
-    #[Groups(['api_posts_read'])]
     #[ORM\Column(length: 500, nullable: true)]
     private ?array $imgPost3 = null;
 
     #[ORM\Column(length: 500, nullable: true)]
-    #[Groups(['api_posts_read'])]
     private ?array $imgPost4 = null;
 
     #[ORM\Column]

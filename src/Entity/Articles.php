@@ -43,23 +43,18 @@ class Articles
         private ?string $slug = null;
     
         #[ORM\Column]
-        #[Groups(['api_articles_read', 'api_articles_browse'])]
         private ?array $imgPost =[];
     
         #[ORM\Column(length: 500, nullable: true)]
-        #[Groups(['api_articles_read', 'api_articles_browse'])]
         private ?array $imgPost2 = null;
     
-        #[Groups(['api_articles_read', 'api_articles_browse'])]
         #[ORM\Column(length: 500, nullable: true)]
         private ?array $imgPost3 = null;
     
         #[ORM\Column(length: 500, nullable: true)]
-        #[Groups(['api_articles_read', 'api_articles_browse'])]
         private ?array $imgPost4 = null;
     
         #[ORM\Column(length: 500)]
-        #[Groups([ 'api_articles_browse'])]
         private ?string $imgThumbnail = null;
     
         #[ORM\Column]
@@ -71,7 +66,6 @@ class Articles
         private ?\DateTime $updatedAt = null;
     
         #[ORM\Column(length: 500)]
-        #[Groups(['api_articles_thumbnail'])]
         private ?string $imgThumbnailJpg = null;
     
         #[ORM\Column(length: 70, nullable: true)]
