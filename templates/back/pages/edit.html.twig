@@ -1,16 +1,13 @@
 {% extends 'base.html.twig' %}
-
-{% block title %}Edit Pages{% endblock %}
-
+{% block title %}Pages{% endblock %}
 {% block body %}
-    <h1>Edit Pages</h1>
+    <h1>Modifier</h1>
 
-    <h2>Image</h2>
-    <img src={{ page.imgHeaderJpg }}  >
-
-    {{ include('back/pages/_form.html.twig', {'button_label': 'Update'}) }}
+    {{ include('back/pages/_form.html.twig', {'button_label': 'Modifier'}) }}
 
     <a href="{{ path('app_back_pages_index') }}">back to list</a>
-
-    {{ include('back/pages/_delete_form.html.twig') }}
+    
+    {% if is_granted('ROLE_ADMIN') %}
+        {{ include('back/pages/_delete_form.html.twig') }}
+    {% endif %}
 {% endblock %}

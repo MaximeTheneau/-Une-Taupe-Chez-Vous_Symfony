@@ -8,6 +8,7 @@ use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: PagesRepository::class)]
 #[ApiResource(
@@ -27,7 +28,11 @@ class Pages
     #[Groups(['api_pages_browse', 'api_pages_read'])]
     private ?string $title = null;
 
-    #[ORM\Column(length: 160, nullable: true)]
+    #[ORM\Column( nullable: true)]
+    #[Assert\Length(
+        max: 170,
+        maxMessage: 'rerer {{ limit }} characters',
+    )]
     #[Groups(['api_pages_read'])]
     private ?string $subtitle = null;
 

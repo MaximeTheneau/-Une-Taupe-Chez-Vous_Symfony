@@ -3,6 +3,9 @@
 namespace App\Controller\Back;
 
 use App\Entity\Articles;
+use App\Entity\Category;
+use App\Entity\ListArticles;
+use App\Entity\ParagraphArticles;
 use App\Form\ArticlesType;
 use App\Repository\ArticlesRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -51,34 +54,39 @@ class ArticlesController extends AbstractController
     public function new(Request $request, ArticlesRepository $articlesRepository): Response
     {
         $this->denyAccessUnlessGranted('ROLE_USER');
-        
+
         $article = new Articles();
+
+        $category = new Category();
+        
         $form = $this->createForm(ArticlesType::class, $article);
         $form->handleRequest($request);
-
+        
+        // Category
+        $article->addCategory($category);
+        
         if ($form->isSubmitted() && $form->isValid()) {
+            
 
+            // SLUG
             $slug = $this->slugger->slug($article->getTitle());
             $article->setSlug($slug);
 
             // IMAGE 1
             $this->imageOptimizer->setPicture($form->get('imgPost')->getData(), $article, 'setImgPost', $slug );
 
-            //IMAGE 2
-            if ($form->get('imgPost2')->getData() != null) {
-                $this->imageOptimizer->setPicture($form->get('imgPost2')->getData(), $article, 'setImgPost2', $slug.'-2');
-            }
-
-            // IMAGE 3
-            if ($form->get('imgPost3')->getData() != null) {
-            $this->imageOptimizer->setPicture($form->get('imgPost3')->getData(), $article, 'setImgPost3', $slug.'-3');
-            }
-            
-            // IMAGE 4
-            if ($form->get('imgPost4')->getData() != null) {
-                $this->imageOptimizer->setPicture($form->get('imgPost4')->getData(), $article, 'setImgPost4', $slug.'-4');
-            }
+            // DATE
             $article->setCreatedAt(new DateTime());
+
+            // IMAGE PARAGRAPH
+            $paragraphArticles = $form->get('paragraphArticles')->getData();
+            foreach ($paragraphArticles as $paragraph) {
+                $img = $paragraph->getImgPostParagh(); // get image paragraph
+                $slug = $this->slugger->slug($paragraph->getSubtitle()); // slugify
+                $slug = substr($slug, 0, 30); // 30 max
+                $paragraph->setImgPostParagh($slug); // set slug to image paragraph
+                $this->imageOptimizer->setPicture($img, $article, 'setImgPost', $slug ); // set image paragraph
+            }
 
             $articlesRepository->save($article, true);
 
@@ -116,20 +124,18 @@ class ArticlesController extends AbstractController
                 $this->imageOptimizer->setPicture($form->get('imgPost')->getData(), $article, 'setImgPost', $slug );
             }
 
-            //IMAGE 2
-            if ($form->get('imgPost2')->getData() != null) {
-                $this->imageOptimizer->setPicture($form->get('imgPost2')->getData(), $article, 'setImgPost2', $slug.'-2' );
+            // IMAGE PARAGRAPH
+            $paragraphArticles = $form->get('paragraphArticles')->getData();
+            foreach ($paragraphArticles as $paragraph) {
+                if ($paragraph->getImgPostParagh() != null) {
+                $img = $paragraph->getImgPostParagh(); // get image paragraph
+                $slug = $this->slugger->slug($paragraph->getSubtitle()); // slugify
+                $slug = substr($slug, 0, 30); // 30 max
+                $paragraph->setImgPostParagh($slug); // set slug to image paragraph
+                $this->imageOptimizer->setPicture($img, $article, 'setImgPost', $slug ); // set image paragraph
+                }
             }
 
-            // IMAGE 3
-            if ($form->get('imgPost3')->getData() != null) {
-            $this->imageOptimizer->setPicture($form->get('imgPost3')->getData(), $article, 'setImgPost3', $slug.'-3');
-            }
-
-            // IMAGE 4
-            if ($form->get('imgPost4')->getData() != null) {
-                $this->imageOptimizer->setPicture($form->get('imgPost4')->getData(), $article, 'setImgPost4', $slug.'-4');
-            }
                 
             $articlesRepository->save($article, true);
             
@@ -150,5 +156,13 @@ class ArticlesController extends AbstractController
         }
 
         return $this->redirectToRoute('app_back_articles_index', [], Response::HTTP_SEE_OTHER);
+    }
+
+    /**
+     * @Route("/article/infinite-list", name="article_infinite_list")
+     */
+    public function infiniteList(Request $request): Response
+    {
+        
     }
 }

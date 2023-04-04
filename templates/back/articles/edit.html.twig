@@ -3,11 +3,14 @@
 {% block title %}Edit Articles{% endblock %}
 
 {% block body %}
-    <h1>Edit Articles</h1>
+    <h1>Les Articles</h1>
 
-    {{ include('back/articles/_form.html.twig', {'button_label': 'Update'}) }}
+    {{ include('back/articles/_form.html.twig', {'button_label': 'Sauvegarder'}) }}
+    
 
-    <a href="{{ path('app_back_articles_index') }}">back to list</a>
+    <a href="{{ path('app_back_articles_index') }}" class="button is-light">Retour à la list</a>
 
-    {{ include('back/articles/_delete_form.html.twig') }}
+    {% if is_granted('ROLE_ADMIN') %}
+        {{ include('back/posts/_delete_form.html.twig') }}
+    {% endif %}
 {% endblock %}

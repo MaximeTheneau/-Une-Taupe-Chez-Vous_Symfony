@@ -7,10 +7,8 @@
     <table class="table">
         <thead>
             <tr>
-                <th>Title</th>
-                <th>Subtitle</th>
-                <th>Contenu</th>
-                <th>imgHeader</th>
+                <th>Titre</th>
+                <th>Image</th>
             </tr>
         </thead>
         <tbody>
@@ -18,11 +16,10 @@
             <tr>
                 <td>{{ article.title }}</td>
                 <td>
-                    <img src={{article.imgThumbnail}} alt="imgHeader" width="100px">
+                    <img src={{'https://res.cloudinary.com/dsn2zwbis/image/upload/v1675085410/unetaupechezvous/' ~ article.slug ~ '.webp'}} alt="imgHeader" width="100px">
                 </td>
                 <td>
-                    <a href="{{ path('app_back_articles_show', {'id': article.id}) }}">show</a>
-                    <a href="{{ path('app_back_articles_edit', {'id': article.id}) }}">edit</a>
+                    <a href="{{ path('app_back_articles_edit', {'id': article.id}) }}" class="button is-info">Modifier</a>
                 </td>
             </tr>
         {% else %}
@@ -33,5 +30,5 @@
         </tbody>
     </table>
 
-    <a href="{{ path('app_back_articles_new') }}">Create new</a>
+    <a href="{{ path('app_back_articles_new') }}" class="button is-primary">Nouvelle article</a>
 {% endblock %}

@@ -1,28 +1,25 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Faq index{% endblock %}
+{% block title %}Foire aux questions{% endblock %}
 
 {% block body %}
-    <h1>Faq index</h1>
+    <h1>Foire aux questions</h1>
 
     <table class="table">
         <thead>
             <tr>
-                <th>Id</th>
-                <th>Question</th>
-                <th>Answer</th>
+                <th>Questions</th>
+                <th>Responses</th>
                 <th>actions</th>
             </tr>
         </thead>
         <tbody>
         {% for faq in faqs %}
             <tr>
-                <td>{{ faq.id }}</td>
                 <td>{{ faq.question }}</td>
                 <td>{{ faq.answer }}</td>
                 <td>
-                    <a href="{{ path('app_back_faq_show', {'id': faq.id}) }}">show</a>
-                    <a href="{{ path('app_back_faq_edit', {'id': faq.id}) }}">edit</a>
+                    <a href="{{ path('app_back_faq_edit', {'id': faq.id}) }}" class="button is-info">Modifier</a>
                 </td>
             </tr>
         {% else %}
@@ -33,5 +30,5 @@
         </tbody>
     </table>
 
-    <a href="{{ path('app_back_faq_new') }}">Create new</a>
+    <a href="{{ path('app_back_faq_new') }}"class="button is-primary">Nouvelle Question</a>
 {% endblock %}

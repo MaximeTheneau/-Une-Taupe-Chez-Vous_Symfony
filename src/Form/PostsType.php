@@ -18,50 +18,56 @@ class PostsType extends AbstractType
     {
         $builder
             ->add('title', TextType::class, [
-                'label' => 'Titre du Services *',
+                'label' => 'Titre du Service *',
                 'attr' => [
                     'class' => 'input',
-                    'placeholder' => 'Le titre du Services ne doit pas faire plus de 70 caractère comme le texte ici 70 ...',
+                    'placeholder' => 'Titre du Service',
+                    'maxlength' => '70',
                 ]
             ])
             ->add('contents', TextareaType::class, [
-                'label' => 'Contenu du Services ',
+                'label' => 'Paragraphe du Service *',
                 'required' => false,
                 'attr' => [
                     'class' => 'textarea',
-                    'placeholder' => 'Le contenu est optionnel',
+                    'placeholder' => 'Paragraphe du Service',
+                    'maxlength' => '750',
                 ]
             ])
             ->add('subtitle', TextType::class, [
-                'label' => 'Sous-titre du Services ',
+                'label' => 'Sous-titre du Service ',
                 'required' => false,
                 'attr' => [
+                    'maxlength' => '160',
                     'class' => 'input',
-                    'placeholder' => 'Le sous-titre du Services ne doit pas faire plus de 70 caractère comme le texte ici 70 ...',
+                    'placeholder' => 'Sous-titre du Service',
                 ]
             ])
             ->add('subtitle2', TextType::class, [
-                'label' => 'Sous-titre du Services ',
+                'label' => '2éme sous-titre du Service ',
                 'required' => false,
                 'attr' => [
                     'class' => 'input',
-                    'placeholder' => 'Le sous-titre du Services ne doit pas faire plus de 70 caractère comme le texte ici 70 ...',
+                    'placeholder' => '2éme sous-titre du Service',
+                    'maxlength' => '160',
                 ]
             ])
             ->add('contents2', TextareaType::class, [
-                'label' => 'Contenu du Services 2',
+                'label' => '2éme Paragraphe du Service',
                 'required' => false,
                 'attr' => [
                     'class' => 'textarea',
-                    'placeholder' => 'Le Second contenu est optionnel',
+                    'placeholder' => '2éme Paragraphe du Service',
+                    'maxlength' => '750',
                 ]
             ])
             ->add('contents3', TextareaType::class, [
-                'label' => 'Contenu du Services 2',
+                'label' => '3éme Paragraphe du Service',
                 'required' => false,
                 'attr' => [
                     'class' => 'textarea',
-                    'placeholder' => 'Le Second contenu est optionnel',
+                    'placeholder' => '3éme Paragraphe du Service',
+                    'maxlength' => '750',
                 ]
             ])
             ->add('imgPost', FileType::class, [

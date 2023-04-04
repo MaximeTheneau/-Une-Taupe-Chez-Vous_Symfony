@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Pages index{% endblock %}
+{% block title %}Pages{% endblock %}
 
 {% block body %}
     <h1>Les pages</h1>
@@ -8,10 +8,9 @@
     <table class="table">
         <thead>
             <tr>
-                <th>Title</th>
-                <th>Subtitle</th>
-                <th>Contenu</th>
-                <th>imgHeader</th>
+                <th>Titre</th>
+                <th>Image</th>
+                <th></th>
             </tr>
         </thead>
         <tbody>
@@ -19,11 +18,11 @@
             <tr>
                 <td>{{ page.title }}</td>
                 <td>
-                    <img src={{page.imgHeaderJpg}} alt="imgHeader" width="100px">
+                    <img src={{'https://res.cloudinary.com/dsn2zwbis/image/upload/v1675085410/unetaupechezvous/' ~ page.slug ~ '.webp'}} alt="imgHeader" width="100px">
                 </td>
                 <td>
-                    <a href="{{ path('app_back_pages_show', {'id': page.id}) }}">show</a>
-                    <a href="{{ path('app_back_pages_edit', {'id': page.id}) }}">edit</a>
+
+                    <a href="{{ path('app_back_pages_edit', {'id': page.id}) }}"class="button is-info">Modifier</a>
                 </td>
             </tr>
         {% else %}
@@ -34,5 +33,5 @@
         </tbody>
     </table>
 
-    <a href="{{ path('app_back_pages_new') }}">Create new</a>
+    <a href="{{ path('app_back_pages_new') }}" class="button is-primary">Nouvelle page</a>
 {% endblock %}

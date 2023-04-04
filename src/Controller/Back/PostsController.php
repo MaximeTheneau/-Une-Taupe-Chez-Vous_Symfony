@@ -42,7 +42,6 @@ class PostsController extends AbstractController
     #[Route('/', name: 'app_back_posts_index', methods: ['GET'])]
     public function index(PostsRepository $postsRepository): Response
     {
-        $this->denyAccessUnlessGranted('ROLE_USER');
 
         return $this->render('back/posts/index.html.twig', [
             'posts' => $postsRepository->findLastPosts(),
@@ -52,7 +51,6 @@ class PostsController extends AbstractController
     #[Route('/new', name: 'app_back_posts_new', methods: ['GET', 'POST'])]
     public function new(Request $request, PostsRepository $postsRepository): Response
     {
-        $this->denyAccessUnlessGranted('ROLE_USER');
 
         $post = new Posts();
         $form = $this->createForm(PostsType::class, $post);
@@ -97,7 +95,6 @@ class PostsController extends AbstractController
     #[Route('/{id}', name: 'app_back_posts_show', methods: ['GET'])]
     public function show(Posts $post): Response
     {
-        $this->denyAccessUnlessGranted('ROLE_USER');
 
         $img = json_decode($post->getImgPost(), true);
 
@@ -110,7 +107,6 @@ class PostsController extends AbstractController
     #[Route('/{id}/edit', name: 'app_back_posts_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Posts $post, PostsRepository $postsRepository): Response
     {
-        $this->denyAccessUnlessGranted('ROLE_USER');
 
         $form = $this->createForm(PostsType::class, $post);
         $form->handleRequest($request);
@@ -156,7 +152,6 @@ class PostsController extends AbstractController
     #[Route('/{id}', name: 'app_back_posts_delete', methods: ['POST'])]
     public function delete(Request $request, Posts $post, PostsRepository $postsRepository): Response
     {
-        $this->denyAccessUnlessGranted('ROLE_MANAGER');
 
         if ($this->isCsrfTokenValid('delete'.$post->getId(), $request->request->get('_token'))) {
             $postsRepository->remove($post, true);

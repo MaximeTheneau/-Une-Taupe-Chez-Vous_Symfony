@@ -38,11 +38,26 @@ class ArticlesRepository extends ServiceEntityRepository
             $this->getEntityManager()->flush();
         }
     }
-    
-    public function findLastArticles()
+    public function findAllArticles()
     {
         return $this->createQueryBuilder('r')
             ->orderBy('r.createdAt', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
+    public function findLastArticles()
+    {
+        return $this->createQueryBuilder('r')
+            ->orderBy('r.createdAt', 'ASC')
+            ->setMaxResults(3)
+            ->getQuery()
+            ->getResult();
+    }
+    public function findDescArticles()
+    {
+        return $this->createQueryBuilder('r')
+            ->orderBy('r.createdAt', 'DESC')
+            ->setMaxResults(3)
             ->getQuery()
             ->getResult();
     }

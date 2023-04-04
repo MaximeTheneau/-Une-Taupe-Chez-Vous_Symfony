@@ -107,10 +107,10 @@ class PagesController extends AbstractController
                 $this->imageOptimizer->setThumbnailJpg($form->get('imgHeader')->getData(), $page, 'setImgHeaderJpg', $slug );
             }
 
-            // IMAGE 2
-            if ($form->get('imgHeader2')->getData() != null) {
-                $this->imageOptimizer->setPicture($form->get('imgHeader2')->getData(), $page, 'setImgHeader2', $slug.'-2' );
-            }
+            // // IMAGE 2
+            // if ($form->get('imgHeader2')->getData() != null) {
+            //     $this->imageOptimizer->setPicture($form->get('imgHeader2')->getData(), $page, 'setImgHeader2', $slug.'-2' );
+            // }
 
 
             $pagesRepository->save($page, true);

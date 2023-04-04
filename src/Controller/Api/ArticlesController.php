@@ -25,7 +25,7 @@ class ArticlesController extends ApiController
 
 
     /**
-     * @Route("", name="browse", methods={"GET"})
+     * @Route("/home", name="browse", methods={"GET"})
      */
     public function browse(ArticlesRepository $articlesRepository ): JsonResponse
     {
@@ -40,6 +40,48 @@ class ArticlesController extends ApiController
                 "groups" => 
                 [
                     "api_articles_browse"
+                ]
+            ]
+        );
+    }
+        
+    /**
+     * @Route("/desc", name="desc", methods={"GET"})
+     */
+    public function desc(ArticlesRepository $articlesRepository ): JsonResponse
+    {
+    
+        $allArticles = $articlesRepository->findDescArticles();
+
+        return $this->json(
+            $allArticles,
+            Response::HTTP_OK,
+            [],
+            [
+                "groups" => 
+                [
+                    "api_articles_desc"
+                ]
+            ]
+        );
+    }
+
+    /**
+     * @Route("/all", name="all", methods={"GET"})
+     */
+    public function all(ArticlesRepository $articlesRepository ): JsonResponse
+    {
+    
+        $allArticles = $articlesRepository->findAllArticles();
+
+        return $this->json(
+            $allArticles,
+            Response::HTTP_OK,
+            [],
+            [
+                "groups" => 
+                [
+                    "api_articles_read"
                 ]
             ]
         );

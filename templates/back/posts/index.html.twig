@@ -16,7 +16,7 @@
         {% for post in posts %}
             <tr>
                 <td>{{ post.title }}</td>
-                <td> <img src={{post.imgPost.path}} alt="imgHeader" width="100px"></td>
+                <td> <img src={{'https://res.cloudinary.com/dsn2zwbis/image/upload/v1675085410/unetaupechezvous/' ~ post.slug ~ '.webp'}} alt="imgHeader" width="100px"></td>
                 <td>
                     <a href="{{ path('app_back_posts_edit', {'id': post.id}) }}" class="button is-info">Modifier</a>
                 </td>
@@ -29,5 +29,5 @@
         </tbody>
     </table>
 
-    <a href="{{ path('app_back_posts_new') }}" class="button is-primary">Nouvelle article</a>
+    <a href="{{ path('app_back_posts_new') }}" class="button is-primary">Nouveau service</a>
 {% endblock %}
