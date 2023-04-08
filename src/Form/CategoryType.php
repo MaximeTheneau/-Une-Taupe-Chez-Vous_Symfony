@@ -15,15 +15,8 @@ class CategoryType extends AbstractType
     {
         $builder
             ->add('name')
-            ->add('subcategory', EntityType::class, [
-                'label' => "Sous-catégorie de l'article",
-                'choice_label' => 'name',
-                'class' => Subcategory::class,
-                'required' => false,
-                'expanded' => true,
-                'multiple' => true,
-            ]
-                )
+            ->add('slug')
+            
         ;
     }
 

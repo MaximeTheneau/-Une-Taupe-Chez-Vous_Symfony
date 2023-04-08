@@ -3,9 +3,11 @@
 namespace App\Form;
 
 use App\Entity\Subcategory;
+use App\Entity\Category;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 
 class SubcategoryType extends AbstractType
 {
@@ -13,7 +15,7 @@ class SubcategoryType extends AbstractType
     {
         $builder
             ->add('name')
-            
+            ->add('slug')
         ;
     }
 

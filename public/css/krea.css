@@ -1,3 +1,7 @@
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
+
 @font-face {
     font-family: 'Krea';
     src: url(../fonts/wildy.ttf);
@@ -7,8 +11,6 @@
     src: url(../fonts/shrimp.ttf);
 }
 
-html {
-}
 body {
     font-family: 'text' !important;
 }

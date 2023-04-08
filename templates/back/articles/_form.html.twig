@@ -1,96 +1,97 @@
 {{ form_start(form) }}
-    {{ form_label(form.category) }}
-    {{ form_widget(form.category) }}
 
-    {{ form_label(form.title) }}
-    {{ form_widget(form.title) }}
-    {{ form_label(form.imgPost) }}
-    {{ form_widget(form.imgPost) }}
-    {{ form_label(form.contents) }}
-    {{ form_widget(form.contents) }}
-    {{ form_label(form.paragraphArticles) }}
-
-
-    <ul 
-            class="paragraph"
-            data-index="{{ form.paragraphArticles|length > 0 ? form.paragraphArticles|last.vars.name + 1 : 0 }}"
-            data-prototype="{{ form_widget(form.paragraphArticles.vars.prototype)|e('html_attr') }}"
-        >   
-            {% for tag in form.paragraphArticles %}
-                <li>
-                {{ form_row(tag) }}
-                </li>
-
-            {% endfor %}
-        </ul>
+    <div class="flex form__contents">
+        <nav class="contents__nav md:w-1/4 bg-slate-300	max-h-full h-full">
+            {{ form_row(form.category) }}
+            {{ form_row(form.subcategory) }}
+            {{ form_row(form.subtopic) }}
+    
+                <button
+                type="button"
+                class="button__link bg-white hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 border border-gray-400 rounded shadow" 
+            >   
+                Ajouter un lien
+            </button>
             <button
-            type="button" 
-            class="add_paragraph button is-fullwidth is-link is-outlined"
-            data-collection-holder-class="paragraph"
-        >   
-            Ajouter un paragraphe
-        </button>
+                type="button" 
+                class="button__list  bg-white hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 border border-gray-400 rounded shadow"
+            >   
+            Ajouter une liste
+            </button>
+            <button
+                type="button" 
+                class="button_paragraph bg-white hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 border border-gray-400 rounded shadow"
+                data-collection-holder-class="paragraph"
+            >   
+                Ajouter un paragraphe
+            </button>
+        </nav>
+        <div class="md:w-3/4">
 
-    <br>
-    {% if form.listArticles|length > 0 %}
-    <p style="display:none;"> Liste d'articles </p>
-{% else %}
-    <p > Liste d'articles </p>
+            {{ form_label(form.imgPost) }}
+            {{ form_widget(form.imgPost) }}
+            <div>
+                <p class="button__altImg">Changez le descriptif de l'image</p>
+                {{ form_row(form.altImg, {'attr': {'class': 'altImg hidden'}}) }}
+                {{ form_label(form.title) }}
+                {{ form_widget(form.title) }}
 
-{% endif %}
 
-    <ul 
-        class="tags none"
-        data-index="{{ form.listArticles|length > 0 ? form.listArticles|last.vars.name + 0 : 0 }}"
-        data-prototype="{{ form_widget(form.listArticles.vars.prototype)|e('html_attr') }}"
-    >   
-        {% for tag in form.listArticles %}
-            <li>
-                {{ form_row(tag) }}
-            </li>
+                {{ form_label(form.contents) }}
+                {{ form_widget(form.contents) }}
 
-        {% endfor %}
-    </ul>
-        <button
-        type="button" 
-        class="add_tag_list button is-fullwidth is-link is-outlined"
-        data-collection-holder-class="tags"
-    >   
-        Ajouter une liste
-    </button>
 
-    <br>
-    <div class="link none">
-        {{ form_label(form.links) }}
-        {{ form_widget(form.links) }}
-        {{ form_label(form.textLinks) }}
-        {{ form_widget(form.textLinks) }}
+                <ul 
+                    class="paragraph"
+                    data-index="{{ form.paragraphArticles|length > 0 ? form.paragraphArticles|last.vars.name + 1 : 0 }}"
+                    data-prototype="{{ form_widget(form.paragraphArticles.vars.prototype)|e('html_attr') }}"
+                >   
+                    {% for tag in form.paragraphArticles %}
+                        <li>
+                            {{ form_row(tag) }}
+                        </li>
+                    {% endfor %}
+                </ul>
+
+            </div>
+
+            <ul 
+                class="list hidden"
+                data-index="{{ form.listArticles|length > 0 ? form.listArticles|last.vars.name + 0 : 0 }}"
+                data-prototype="{{ form_widget(form.listArticles.vars.prototype)|e('html_attr') }}"
+            >   
+                {% for tag in form.listArticles %}
+                    <li>
+                        {{ form_row(tag) }}
+                    </li>
+
+                {% endfor %}
+            </ul>
+
+            <div class="link hidden">
+                {{ form_label(form.links) }}
+                {{ form_widget(form.links) }}
+                {{ form_label(form.textLinks) }}
+                {{ form_widget(form.textLinks) }}
+            </div>
+
+
+            <button type="submit" class="button is-primary is-fullwidth">{{ button_label|default('Sauvegarder') }}</button>
+            
+
+        </div>
 
     </div>
-    <button
-        type="button"
-        class="add_link button is-fullwidth is-link is-outlined" 
-    >   
-        Ajouter un lien
-    </button>
-
-    <button type="submit" class="button is-primary is-fullwidth">{{ button_label|default('Sauvegarder') }}</button>
+    
 
 {{ form_end(form) }}
 
 {% block javascripts %}
+    <script src={{asset('js/articles.js')}}></script>
     <script type="text/javascript">
 
-    const addLinkButton = document.querySelector('.add_link');
-    addLinkButton.addEventListener('click', function() {
-        const link = document.querySelector('.link');
-        link.classList.remove('none');
-        const button = document.querySelector('.add_link');
-        console.log(button);
-       button.classList.add('none');
-    });
 
-    const addParagraphButton = document.querySelector('.add_paragraph');
+    const addParagraphButton = document.querySelector('.button_paragraph');
 
     addParagraphButton.addEventListener('click', function() {
     let collectionHolder = document.querySelector('.paragraph');
@@ -108,23 +109,6 @@
     collectionHolder.dataset.index = parseInt(index) + 1;
 });
 
-    const addTagLink = document.querySelector('.add_tag_list');
-        const collectionHolder = document.querySelector('.tags');
-        const prototype = collectionHolder.dataset.prototype;
-        let index = collectionHolder.dataset.index;
-
-    addTagLink.addEventListener('click', function(e) {
-        e.preventDefault();
-        const button = document.querySelector('.tags');
-        addTagLink.textContent = 'Ajouter un element à la liste';
-        console.log(addTagLink.textContent);
-        const ul = document.querySelector('.tags');
-        ul.classList.remove('none');
-        const newForm = prototype.replace(/__name__/g, index);
-        index++;
-        const newLi = document.createElement('li');
-        newLi.innerHTML = newForm;
-        collectionHolder.appendChild(newLi);
-    });
+   
     </script>
 {% endblock %}

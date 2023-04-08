@@ -21,17 +21,16 @@ class Category
     #[Groups(['api_articles_read'])]
     private ?string $name = null;
 
-    #[ORM\ManyToMany(targetEntity: Articles::class, mappedBy: 'category')]
+    #[ORM\Column(length: 70, nullable: true)]
+    #[Groups(['api_articles_read'])]
+    private ?string $slug = null;
+
+    #[ORM\OneToMany(mappedBy: 'category', targetEntity: Articles::class)]
     private Collection $articles;
-
-    #[ORM\ManyToMany(targetEntity: Subcategory::class, inversedBy: 'categories')]
-    private Collection $subcategory;
-
 
     public function __construct()
     {
         $this->articles = new ArrayCollection();
-        $this->subcategory = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -51,6 +50,18 @@ class Category
         return $this;
     }
 
+    public function getSlug(): ?string
+    {
+        return $this->slug;
+    }
+
+    public function setSlug(?string $slug): self
+    {
+        $this->slug = $slug;
+
+        return $this;
+    }
+
     /**
      * @return Collection<int, Articles>
      */
@@ -63,7 +74,7 @@ class Category
     {
         if (!$this->articles->contains($article)) {
             $this->articles->add($article);
-            $article->addCategory($this);
+            $article->setCategory($this);
         }
 
         return $this;
@@ -72,34 +83,12 @@ class Category
     public function removeArticle(Articles $article): self
     {
         if ($this->articles->removeElement($article)) {
-            $article->removeCategory($this);
+            // set the owning side to null (unless already changed)
+            if ($article->getCategory() === $this) {
+                $article->setCategory(null);
+            }
         }
 
         return $this;
     }
-
-    /**
-     * @return Collection<int, Subcategory>
-     */
-    public function getSubcategory(): Collection
-    {
-        return $this->subcategory;
-    }
-
-    public function addSubcategory(Subcategory $subcategory): self
-    {
-        if (!$this->subcategory->contains($subcategory)) {
-            $this->subcategory->add($subcategory);
-        }
-
-        return $this;
-    }
-
-    public function removeSubcategory(Subcategory $subcategory): self
-    {
-        $this->subcategory->removeElement($subcategory);
-
-        return $this;
-    }
-
 }

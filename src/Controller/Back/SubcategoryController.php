@@ -9,10 +9,20 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\String\Slugger\SluggerInterface;
 
 #[Route('/subcategory')]
 class SubcategoryController extends AbstractController
 {
+    private $slugger;
+
+    public function __construct(
+        SluggerInterface $slugger,
+    )
+    {
+        $this->slugger = $slugger;
+    }
+    
     #[Route('/', name: 'app_back_subcategory_index', methods: ['GET'])]
     public function index(SubcategoryRepository $subcategoryRepository): Response
     {
@@ -29,6 +39,13 @@ class SubcategoryController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+
+            // Create slug 
+            if(empty($subcategory->getSlug())) {
+                $slug = $this->slugger->slug($subcategory->getName());
+                $subcategory->setSlug($slug);
+            }
+
             $subcategoryRepository->save($subcategory, true);
 
             return $this->redirectToRoute('app_back_subcategory_index', [], Response::HTTP_SEE_OTHER);
@@ -55,6 +72,19 @@ class SubcategoryController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            
+            // Create slug 
+            if( $subcategory->getName() !== $form->get('name')->getData() ) {
+                $slug = $this->slugger->slug($subcategory->getName());
+                $subcategory->setSlug($slug);
+            } 
+            // Empty slug
+            if(empty($subcategory->getSlug())) {
+                $slug = $this->slugger->slug($subcategory->getName());
+                $subcategory->setSlug($slug);
+            }
+
+
             $subcategoryRepository->save($subcategory, true);
 
             return $this->redirectToRoute('app_back_subcategory_index', [], Response::HTTP_SEE_OTHER);

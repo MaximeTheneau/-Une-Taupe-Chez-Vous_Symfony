@@ -47,10 +47,9 @@ class ImageOptimizer
             $this->uploadApi = new UploadApi();
     }
 
-    public function setPicture( $brochureFile, $post, $setName, $slug ): void
+    public function setPicture( $brochureFile, $slug ): void
     {   
         // Save Local File
-
         $img = $this->imagine->open($brochureFile)
             ->thumbnail(new Box(1000, 1000))
             ->save($this->photoDir.$slug.'.webp', ['webp_quality' => 80]);

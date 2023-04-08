@@ -27,7 +27,7 @@ class Articles
     #[Groups(['api_articles_browse', 'api_articles_read', 'api_articles_desc' ])]
     private ?string $title = null;
     
-    #[ORM\Column(length: 255, unique: true, type: Types::STRING)]
+    #[ORM\Column(length: 70, unique: true, type: Types::STRING)]
     #[Groups(['api_articles_browse', 'api_articles_read', 'api_articles_desc'])]
     private ?string $slug = null;
 
@@ -59,27 +59,30 @@ class Articles
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $textLinks = null;
 
-    #[ORM\ManyToMany(targetEntity: Category::class, inversedBy: 'articles')]
+    #[ORM\ManyToOne(inversedBy: 'articles')]
     #[Groups(['api_articles_read'])]
-    private Collection $category;
-    private $newCategory;
+    private ?Category $category = null;
 
-    public function getNewCategory(): ?string
-    {
-        return $this->newCategory;
-    }
-    
-    public function setNewCategory(?string $newCategory): self
-    {
-        $this->newCategory = $newCategory;
-    
-        return $this;
-    }
+    #[ORM\ManyToMany(targetEntity: Subcategory::class, inversedBy: 'articles')]
+    #[Groups(['api_articles_read'])]
+    private Collection $subcategory;
+
+    #[ORM\ManyToMany(targetEntity: Subtopic::class, inversedBy: 'articles')]
+    #[Groups(['api_articles_read'])]
+    private Collection $subtopic;
+
+    #[ORM\Column(length: 125, nullable: true)]
+    private ?string $altImg = null;
+
+    #[ORM\Column(length: 500, nullable: true)]
+    private ?string $imgPost = null;
+
     public function __construct()
     {
         $this->listArticles = new ArrayCollection();
         $this->paragraphArticles = new ArrayCollection();
-        $this->category = new ArrayCollection();
+        $this->subcategory = new ArrayCollection();
+        $this->subtopic = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -233,26 +236,86 @@ class Articles
         return $this;
     }
 
-    /**
-     * @return Collection<int, Category>
-     */
-    public function getCategory(): Collection
+    public function getCategory(): ?Category
     {
         return $this->category;
     }
 
-    public function addCategory(Category $category): self
+    public function setCategory(?Category $category): self
     {
-        if (!$this->category->contains($category)) {
-            $this->category->add($category);
+        $this->category = $category;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Subcategory>
+     */
+    public function getSubcategory(): Collection
+    {
+        return $this->subcategory;
+    }
+
+    public function addSubcategory(Subcategory $subcategory): self
+    {
+        if (!$this->subcategory->contains($subcategory)) {
+            $this->subcategory->add($subcategory);
         }
 
         return $this;
     }
 
-    public function removeCategory(Category $category): self
+    public function removeSubcategory(Subcategory $subcategory): self
     {
-        $this->category->removeElement($category);
+        $this->subcategory->removeElement($subcategory);
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Subtopic>
+     */
+    public function getSubtopic(): Collection
+    {
+        return $this->subtopic;
+    }
+
+    public function addSubtopic(Subtopic $subtopic): self
+    {
+        if (!$this->subtopic->contains($subtopic)) {
+            $this->subtopic->add($subtopic);
+        }
+
+        return $this;
+    }
+
+    public function removeSubtopic(Subtopic $subtopic): self
+    {
+        $this->subtopic->removeElement($subtopic);
+
+        return $this;
+    }
+
+    public function getAltImg(): ?string
+    {
+        return $this->altImg;
+    }
+
+    public function setAltImg(?string $altImg): self
+    {
+        $this->altImg = $altImg;
+
+        return $this;
+    }
+
+    public function getImgPost(): ?string
+    {
+        return $this->imgPost;
+    }
+
+    public function setImgPost(?string $imgPost): self
+    {
+        $this->imgPost = $imgPost;
 
         return $this;
     }

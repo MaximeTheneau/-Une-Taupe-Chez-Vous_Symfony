@@ -9,7 +9,6 @@
         "ext-iconv": "*",
         "api-platform/core": "^3.0",
         "cloudinary/cloudinary_php": "^2.10",
-        "doctrine/annotations": "^2.0",
         "doctrine/doctrine-bundle": "^2.8",
         "doctrine/doctrine-migrations-bundle": "^3.0",
         "doctrine/orm": "^2.14",
@@ -35,6 +34,8 @@
         "symfony/serializer": "6.2.*",
         "symfony/twig-bundle": "6.2.*",
         "symfony/validator": "6.2.*",
+        "symfony/var-dumper": "6.2.*",
+        "symfony/webpack-encore-bundle": "^1.16",
         "symfony/yaml": "6.2.*",
         "twig/twig": "^3.5"
     },
@@ -86,7 +87,6 @@
         }
     },
     "require-dev": {
-        "doctrine/annotations": "^1.13",
         "doctrine/doctrine-fixtures-bundle": "^3.4",
         "symfony/maker-bundle": "^1.48"
     }

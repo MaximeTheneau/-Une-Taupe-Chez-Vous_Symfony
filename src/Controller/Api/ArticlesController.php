@@ -3,6 +3,7 @@
 namespace App\Controller\Api;
 
 use App\Entity\Articles;
+use App\Entity\Category;
 use App\Repository\ArticlesRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -40,6 +41,27 @@ class ArticlesController extends ApiController
                 "groups" => 
                 [
                     "api_articles_browse"
+                ]
+            ]
+        );
+    }
+
+    /**
+     * @Route("/{name}", name="", methods={"GET"})
+     */
+    public function category(ArticlesRepository $articlesRepository, Category $category): JsonResponse
+    {
+        $articles = $articlesRepository->findBy(['category' => $category]);
+
+        return $this->json(
+            $articles,
+            Response::HTTP_OK,
+            [],
+            [
+                "groups" => 
+                [
+                    "api_articles_browse"
+
                 ]
             ]
         );

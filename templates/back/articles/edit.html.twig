@@ -3,14 +3,18 @@
 {% block title %}Edit Articles{% endblock %}
 
 {% block body %}
-    <h1>Les Articles</h1>
+
+    <img src={{'https://res.cloudinary.com/dsn2zwbis/image/upload/unetaupechezvous/' ~ article.imgPost ~ '.webp'}} alt="imgHeader" >    
 
     {{ include('back/articles/_form.html.twig', {'button_label': 'Sauvegarder'}) }}
     
 
+    <form method="post" action="{{ path('app_back_articles_delete', {'id': article.id}) }}" onsubmit="return confirm('Are you sure you want to delete this item?');">
+        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ article.id) }}">
+        <button class="btn">Delete</button>
+    </form>
+    
     <a href="{{ path('app_back_articles_index') }}" class="button is-light">Retour à la list</a>
 
-    {% if is_granted('ROLE_ADMIN') %}
-        {{ include('back/posts/_delete_form.html.twig') }}
-    {% endif %}
+
 {% endblock %}

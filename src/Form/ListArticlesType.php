@@ -22,7 +22,7 @@ class ListArticlesType extends AbstractType
     {
         $builder
             ->add('title', TextType::class, [
-                'label' => 'Titre de la liste',
+                'label' => 'Titre',
                 'required' => false,
                 'attr' => [
                     'class' => 'input',
@@ -31,7 +31,7 @@ class ListArticlesType extends AbstractType
                 ]
             ])
             ->add('description', TextareaType::class, [
-                'label' => 'Description de la liste',
+                'label' => 'Description',
                 'required' => false,
                 'attr' => [
                     'class' => 'textarea',
