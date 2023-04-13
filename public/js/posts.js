@@ -1,7 +1,6 @@
 
 toggleDivWithButton('.button__altImg', '.altImg');
 toggleDivWithButton('.button__link', '.link');
-toggleDivWithButton('.button__list', '.list');
 
 function toggleDivWithButton(buttonId, divId) {
     const button = document.querySelector(buttonId);

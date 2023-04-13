@@ -2,7 +2,7 @@
 
 namespace App\Form;
 
-use App\Entity\ListArticles;
+use App\Entity\ListPosts;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -16,7 +16,7 @@ use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 
 
 
-class ListArticlesType extends AbstractType
+class ListPostsType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
@@ -25,7 +25,7 @@ class ListArticlesType extends AbstractType
                 'label' => 'Titre',
                 'required' => false,
                 'attr' => [
-                    'class' => 'input',
+                    'class' => 'block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500',
                     'placeholder' => 'max 170 caractères',
                     'maxlength' => '170',
                 ]
@@ -34,7 +34,7 @@ class ListArticlesType extends AbstractType
                 'label' => 'Description',
                 'required' => false,
                 'attr' => [
-                    'class' => 'textarea',
+                    'class' => 'block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500',
                     'placeholder' => 'max 5000 caractères',
                     'maxlength' => '5000',
                 ]
@@ -47,7 +47,7 @@ class ListArticlesType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'data_class' => ListArticles::class,
+            'data_class' => ListPosts::class,
         ]);
     }
 }

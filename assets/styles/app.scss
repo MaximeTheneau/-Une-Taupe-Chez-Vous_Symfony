@@ -13,17 +13,25 @@
   font-weight: normal;
   font-style: normal;
 }
-.form__contents{
+
+.body{
   font-family: 'principal';
+}
+
+.form__contents{
   & nav{
     & button, label{
       font-size: 1rem;
     }
   }
 }
-
-body {
-  font-family: 'principal';
+.pages__form {
+  & img{
+    max-width: 70%;
+    max-height: 50vh;
+    object-fit: contain;
+    margin: 0 auto;
+  }
 }
 
 input,
@@ -50,14 +58,7 @@ input[type="checkbox"] {
   width: 10%;
 }
 
-label {
-  font-size: 1.5rem;
-  padding: 0.5rem !important;
-}
 
-body {
-  font-family: 'text' !important;
-}
 .krea, 
 h1 {
   font-size: 3rem;
@@ -79,10 +80,7 @@ nav a.button.is-primary {
   width: 100%;
   margin: 0;
 }
-label{
-  font-size: 1.5rem;
-  padding: 1rem;
-}
+
 .card-krea{
   font-family: 'krea';
   font-size: 1.5rem;
@@ -104,4 +102,7 @@ label{
 
 .none{
   display: none !important;
+}
+#posts_category {
+  width: 100%;
 }

@@ -18,19 +18,20 @@ class Category
     private ?int $id = null;
 
     #[ORM\Column(length: 70, nullable: true)]
-    #[Groups(['api_articles_read'])]
+    #[Groups(['api_posts_read', 'api_posts_category'])]
     private ?string $name = null;
 
     #[ORM\Column(length: 70, nullable: true)]
-    #[Groups(['api_articles_read'])]
+    #[Groups(['api_posts_read', 'api_posts_category'])]
     private ?string $slug = null;
 
-    #[ORM\OneToMany(mappedBy: 'category', targetEntity: Articles::class)]
-    private Collection $articles;
+    #[ORM\OneToMany(mappedBy: 'category', targetEntity: Posts::class)]
+    private Collection $posts;
+
 
     public function __construct()
     {
-        $this->articles = new ArrayCollection();
+        $this->posts = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -63,32 +64,33 @@ class Category
     }
 
     /**
-     * @return Collection<int, Articles>
+     * @return Collection<int, Posts>
      */
-    public function getArticles(): Collection
+    public function getPosts(): Collection
     {
-        return $this->articles;
+        return $this->posts;
     }
 
-    public function addArticle(Articles $article): self
+    public function addPost(Posts $post): self
     {
-        if (!$this->articles->contains($article)) {
-            $this->articles->add($article);
-            $article->setCategory($this);
+        if (!$this->posts->contains($post)) {
+            $this->posts->add($post);
+            $post->setCategory($this);
         }
 
         return $this;
     }
 
-    public function removeArticle(Articles $article): self
+    public function removeArticle(Posts $post): self
     {
-        if ($this->articles->removeElement($article)) {
+        if ($this->posts->removeElement($post)) {
             // set the owning side to null (unless already changed)
-            if ($article->getCategory() === $this) {
-                $article->setCategory(null);
+            if ($post->getCategory() === $this) {
+                $post->setCategory(null);
             }
         }
 
         return $this;
     }
+
 }

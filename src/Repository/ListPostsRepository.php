@@ -2,26 +2,26 @@
 
 namespace App\Repository;
 
-use App\Entity\ListArticles;
+use App\Entity\ListPosts;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<ListArticles>
+ * @extends ServiceEntityRepository<ListPosts>
  *
- * @method ListArticles|null find($id, $lockMode = null, $lockVersion = null)
- * @method ListArticles|null findOneBy(array $criteria, array $orderBy = null)
- * @method ListArticles[]    findAll()
- * @method ListArticles[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method ListPosts|null find($id, $lockMode = null, $lockVersion = null)
+ * @method ListPosts|null findOneBy(array $criteria, array $orderBy = null)
+ * @method ListPosts[]    findAll()
+ * @method ListPosts[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class ListArticlesRepository extends ServiceEntityRepository
+class ListPostsRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, ListArticles::class);
+        parent::__construct($registry, ListPosts::class);
     }
 
-    public function save(ListArticles $entity, bool $flush = false): void
+    public function save(ListPosts $entity, bool $flush = false): void
     {
         $this->getEntityManager()->persist($entity);
 
@@ -30,7 +30,7 @@ class ListArticlesRepository extends ServiceEntityRepository
         }
     }
 
-    public function remove(ListArticles $entity, bool $flush = false): void
+    public function remove(ListPosts $entity, bool $flush = false): void
     {
         $this->getEntityManager()->remove($entity);
 
@@ -40,7 +40,7 @@ class ListArticlesRepository extends ServiceEntityRepository
     }
 
 //    /**
-//     * @return ListArticles[] Returns an array of ListArticles objects
+//     * @return ListPosts[] Returns an array of ListPosts objects
 //     */
 //    public function findByExampleField($value): array
 //    {
@@ -54,7 +54,7 @@ class ListArticlesRepository extends ServiceEntityRepository
 //        ;
 //    }
 
-//    public function findOneBySomeField($value): ?ListArticles
+//    public function findOneBySomeField($value): ?ListPosts
 //    {
 //        return $this->createQueryBuilder('l')
 //            ->andWhere('l.exampleField = :val')

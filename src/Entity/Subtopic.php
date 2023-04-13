@@ -17,15 +17,15 @@ class Subtopic
     private ?int $id = null;
 
     #[ORM\Column(length: 70)]
-    #[Groups(['api_articles_read'])]
+    #[Groups(['api_posts_read'])]
     private ?string $name = null;
 
     #[ORM\Column(length: 70, nullable: true)]
-    #[Groups(['api_articles_read'])]
+    #[Groups(['api_posts_read'])]
     private ?string $slug = null;
 
-    #[ORM\ManyToMany(targetEntity: Articles::class, mappedBy: 'subtopic')]
-    private Collection $articles;
+    #[ORM\ManyToMany(targetEntity: Posts::class, mappedBy: 'subtopic')]
+    private Collection $posts;
 
     public function __construct()
     {
@@ -62,27 +62,27 @@ class Subtopic
     }
 
     /**
-     * @return Collection<int, Articles>
+     * @return Collection<int, Posts>
      */
-    public function getArticles(): Collection
+    public function getPosts(): Collection
     {
         return $this->articles;
     }
 
-    public function addArticle(Articles $article): self
+    public function addPost(Posts $post): self
     {
-        if (!$this->articles->contains($article)) {
-            $this->articles->add($article);
-            $article->addSubtopic($this);
+        if (!$this->articles->contains($post)) {
+            $this->articles->add($post);
+            $post->addSubtopic($this);
         }
 
         return $this;
     }
 
-    public function removeArticle(Articles $article): self
+    public function removeArticle(Posts $post): self
     {
-        if ($this->articles->removeElement($article)) {
-            $article->removeSubtopic($this);
+        if ($this->articles->removeElement($post)) {
+            $post->removeSubtopic($this);
         }
 
         return $this;

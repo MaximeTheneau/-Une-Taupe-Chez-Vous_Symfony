@@ -3,13 +3,16 @@
 {% block title %}Edit Posts{% endblock %}
 
 {% block body %}
-    <h1>Modifier l'article</h1>
-        
+
+       
+
     {{ include('back/posts/_form.html.twig', {'button_label': 'Sauvegarder'}) }}
+    
 
-    <a href="{{ path('app_back_posts_index') }}" class="button is-light">Retour à la liste</a>
+    <form method="post" action="{{ path('app_back_posts_delete', {'id': post.id}) }}" onsubmit="return confirm('Are you sure you want to delete this item?');">
+        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ post.id) }}">
+        <button class="btn">Supprimer</button>
+    </form>
+    
 
-    {% if is_granted('ROLE_ADMIN') %}
-        {{ include('back/posts/_delete_form.html.twig') }}
-    {% endif %}
 {% endblock %}

@@ -2,28 +2,29 @@
 
 namespace App\Entity;
 
-use App\Repository\ListArticlesRepository;
+use App\Repository\ListPostsRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
-#[ORM\Entity(repositoryClass: ListArticlesRepository::class)]
+#[ORM\Entity(repositoryClass: ListPostsRepository::class)]
 #[ApiResource]
-class ListArticles
+class ListPosts
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['api_posts_read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 170, nullable: true)]
-    #[Groups(['api_articles_read'])]
+    #[Groups(['api_posts_read'])]
     private ?string $title = null;
 
-    #[ORM\ManyToOne(inversedBy: 'ListArticles')]
-    private ?Articles $articles = null;
+    #[ORM\ManyToOne(inversedBy: 'ListPosts')]
+    private ?Posts $posts = null;
 
-    #[ORM\Column(length: 750, nullable: true)]
-    #[Groups(['api_articles_read'])]
+    #[ORM\Column(length: 5000, nullable: true)]
+    #[Groups(['api_posts_read'])]
     private ?string $description = null;
 
     public function getId(): ?int
@@ -43,14 +44,14 @@ class ListArticles
         return $this;
     }
 
-    public function getArticles(): ?Articles
+    public function getPosts(): ?Posts
     {
-        return $this->articles;
+        return $this->posts;
     }
 
-    public function setArticles(?Articles $articles): self
+    public function setPosts(?Posts $posts): self
     {
-        $this->articles = $articles;
+        $this->posts = $posts;
 
         return $this;
     }

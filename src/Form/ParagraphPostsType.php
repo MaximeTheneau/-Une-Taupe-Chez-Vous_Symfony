@@ -2,7 +2,7 @@
 
 namespace App\Form;
 
-use App\Entity\ParagraphArticles;
+use App\Entity\ParagraphPosts;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -16,7 +16,7 @@ use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 
 
 
-class ParagraphArticlesType extends AbstractType
+class ParagraphPostsType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
@@ -28,7 +28,7 @@ class ParagraphArticlesType extends AbstractType
                 'mapped' => true,
                 'attr' => [
                     'placeholder' => 'max 5Mo',
-                    'class' => 'input',
+                    'class' => 'block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500',
                 ],
                 'constraints' => [
                     new File([
@@ -46,7 +46,7 @@ class ParagraphArticlesType extends AbstractType
             'label' => 'Sous-titre',
             'required' => true,
             'attr' => [
-                'class' => 'input',
+                'class' => 'block p-2.5 w-full text-lg text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500',
                 'placeholder' => 'Sous-titre du paragraphe (max 170 caractères)',
                 'maxlength' => '170',
                 ]
@@ -54,9 +54,11 @@ class ParagraphArticlesType extends AbstractType
             ->add('paragraph', TextareaType::class, [
                 'label' => 'Paragraphe',
                 'attr' => [
-                    'class' => 'textarea',
+                    'class' => 'block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500',
                     'placeholder' => 'Paragraphe de l\'article (max 5000 caractères)',
                     'maxlength' => '5000',
+                    'rows' => '4',
+                    
                     ]
             ])
 
@@ -68,7 +70,7 @@ class ParagraphArticlesType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'data_class' => ParagraphArticles::class,
+            'data_class' => ParagraphPosts::class,
         ]);
     }
 }

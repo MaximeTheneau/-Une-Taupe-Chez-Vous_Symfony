@@ -2,26 +2,26 @@
 
 namespace App\Repository;
 
-use App\Entity\Pages;
+use App\Entity\ParagraphPosts;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<Pages>
+ * @extends ServiceEntityRepository<ParagraphPosts>
  *
- * @method Pages|null find($id, $lockMode = null, $lockVersion = null)
- * @method Pages|null findOneBy(array $criteria, array $orderBy = null)
- * @method Pages[]    findAll()
- * @method Pages[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method ParagraphPosts|null find($id, $lockMode = null, $lockVersion = null)
+ * @method ParagraphPosts|null findOneBy(array $criteria, array $orderBy = null)
+ * @method ParagraphPosts[]    findAll()
+ * @method ParagraphPosts[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class PagesRepository extends ServiceEntityRepository
+class ParagraphPostsRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, Pages::class);
+        parent::__construct($registry, ParagraphPosts::class);
     }
 
-    public function save(Pages $entity, bool $flush = false): void
+    public function save(ParagraphPosts $entity, bool $flush = false): void
     {
         $this->getEntityManager()->persist($entity);
 
@@ -30,7 +30,7 @@ class PagesRepository extends ServiceEntityRepository
         }
     }
 
-    public function remove(Pages $entity, bool $flush = false): void
+    public function remove(ParagraphPosts $entity, bool $flush = false): void
     {
         $this->getEntityManager()->remove($entity);
 
@@ -40,7 +40,7 @@ class PagesRepository extends ServiceEntityRepository
     }
 
 //    /**
-//     * @return Pages[] Returns an array of Pages objects
+//     * @return ParagraphPosts[] Returns an array of ParagraphPosts objects
 //     */
 //    public function findByExampleField($value): array
 //    {
@@ -54,7 +54,7 @@ class PagesRepository extends ServiceEntityRepository
 //        ;
 //    }
 
-//    public function findOneBySomeField($value): ?Pages
+//    public function findOneBySomeField($value): ?ParagraphPosts
 //    {
 //        return $this->createQueryBuilder('p')
 //            ->andWhere('p.exampleField = :val')

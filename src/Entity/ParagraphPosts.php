@@ -2,13 +2,13 @@
 
 namespace App\Entity;
 
-use App\Repository\ParagraphArticlesRepository;
+use App\Repository\ParagraphPostsRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 
-#[ORM\Entity(repositoryClass: ParagraphArticlesRepository::class)]
-class ParagraphArticles
+#[ORM\Entity(repositoryClass: ParagraphPostsRepository::class)]
+class ParagraphPosts
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -16,18 +16,18 @@ class ParagraphArticles
     private ?int $id = null;
 
     #[ORM\Column(length: 170, nullable: true)]
-    #[Groups(['api_articles_read'])]
+    #[Groups(['api_posts_read'])]
     private ?string $subtitle = null;
 
     #[ORM\Column(length: 5000, nullable: true)]
-    #[Groups(['api_articles_read'])]
+    #[Groups(['api_posts_read'])]
     private ?string $paragraph = null;
 
-    #[ORM\ManyToOne(inversedBy: 'paragraphArticles')]
-    private ?Articles $articles = null;
+    #[ORM\ManyToOne(inversedBy: 'paragraphPosts')]
+    private ?Posts $posts = null;
 
     #[ORM\Column(length: 500, nullable: true)]
-    #[Groups(['api_articles_read'])]
+    #[Groups(['api_posts_read'])]
     private ?string $imgPostParagh = null;
 
     public function getId(): ?int
@@ -59,14 +59,14 @@ class ParagraphArticles
         return $this;
     }
 
-    public function getArticles(): ?Articles
+    public function getPosts(): ?Posts
     {
-        return $this->articles;
+        return $this->posts;
     }
 
-    public function setArticles(?Articles $articles): self
+    public function setPosts(?Posts $posts): self
     {
-        $this->articles = $articles;
+        $this->posts = $posts;
 
         return $this;
     }

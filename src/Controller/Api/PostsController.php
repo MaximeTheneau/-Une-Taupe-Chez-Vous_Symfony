@@ -3,6 +3,8 @@
 namespace App\Controller\Api;
 
 use App\Entity\Posts;
+use App\Entity\Category;
+use App\Entity\Subcategory;
 use App\Repository\PostsRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -25,12 +27,12 @@ class PostsController extends ApiController
 
 
     /**
-     * @Route("", name="browse", methods={"GET"})
+     * @Route("/home", name="browse", methods={"GET"})
      */
     public function browse(PostsRepository $postsRepository ): JsonResponse
     {
     
-        $allPosts = $postsRepository->findAll();
+        $allPosts = $postsRepository->findLastPosts();
 
         return $this->json(
             $allPosts,
@@ -39,23 +41,139 @@ class PostsController extends ApiController
             [
                 "groups" => 
                 [
-                    "api_posts_browse"
+                    "api_posts__browse"
                 ]
             ]
         );
     }
 
     /**
-     * @Route("/thumbnail", name="thumbnail", methods={"GET"})
+     * @Route("&category={name}", name="articles", methods={"GET"})
      */
-    public function thumbnail(PostsRepository $postsRepository ): JsonResponse
+    public function category(PostsRepository $postsRepository, Category $category): JsonResponse
+    {
+        $posts = $postsRepository->findBy(['category' => $category]);
+
+        return $this->json(
+            $posts,
+            Response::HTTP_OK,
+            [],
+            [
+                "groups" => 
+                [
+                    "api_posts_category"
+
+                ]
+            ]
+        );
+    }
+
+    /**
+     * @Route("&subcategory={slug}", name="subcategory", methods={"GET"})
+     */
+    public function subcategory(PostsRepository $postsRepository, Subcategory $subcategory): JsonResponse
+    {
+        $posts = $postsRepository->findBy(['subcategory' => $subcategory]);
+
+        return $this->json(
+            $posts,
+            Response::HTTP_OK,
+            [],
+            [
+                "groups" => 
+                [
+                    "api_posts_subcategory"
+
+                ]
+            ]
+        );
+    }
+
+    /**
+    * @Route("&limit=3&category={name}", name="", methods={"GET"})
+    */
+    public function limit(PostsRepository $postsRepository, Category $category): JsonResponse
+    {
+        $posts = $postsRepository->findBy(['category' => $category], ['createdAt' => 'DESC'], 3);
+
+
+        return $this->json(
+            $posts,
+            Response::HTTP_OK,
+            [],
+            [
+                "groups" => 
+                [
+                    "api_posts_browse"
+
+                ]
+            ]
+        );
+    }
+        
+    /**
+     * @Route("&limit=3&filter=desc&category={name}", name="desc", methods={"GET"})
+     */
+    public function desc(PostsRepository $postsRepository, Category $category ): JsonResponse
     {
     
-        $allPosts = $postsRepository->findLastPosts();
-        #dd($allPages);
+        $allPosts = $postsRepository->findBy(['category' => $category], ['createdAt' => 'DESC'], 3);
 
         return $this->json(
             $allPosts,
+            Response::HTTP_OK,
+            [],
+            [
+                "groups" => 
+                [
+                    "api_posts_desc"
+                ]
+            ]
+        );
+    }
+
+    /**
+     * @Route("/all", name="all", methods={"GET"})
+     */
+    public function all(PostsRepository $postsRepository ): JsonResponse
+    {
+    
+        $allPosts = $postsRepository->findAllPosts();
+
+        return $this->json(
+            $allPosts,
+            Response::HTTP_OK,
+            [],
+            [
+                "groups" => 
+                [
+                    "api_posts_read"
+                ]
+            ]
+        );
+    }
+
+    /**
+     * @Route("/thumbnail/{slug}", name="thumbnail", methods={"GET"})
+     */
+    public function thumbnail(PostsRepository $postsRepository, Posts $posts = null ): JsonResponse
+    {
+    
+        if ($posts === null)
+        {
+            // on renvoie donc une 404
+            return $this->json(
+                [
+                    "erreur" => "Page non trouvée",
+                    "code_error" => 404
+                ],
+                Response::HTTP_NOT_FOUND,// 404
+            );
+        }
+        #dd($allPages);
+
+        return $this->json(
+            $posts,
             Response::HTTP_OK,
             [],
             [
@@ -86,13 +204,9 @@ class PostsController extends ApiController
 
         return $this->json(
             $posts,
-            // code HTTP pour dire que tout se passe bien (200) 
             Response::HTTP_OK,
-            // les entêtes HTTP, on les utilise dans très peu de cas, donc valeur par défaut : []
             [],
-            // le contexte, on l'utilise pour spécifier les groupes de serialisation
             [
-                // je lui donne le/les noms de groupes de serialisation
                 "groups" => 
                 [
                     "api_posts_read"

@@ -17,19 +17,20 @@ class Subcategory
     private ?int $id = null;
 
     #[ORM\Column(length: 70, nullable: true)]
-    #[Groups(['api_articles_read'])]
+    #[Groups(['api_posts_category', 'api_posts_browse', 'api_posts_desc', 'api_posts_subcategory', 'api_posts_read'])]
     private ?string $name = null;
 
     #[ORM\Column(length: 70, nullable: true)]
-    #[Groups(['api_articles_read'])]
+    #[Groups(['api_posts_category', 'api_posts_browse', 'api_posts_desc', 'api_posts_subcategory', 'api_posts_read'])]
     private ?string $slug = null;
 
-    #[ORM\ManyToMany(targetEntity: Articles::class, mappedBy: 'subcategory')]
-    private Collection $articles;
+    #[ORM\OneToMany(mappedBy: 'subcategory', targetEntity: Posts::class)]
+    private Collection $posts;
 
     public function __construct()
     {
         $this->articles = new ArrayCollection();
+        $this->posts = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -61,28 +62,47 @@ class Subcategory
         return $this;
     }
 
-    /**
-     * @return Collection<int, Articles>
-     */
-    public function getArticles(): Collection
+    public function getCategory(): ?Category
     {
-        return $this->articles;
+        return $this->category;
     }
 
-    public function addArticle(Articles $article): self
+    public function setCategory(?Category $category): self
     {
-        if (!$this->articles->contains($article)) {
-            $this->articles->add($article);
-            $article->addSubcategory($this);
+        $this->category = $category;
+
+        return $this;
+    }
+
+    public function getPosts(): ?Posts
+    {
+        return $this->posts;
+    }
+
+    public function setPosts(?Posts $posts): self
+    {
+        $this->posts = $posts;
+
+        return $this;
+    }
+
+    public function addPost(Posts $post): self
+    {
+        if (!$this->posts->contains($post)) {
+            $this->posts->add($post);
+            $post->setSubcategory($this);
         }
 
         return $this;
     }
 
-    public function removeArticle(Articles $article): self
+    public function removePost(Posts $post): self
     {
-        if ($this->articles->removeElement($article)) {
-            $article->removeSubcategory($this);
+        if ($this->posts->removeElement($post)) {
+            // set the owning side to null (unless already changed)
+            if ($post->getSubcategory() === $this) {
+                $post->setSubcategory(null);
+            }
         }
 
         return $this;

@@ -5,54 +5,37 @@ namespace App\Entity;
 use App\Repository\PostsRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 use Symfony\Component\Serializer\Annotation\Groups;
 use ApiPlatform\Doctrine\Orm\Filter\DateFilter;
 
+
 #[ORM\Entity(repositoryClass: PostsRepository::class)]
-#[ApiResource]
 class Posts
 {
-
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['api_posts_browse', 'api_posts_read', 'api_posts_thumbnail'])]
+    #[Groups(['api_posts_browse', 'api_posts_read', 'api_posts_desc' ])]
     private ?int $id = null;
 
-    #[ORM\Column(length: 70)]
-    #[Groups(['api_posts_browse', 'api_posts_read', 'api_posts_thumbnail'])]
+    #[ORM\Column(length: 70, unique: true, type: Types::STRING)]
+    #[Groups(['api_posts_browse', 'api_posts_read', 'api_posts_desc', 'api_posts_category', 'api_posts_subcategory' ])]
     private ?string $title = null;
-
-    #[ORM\Column(length: 750, nullable: true)]
-    #[Groups(['api_posts_read'])]
-    private ?string $contents = null;
-
-    #[ORM\Column(length: 750, nullable: true)]
-    #[Groups(['api_posts_read'])]
-    private ?string $contents2 = null;
-
-    #[ORM\Column(length: 70, nullable: true)]
-    #[Groups(['api_posts_read'])]
-    private ?string $subtitle = null;
     
-    #[ORM\Column(length: 255)]
-    #[Groups(['api_posts_browse', 'api_posts_read', 'api_posts_thumbnail'])]
+    #[ORM\Column(length: 70, unique: true, type: Types::STRING)]
+    #[Groups(['api_posts_browse', 'api_posts_read', 'api_posts_desc', 'api_posts_category', 'api_posts_subcategory' ])]
     private ?string $slug = null;
 
-    #[ORM\Column]
-    private ?array $imgPost =[];
-
-    #[ORM\Column(length: 500, nullable: true)]
-    private ?array $imgPost2 = null;
-
-    #[ORM\Column(length: 500, nullable: true)]
-    private ?array $imgPost3 = null;
-
-    #[ORM\Column(length: 500, nullable: true)]
-    private ?array $imgPost4 = null;
+    
+    #[ORM\Column(length: 5000, nullable: true, type: Types::STRING)]
+    #[Type(type: Types::string)]
+    #[Groups(['api_posts_read'])]
+    private ?string $contents = null;
 
     #[ORM\Column]
     #[Groups(['api_posts_read'])]
@@ -62,20 +45,52 @@ class Posts
     #[Groups(['api_posts_read'])]
     private ?\DateTime $updatedAt = null;
 
-
-    #[ORM\Column(length: 70, nullable: true)]
+    #[ORM\OneToMany(mappedBy: 'posts', targetEntity: ListPosts::class, cascade: ['persist', 'remove'], orphanRemoval: true)]
     #[Groups(['api_posts_read'])]
-    private ?string $subtitle2 = null;
+    private Collection $listPosts;
 
-    #[ORM\Column(length: 750, nullable: true)]
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $links = null;
+
+    #[ORM\OneToMany(mappedBy: 'posts', targetEntity: ParagraphPosts::class, cascade: ['persist', 'remove'], orphanRemoval: true)]
     #[Groups(['api_posts_read'])]
-    private ?string $contents3 = null;
+    private Collection $paragraphPosts;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $textLinks = null;
+
+    #[ORM\ManyToOne(inversedBy: 'posts')]
+    #[Groups(['api_posts_read', 'api_posts_category'])]
+    private ?Category $category = null;
+
+    #[ORM\ManyToMany(targetEntity: Subtopic::class, inversedBy: 'posts')]
+    #[Groups(['api_posts_read'])]
+    private Collection $subtopic;
+
+    #[ORM\Column(length: 125, nullable: true)]
+    #[Groups(['api_posts_read'])]
+    private ?string $altImg = null;
+
+    #[ORM\Column(length: 500, nullable: true)]
+    #[Groups(['api_posts_read'])]
+    private ?string $imgPost = null;
+
+    #[ORM\ManyToOne(inversedBy: 'posts')]
+    #[Groups(['api_posts_browse', 'api_posts_category', 'api_posts_desc', 'api_posts_subcategory', 'api_posts_read'])]
+    private ?Subcategory $subcategory = null;
+
+    public function __construct()
+    {
+        $this->listPosts = new ArrayCollection();
+        $this->paragraphPosts = new ArrayCollection();
+        $this->subtopic = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
         return $this->id;
     }
+    
 
     public function getTitle(): ?string
     {
@@ -101,18 +116,6 @@ class Posts
         return $this;
     }
 
-    public function getContents2(): ?string
-    {
-        return $this->contents2;
-    }
-
-    public function setContents2(string $contents2): self
-    {
-        $this->contents2 = $contents2;
-
-        return $this;
-    }
-
     public function getSlug(): ?string
     {
         return $this->slug;
@@ -123,65 +126,6 @@ class Posts
         $this->slug = $slug;
 
         return $this;
-    }
-
-    public function getImgPost(): ?array
-    {
-        $imgPost = $this->imgPost;
-
-        return $imgPost;
-    }
-
-    public function setImgPost(array $imgPost): self
-    {
-        $this->imgPost = $imgPost;
-
-        return $this;
-    }
-
-    public function getImgPost2(): ?array
-    {
-        return $this->imgPost2;
-    }
-
-    public function setImgPost2(?array $imgPost2): self
-    {
-        $this->imgPost2 = $imgPost2;
-
-        return $this;
-
-    }
-
-    public function getImgPost3(): ?array
-    {
-        return $this->imgPost3;
-    }
-
-    public function setImgPost3(?array $imgPost3): void
-    {
-        $this->imgPost3 = $imgPost3;
-    }
-
-    public function getImgPost4(): ?array
-    {
-        return $this->imgPost4;
-    }
-
-    public function setImgPost4(?array $imgPost4): void
-    {
-        $this->imgPost4 = $imgPost4;
-
-    }
-
-    public function getSubtitle(): ?string
-    {
-        return $this->subtitle;
-    }
-
-    public function setSubtitle(?string $subtitle): void
-    {
-        $this->subtitle = $subtitle;
-
     }
 
 
@@ -209,26 +153,158 @@ class Posts
         return $this;
     }
 
-    public function getSubtitle2(): ?string
+    /**
+     * @return Collection<int, ListPosts>
+     */
+    public function getListPosts(): Collection
     {
-        return $this->subtitle2;
+        return $this->listPosts;
     }
 
-    public function setSubtitle2(?string $subtitle2): self
+    public function addListPost(ListPosts $listPost): self
     {
-        $this->subtitle2 = $subtitle2;
+        if (!$this->listPosts->contains($listPost)) {
+            $this->listPosts->add($listPost);
+            $listPost->setPosts($this);
+        }
 
         return $this;
     }
 
-    public function getContents3(): ?string
+    public function removeListPost(ListPosts $listPost): self
     {
-        return $this->contents3;
+        if ($this->listPosts->removeElement($listPost)) {
+            // set the owning side to null (unless already changed)
+            if ($listPost->getPosts() === $this) {
+                $listPost->setPosts(null);
+            }
+        }
+
+        return $this;
     }
 
-    public function setContents3(?string $contents3): self
+    public function getLinks(): ?string
     {
-        $this->contents3 = $contents3;
+        return $this->links;
+    }
+
+    public function setLinks(?string $links): self
+    {
+        $this->links = $links;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ParagraphPosts>
+     */
+    public function getParagraphPosts(): Collection
+    {
+        return $this->paragraphPosts;
+    }
+
+    public function addParagraphPost(ParagraphPosts $paragraphPost): self
+    {
+        if (!$this->paragraphPosts->contains($paragraphPost)) {
+            $this->paragraphPosts->add($paragraphPost);
+            $paragraphPost->setPosts($this);
+        }
+
+        return $this;
+    }
+
+    public function removeParagraphPost(ParagraphPosts $paragraphPost): self
+    {
+        if ($this->paragraphPosts->removeElement($paragraphPost)) {
+            // set the owning side to null (unless already changed)
+            if ($paragraphPost->getPosts() === $this) {
+                $paragraphPost->setPosts(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getTextLinks(): ?string
+    {
+        return $this->textLinks;
+    }
+
+    public function setTextLinks(?string $textLinks): self
+    {
+        $this->textLinks = $textLinks;
+
+        return $this;
+    }
+
+    public function getCategory(): ?Category
+    {
+        return $this->category;
+    }
+
+    public function setCategory(?Category $category): self
+    {
+        $this->category = $category;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Subtopic>
+     */
+    public function getSubtopic(): Collection
+    {
+        return $this->subtopic;
+    }
+
+    public function addSubtopic(Subtopic $subtopic): self
+    {
+        if (!$this->subtopic->contains($subtopic)) {
+            $this->subtopic->add($subtopic);
+        }
+
+        return $this;
+    }
+
+    public function removeSubtopic(Subtopic $subtopic): self
+    {
+        $this->subtopic->removeElement($subtopic);
+
+        return $this;
+    }
+
+    public function getAltImg(): ?string
+    {
+        return $this->altImg;
+    }
+
+    public function setAltImg(?string $altImg): self
+    {
+        $this->altImg = $altImg;
+
+        return $this;
+    }
+
+    public function getImgPost(): ?string
+    {
+        return $this->imgPost;
+    }
+
+    public function setImgPost(?string $imgPost): self
+    {
+        $this->imgPost = $imgPost;
+
+        return $this;
+    }
+
+    public function getSubcategory(): ?Subcategory
+    {
+        return $this->subcategory;
+    }
+
+    public function setSubcategory(?Subcategory $subcategory): self
+    {
+        $this->subcategory = $subcategory;
 
         return $this;
     }
