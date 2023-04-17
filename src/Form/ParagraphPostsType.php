@@ -13,8 +13,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
-
-
+use Symfony\Component\Form\FormEvents;
 
 class ParagraphPostsType extends AbstractType
 {
@@ -24,8 +23,8 @@ class ParagraphPostsType extends AbstractType
         ->add('imgPostParagh', FileType::class, [
                 'label' => 'Image du paragraphe',
                 'required' => false,
+                'empty_data' => null,
                 'data_class' => null,
-                'mapped' => true,
                 'attr' => [
                     'placeholder' => 'max 5Mo',
                     'class' => 'block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500',
@@ -42,6 +41,15 @@ class ParagraphPostsType extends AbstractType
                     ])
                 ],
             ],)
+        ->add('altImg', TextType::class, [
+                'label' => false,
+                'required' => false,
+                'attr' => [
+                    'class' => 'altImg hidden block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500',
+                    'placeholder' => 'Texte alternatif de l\'image (max 165 caractères)',
+                    'maxlength' => '165',
+                ]
+            ])
         ->add('subtitle', TextType::class, [
             'label' => 'Sous-titre',
             'required' => true,

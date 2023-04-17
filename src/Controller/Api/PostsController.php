@@ -6,6 +6,7 @@ use App\Entity\Posts;
 use App\Entity\Category;
 use App\Entity\Subcategory;
 use App\Repository\PostsRepository;
+use App\Repository\SubcategoryRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -52,7 +53,7 @@ class PostsController extends ApiController
      */
     public function category(PostsRepository $postsRepository, Category $category): JsonResponse
     {
-        $posts = $postsRepository->findBy(['category' => $category]);
+        $posts = $postsRepository->findBy(['category' => $category], ['createdAt' => 'DESC']);
 
         return $this->json(
             $posts,
@@ -94,7 +95,7 @@ class PostsController extends ApiController
     */
     public function limit(PostsRepository $postsRepository, Category $category): JsonResponse
     {
-        $posts = $postsRepository->findBy(['category' => $category], ['createdAt' => 'DESC'], 3);
+        $posts = $postsRepository->findBy(['category' => $category], ['createdAt' => 'ASC'], 3);
 
 
         return $this->json(
@@ -116,8 +117,8 @@ class PostsController extends ApiController
      */
     public function desc(PostsRepository $postsRepository, Category $category ): JsonResponse
     {
-    
-        $allPosts = $postsRepository->findBy(['category' => $category], ['createdAt' => 'DESC'], 3);
+
+        $allPosts = $postsRepository->findDescPosts();
 
         return $this->json(
             $allPosts,
@@ -170,7 +171,6 @@ class PostsController extends ApiController
                 Response::HTTP_NOT_FOUND,// 404
             );
         }
-        #dd($allPages);
 
         return $this->json(
             $posts,
@@ -214,6 +214,23 @@ class PostsController extends ApiController
             ]);
     }
 
+    /**
+    *@Route("&filter=subcategory", name="allSubcategory", methods={"GET"})
+    */
+    public function allSubcategory(SubcategoryRepository $subcategories ): JsonResponse
+    {
+    
+        $subcategories = $subcategories->findAll();
+
+        return $this->json(
+            $subcategories,
+            Response::HTTP_OK,
+            [],
+            [
+                "groups" => ["api_posts__allSubcategory"]
+            ]
+        );
+    }
    
 
 }

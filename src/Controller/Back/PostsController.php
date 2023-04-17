@@ -96,33 +96,41 @@ class PostsController extends AbstractController
                 $post->setImgPost($slug);
                 $this->imageOptimizer->setPicture($brochureFile, $slug );
                 
-                // ALT IMG
-                if (empty($post->getAltImg())) {
-                    $post->setAltImg($post->getTitle());
-                } else {
-                    $post->setAltImg($post->getAltImg());
-                }
+            }
+
+            // ALT IMG
+            if (empty($post->getAltImg())) {
+                $post->setAltImg($post->getTitle());
+            } else {
+                $post->setAltImg($post->getAltImg());
             }
             
             // DATE
             $post->setCreatedAt(new DateTime());
 
-
-
-
             // IMAGE PARAGRAPH
-            // $brochureFileParagraph = $form->get('paragraphPosts')->getData();
+            $brochureFileParagraph = $form->get('paragraphPosts')->getData();
 
-            // $paragraphPosts = $form->get('paragraphPosts')->getData();
-            // foreach ($paragraphPosts as $paragraph) {
-            //     if (!empty($paragraph)) {
-            //         $brochureFileParagraph = $paragraph->getImgPostParagh();
-            //         $slugPara = $this->slugger->slug($paragraph->getSubtitle()); // slugify
-            //         $slugPara = substr($slugPara, 0, 30); // 30 max
-            //         $paragraph->setImgPostParagh($slugPara);// set slug to image paragraph
-            //         $this->imageOptimizer->setPicture($brochureFileParagraph, $slugPara ); // set image paragraph
-            //     }            
-            // } 
+            $paragraphPosts = $form->get('paragraphPosts')->getData();
+            foreach ($paragraphPosts as $paragraph) {
+                // IMAGE PARAGRAPH
+                if (!empty($paragraph->getImgPostParagh())) {
+                    $brochureFileParagraph = $paragraph->getImgPostParagh();
+                    // SLUG
+                    $slugPara = $this->slugger->slug($paragraph->getSubtitle()); // slugify
+                    $slugPara = substr($slugPara, 0, 30); // 30 max
+                    $paragraph->setImgPostParagh($slugPara);// set slug to image paragraph
+                    // Cloudinary
+                    $this->imageOptimizer->setPicture($brochureFileParagraph, $slugPara ); // set image paragraph
+                } 
+
+                // ALT IMG PARAGRAPH
+                if (empty($paragraph->getAltImg())) {
+                    $paragraph->setAltImg($paragraph->getSubtitle());
+                } else {
+                    $paragraph->setAltImg($paragraph->getAltImg());
+                }          
+            } 
             
             $postsRepository->save($post, true);
 
@@ -169,29 +177,40 @@ class PostsController extends AbstractController
                 
                 $post->setImgPost($slug);
                 $this->imageOptimizer->setPicture($brochureFile, $post->getImgPost() );
-                // ALT IMG
-                if (empty($post->getAltImg())) {
-                    $post->setAltImg($post->getTitle());
-                } else {
-                    $post->setAltImg($post->getAltImg());
-                }
+                
             } else {
                 $post->setImgPost($slug);
             }
-           
-           // IMAGE PARAGRAPH
+           // ALT IMG
+           if (empty($post->getAltImg())) {
+            $post->setAltImg($post->getTitle());
+            } else {
+                $post->setAltImg($post->getAltImg());
+            }
 
-        //    $paragraphPosts = $formParagraph->get('imgPostParagh')->getData();
-        //    foreach ($paragraphPosts as $paragraph) {
-        //     if ($paragraphPosts !== null ) {
-        //         $brochureFileParagraph = $paragraph->getImgPostParagh();
-                        
-        //                 $slugPara = $this->slugger->slug($paragraph->getSubtitle()); // slugify
-        //                 $slugPara = substr($slugPara, 0, 30); // 30 max
-        //                 $paragraph->setImgPostParagh($slugPara);// set slug to image paragraph
-        //                 $this->imageOptimizer->setPicture($brochureFileParagraph, $slugPara ); // set image paragraph
-        //             }            
-        //     } 
+           // IMAGE PARAGRAPH
+            $brochureFileParagraph = $form->get('paragraphPosts')->getData();
+
+            $paragraphPosts = $form->get('paragraphPosts')->getData();
+            foreach ($paragraphPosts as $paragraph) {
+                
+                // IMAGE PARAGRAPH
+                if (!empty($paragraph->getImgPostParagh())) {
+                    $brochureFileParagraph = $paragraph->getImgPostParagh();
+                    // Slug
+                    $slugPara = $this->slugger->slug($paragraph->getSubtitle()); // slugify
+                    $slugPara = substr($slugPara, 0, 30); // 30 max
+                    $paragraph->setImgPostParagh($slugPara);// set slug to image paragraph
+                    // Cloudinary
+                    $this->imageOptimizer->setPicture($brochureFileParagraph, $slugPara ); // set image paragraph
+                }
+                // ALT IMG PARAGRAPH
+                if (empty($paragraph->getAltImg())) {
+                    $paragraph->setAltImg($paragraph->getSubtitle());
+                } else {
+                    $paragraph->setAltImg($paragraph->getAltImg());
+                }
+            } 
 
             $postsRepository->save($post, true);
 
