@@ -39,29 +39,54 @@ class ContactController extends ApiController
         $content = $request->getContent();
         $data = json_decode($content, true);
 
-        if (empty($data['name'] || $data['email'] || $data['message'])) {
+
+        if (empty($data['name']) || empty($data['email']) || empty($data['message']) || empty($data['subject']) || empty($data['postalCode'])) {
             return $this->json(
                 [
                     "erreur" => "Erreur de saisie",
                     "code_error" => 404
                 ],
-                Response::HTTP_NOT_FOUND,// 404
+                Response::HTTP_NOT_FOUND, // 404
             );
         }
-        $emailFrom = 'email@example.fr';
+
+        if (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
+            return $this->json(
+                [
+                    "erreur" => "Adresse e-mail invalide",
+                    "code_error" => 400
+                ],
+                Response::HTTP_BAD_REQUEST, // 400
+            );
+        }
+
+        $data['name'] = htmlspecialchars($data['name']);
+        $data['message'] = htmlspecialchars($data['message']);
+        $data['subject'] = htmlspecialchars($data['subject']);
+        $data['postalCode'] = htmlspecialchars($data['postalCode']);
         
+        if ($data['subject'] === 'Webmaster') {
+            $data['subject'] = 'Demande de contact webmaster';
+            $emailTo = $_ENV['MAILER_TO_WEBMASTER'];
+        }
+        else {
+            $emailTo = $_ENV['MAILER_TO'];
+        }
+
         $email = (new TemplatedEmail())
-            ->to($webmaster)
-            ->from($emailFrom)
-            ->subject('nouveau message de ' . $data['name'])
+            ->to($emailTo)
+            ->from($_ENV['MAILER_TO'])
+            ->subject($data['subject'] . ' de ' . $data['name'])
             ->htmlTemplate('emails/contact.html.twig')
             ->context([
                 'emailContact' => $data['email'],
+                'subjectContact' => $data['subject'],
                 'nameContact' => $data['name'],
                 'messageContact' => $data['message'],
-            ]);
+                'postalCodeContact' => $data['postalCode'],
+            ])
+            ->replyTo($data['email']);
 
-        #dd($email);
         $mailer->send($email);
 
         return $this->json(
@@ -70,6 +95,8 @@ class ContactController extends ApiController
             ],
             Response::HTTP_OK,
         );
+
+        
         }
 	
 }

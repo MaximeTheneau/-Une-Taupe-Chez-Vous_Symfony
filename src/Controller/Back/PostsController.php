@@ -154,15 +154,14 @@ class PostsController extends AbstractController
     #[Route('/{id}/edit', name: 'app_back_posts_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Posts $post, $id, ParagraphPostsRepository $paragraphPostsRepository, PostsRepository $postsRepository): Response
     {
+        // ALT IMG
         $paragraphPosts = $paragraphPostsRepository->find($id);
         $form = $this->createForm(PostsType::class, $post);
         $form->handleRequest($request);
 
-
         $formParagraph = $this->createForm(ParagraphPostsType::class, $paragraphPosts);
         $formParagraph->handleRequest($request);
         $imgPost = $post->getImgPost();
-        
         if ($form->isSubmitted() && $form->isValid()) {
             
             // SLUG
@@ -181,13 +180,7 @@ class PostsController extends AbstractController
             } else {
                 $post->setImgPost($slug);
             }
-           // ALT IMG
-           if (empty($post->getAltImg())) {
-            $post->setAltImg($post->getTitle());
-            } else {
-                $post->setAltImg($post->getAltImg());
-            }
-
+            
            // IMAGE PARAGRAPH
             $brochureFileParagraph = $form->get('paragraphPosts')->getData();
 

@@ -68,7 +68,7 @@ class Posts
     private Collection $subtopic;
 
     #[ORM\Column(length: 125, nullable: true)]
-    #[Groups(['api_posts_read'])]
+    #[Groups(['api_posts_category', 'api_posts_read' ])]
     private ?string $altImg = null;
 
     #[ORM\Column(length: 500, nullable: true)]
