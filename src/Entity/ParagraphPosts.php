@@ -13,6 +13,7 @@ class ParagraphPosts
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['api_posts_read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 170, nullable: true)]
