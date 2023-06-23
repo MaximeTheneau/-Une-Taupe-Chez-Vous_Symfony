@@ -108,6 +108,20 @@ class PostsController extends AbstractController
             // DATE
             $post->setCreatedAt(new DateTime());
 
+            // SLUG PARAGRAPH
+            $paragraphPosts = $form->get('paragraphPosts')->getData();
+            foreach ($paragraphPosts as $paragraph) {
+                if (!empty($paragraph->getSubtitle())) {
+
+                    // SLUG
+                    $slugPara = $this->slugger->slug($paragraph->getSubtitle());
+                    $slugPara = substr($slugPara, 0, 30); 
+                    $paragraph->setSlug($slugPara);
+
+                } 
+
+            } 
+
             // IMAGE PARAGRAPH
             $brochureFileParagraph = $form->get('paragraphPosts')->getData();
 
@@ -166,7 +180,11 @@ class PostsController extends AbstractController
             
             // SLUG
             $slug = $this->slugger->slug($post->getTitle());
-            $post->setSlug($slug);
+            if($post->getSlug() !== "Accueil") {
+                $post->setSlug($slug);
+            } else {
+                $post->setSlug('Accueil');
+            }
             
             $image = $formParagraph->get('imgPostParagh')->getData();
     
@@ -180,6 +198,20 @@ class PostsController extends AbstractController
             } else {
                 $post->setImgPost($slug);
             }
+            
+            // SLUG PARAGRAPH
+            $paragraphPosts = $form->get('paragraphPosts')->getData();
+            foreach ($paragraphPosts as $paragraph) {
+                if (!empty($paragraph->getSubtitle())) {
+
+                    // SLUG
+                    $slugPara = $this->slugger->slug($paragraph->getSubtitle());
+                    $slugPara = substr($slugPara, 0, 30); 
+                    $paragraph->setSlug($slugPara);
+
+                } 
+
+            } 
             
            // IMAGE PARAGRAPH
             $brochureFileParagraph = $form->get('paragraphPosts')->getData();

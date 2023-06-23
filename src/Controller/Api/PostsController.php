@@ -91,7 +91,7 @@ class PostsController extends ApiController
     }
 
     /**
-    * @Route("&limit=3&category={name}", name="", methods={"GET"})
+    * @Route("&limit=3&category={name}", name="category", methods={"GET"})
     */
     public function limit(PostsRepository $postsRepository, Category $category): JsonResponse
     {
@@ -105,7 +105,7 @@ class PostsController extends ApiController
             [
                 "groups" => 
                 [
-                    "api_posts_browse"
+                    "api_posts_category"
 
                 ]
             ]
@@ -113,15 +113,15 @@ class PostsController extends ApiController
     }
         
     /**
-     * @Route("&limit=3&filter=desc&category={name}", name="desc", methods={"GET"})
+     * @Route("&limit=3&filter=desc&category={slug}", name="desc", methods={"GET"})
      */
-    public function desc(PostsRepository $postsRepository, Category $category ): JsonResponse
+    public function desc(PostsRepository $postsRepository, string $slug ): JsonResponse
     {
 
-        $allPosts = $postsRepository->findDescPosts();
+        $posts = $postsRepository->findByCategorySlug($slug, 3);
 
         return $this->json(
-            $allPosts,
+            $posts,
             Response::HTTP_OK,
             [],
             [
@@ -148,7 +148,7 @@ class PostsController extends ApiController
             [
                 "groups" => 
                 [
-                    "api_posts_read"
+                    "api_posts_all"
                 ]
             ]
         );

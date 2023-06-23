@@ -56,11 +56,14 @@ class PostsRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
-    public function findDescPosts()
+    public function findByCategorySlug(string $slug, int $limit)
     {
-        return $this->createQueryBuilder('r')
-            ->orderBy('r.createdAt', 'DESC')
-            ->setMaxResults(3)
+        return $this->createQueryBuilder('p')
+            ->join('p.category', 'c')
+            ->andWhere('c.slug = :slug')
+            ->setParameter('slug', $slug)
+            ->orderBy('p.createdAt', 'DESC')
+            ->setMaxResults($limit)
             ->getQuery()
             ->getResult();
     }

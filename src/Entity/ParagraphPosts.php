@@ -34,6 +34,10 @@ class ParagraphPosts
     #[ORM\Column(length: 170, nullable: true)]
     private ?string $altImg = null;
 
+    #[ORM\Column(length: 50, nullable: true)]
+    #[Groups(['api_posts_read'])]
+    private ?string $slug = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -95,6 +99,18 @@ class ParagraphPosts
     public function setAltImg(?string $altImg): self
     {
         $this->altImg = $altImg;
+
+        return $this;
+    }
+
+    public function getSlug(): ?string
+    {
+        return $this->slug;
+    }
+
+    public function setSlug(?string $slug): self
+    {
+        $this->slug = $slug;
 
         return $this;
     }

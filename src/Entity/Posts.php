@@ -20,15 +20,15 @@ class Posts
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['api_posts_browse', 'api_posts_read', 'api_posts_desc' ])]
+    #[Groups(['api_posts_browse', 'api_posts_read', 'api_posts_desc', 'api_posts_category' ])]
     private ?int $id = null;
 
     #[ORM\Column(length: 70, unique: true, type: Types::STRING)]
-    #[Groups(['api_posts_browse', 'api_posts_read', 'api_posts_desc', 'api_posts_category', 'api_posts_subcategory' ])]
+    #[Groups(['api_posts_browse', 'api_posts_read', 'api_posts_desc', 'api_posts_category', 'api_posts_subcategory', 'api_posts_articles_desc', 'api_posts_all' ])]
     private ?string $title = null;
     
     #[ORM\Column(length: 70, unique: true, type: Types::STRING)]
-    #[Groups(['api_posts_browse', 'api_posts_read', 'api_posts_desc', 'api_posts_category', 'api_posts_subcategory' ])]
+    #[Groups(['api_posts_browse', 'api_posts_read', 'api_posts_desc', 'api_posts_category', 'api_posts_subcategory', 'api_posts_all' ])]
     private ?string $slug = null;
 
     
@@ -38,11 +38,11 @@ class Posts
     private ?string $contents = null;
 
     #[ORM\Column]
-    #[Groups(['api_posts_read'])]
+    #[Groups(['api_posts_read', 'api_posts_category' ])]
     private ?\DateTime $createdAt = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['api_posts_read'])]
+    #[Groups(['api_posts_read', 'api_posts_category'])]
     private ?\DateTime $updatedAt = null;
 
     #[ORM\OneToMany(mappedBy: 'posts', targetEntity: ListPosts::class, cascade: ['persist', 'remove'], orphanRemoval: true)]
@@ -60,7 +60,7 @@ class Posts
     private ?string $textLinks = null;
 
     #[ORM\ManyToOne(inversedBy: 'posts')]
-    #[Groups(['api_posts_read', 'api_posts_category'])]
+    #[Groups(['api_posts_read', 'api_posts_category', 'api_posts_all', 'api_posts_desc', 'api_posts_subcategory', 'api_posts_category'])]
     private ?Category $category = null;
 
     #[ORM\ManyToMany(targetEntity: Subtopic::class, inversedBy: 'posts')]
@@ -72,11 +72,11 @@ class Posts
     private ?string $altImg = null;
 
     #[ORM\Column(length: 500, nullable: true)]
-    #[Groups(['api_posts_read'])]
+    #[Groups(['api_posts_read', 'api_posts_all',  'api_posts_desc', 'api_posts_subcategory', 'api_posts_category' ])]
     private ?string $imgPost = null;
 
     #[ORM\ManyToOne(inversedBy: 'posts')]
-    #[Groups(['api_posts_browse', 'api_posts_category', 'api_posts_desc', 'api_posts_subcategory', 'api_posts_read'])]
+    #[Groups(['api_posts_all', 'api_posts_browse', 'api_posts_category', 'api_posts_desc', 'api_posts_subcategory', 'api_posts_read'])]
     private ?Subcategory $subcategory = null;
 
     public function __construct()
