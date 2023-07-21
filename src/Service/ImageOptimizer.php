@@ -58,6 +58,7 @@ class ImageOptimizer
 
         $newForm = '{"path": "'.$this->projectDir.$this->photoDir.$slug.'.webp", "width": '.$widthSmall.', "height": '.$heightSmall.'}';
 
+        // $post->$setName($this->serializer->decode($newForm, 'json'));
 
         // Save Cloudinary File
 
@@ -72,51 +73,11 @@ class ImageOptimizer
             "height" => 1000,
             "crop" => "limit",
             "secure" => true));
+
+        unlink($this->photoDir . $slug . '.webp');
+
     }
 
-    public function setThumbnail( $brochureFile, $post, $setName, $slug ): void
-    {   
-        $newForm = $this->projectDir.$this->photoDir.$slug.'-miniature.webp';
-        $post->$setName($newForm);
-        list($iwidth, $iheight) = getimagesize($brochureFile);
-        $ratio = $iwidth / $iheight;
-        $width =  250;
-        $height = 250;
-        if ($width / $height < $ratio) {
-            $width = $height * $ratio;
-        } else {
-            $height = $width / $ratio;
-        }
-        $thumbnail = $this->imagine->open($brochureFile)
-        ->thumbnail(new Box($width, $height))
-        ->save($this->photoDir.$slug.'-miniature.webp', ['webp_quality' => 80]);
-
-
-        
-    }
-
-    public function setThumbnailJpg( $brochureFile, $post, $setName, $slug ): void
-    {   
-        $newForm = $this->projectDir.$this->photoDir.$slug.'.png';
-        $post->$setName($newForm);
-        list($iwidth, $iheight) = getimagesize($brochureFile);
-        $ratio = $iwidth / $iheight;
-        $width =  250;
-        $height = 250;
-        if ($width / $height < $ratio) {
-            $width = $height * $ratio;
-        } else {
-            $height = $width / $ratio;
-        }
-        
-        #dd($width, $height);
-        
-        $thumbnail = $this->imagine->open($brochureFile)
-        ->thumbnail(new Box($width, $height), 'inset')
-        ->save($this->photoDir.$slug.'.png', ['png_quality' => 80]);
-        
-    }
-        
 }
 
 
