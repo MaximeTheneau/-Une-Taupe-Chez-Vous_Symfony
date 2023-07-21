@@ -58,7 +58,6 @@ class ImageOptimizer
 
         $newForm = '{"path": "'.$this->projectDir.$this->photoDir.$slug.'.webp", "width": '.$widthSmall.', "height": '.$heightSmall.'}';
 
-        // $post->$setName($this->serializer->decode($newForm, 'json'));
 
         // Save Cloudinary File
 
