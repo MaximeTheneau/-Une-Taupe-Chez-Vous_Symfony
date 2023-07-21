@@ -111,27 +111,6 @@ class ContactController extends ApiController
         $content = $request->getContent();
         $data = json_decode($content, true);
 
-        if (
-            strlen($data['name']) < 2 ||
-            strlen($data['name']) > 120 ||
-            strlen($data['location']) < 2 ||
-            strlen($data['location']) > 120 ||
-            strlen($data['postalCode']) !== 2 ||
-            strlen($data['subject']) < 15 ||
-            strlen($data['subject']) > 120 ||
-            strlen($data['directory']) < 2 ||
-            strlen($data['directory']) > 120            
-            ) {
-            return $this->json(
-                [
-                    "erreur" => "Erreur de saisie",
-                    "code_error" => 400
-                ],
-                Response::HTTP_BAD_REQUEST
-            );
-        }
-
-
         $constraintViolationList = $validator->validate($data['siteWeb'], [
             new Assert\Url(),
         ]);
@@ -143,16 +122,6 @@ class ContactController extends ApiController
             ]),
         ]);
     
-        if (count($constraintViolationList) > 0) {
-            // La valeur de `$data['website']` ne correspond pas à la regex
-            return $this->json(
-                [
-                    "erreur" => "Le site web doit commencer par 'https://'",
-                    "code_error" => 400
-                ],
-                Response::HTTP_BAD_REQUEST
-            );
-        }
 
         if (
             empty($data['name']) ||
@@ -182,10 +151,6 @@ class ContactController extends ApiController
                 Response::HTTP_BAD_REQUEST, // 400
             );
         }
-
-        $data['name'] = htmlspecialchars($data['name']);
-        $data['subject'] = htmlspecialchars($data['subject']);
-        $data['postalCode'] = htmlspecialchars($data['postalCode']);
         
         if ($data['subject'] === 'Webmaster') {
             $data['subject'] = 'Demande de contact webmaster';
