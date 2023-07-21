@@ -50,16 +50,12 @@ class ImageOptimizer
     public function setPicture( $brochureFile, $slug ): void
     {   
         // Save Local File
+
         $img = $this->imagine->open($brochureFile)
             ->thumbnail(new Box(1000, 1000))
             ->save($this->photoDir.$slug.'.webp', ['webp_quality' => 80]);
-        $heightSmall = $img->getSize()->getHeight();
-        $widthSmall = $img->getSize()->getWidth();
 
-        $newForm = '{"path": "'.$this->projectDir.$this->photoDir.$slug.'.webp", "width": '.$widthSmall.', "height": '.$heightSmall.'}';
-
-        // $post->$setName($this->serializer->decode($newForm, 'json'));
-
+        
         // Save Cloudinary File
 
         $this->uploadApi->upload($this->photoDir.$slug.'.webp', array(
@@ -73,6 +69,8 @@ class ImageOptimizer
             "height" => 1000,
             "crop" => "limit",
             "secure" => true));
+        
+        // Delete Local File
 
         unlink($this->photoDir . $slug . '.webp');
 
