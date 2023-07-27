@@ -20,7 +20,7 @@ class Posts
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['api_posts_browse', 'api_posts_read', 'api_posts_desc', 'api_posts_category' ])]
+    #[Groups(['api_posts_browse', 'api_posts_read', 'api_posts_desc', 'api_posts_category', 'api_sitemap_full' ])]
     private ?int $id = null;
 
     #[ORM\Column(length: 70, unique: true, type: Types::STRING)]
@@ -28,7 +28,7 @@ class Posts
     private ?string $title = null;
     
     #[ORM\Column(length: 70, unique: true, type: Types::STRING)]
-    #[Groups(['api_posts_browse', 'api_posts_read', 'api_posts_desc', 'api_posts_category', 'api_posts_subcategory', 'api_posts_all' ])]
+    #[Groups(['api_posts_browse', 'api_posts_read', 'api_posts_desc', 'api_posts_category', 'api_posts_subcategory', 'api_posts_all', 'api_sitemap_full' ])]
     private ?string $slug = null;
 
     
