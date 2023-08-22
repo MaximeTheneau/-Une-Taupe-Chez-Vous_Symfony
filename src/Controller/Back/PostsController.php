@@ -16,6 +16,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpClient\HttpClient;
 use DateTime;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -148,12 +149,27 @@ class PostsController extends AbstractController
             
             $postsRepository->save($post, true);
 
+            $this->triggerNextJsBuild();
+
             return $this->redirectToRoute('app_back_posts_index', [], Response::HTTP_SEE_OTHER);
         }
 
         return $this->renderForm('back/posts/new.html.twig', [
             'post' => $post,
             'form' => $form,
+        ]);
+    }
+
+    public function triggerNextJsBuild()
+    {
+        $client = HttpClient::create();
+        $response = $client->request('POST', 'http://localhost:3000/api/build-export-endpoint', [
+            'headers' => [
+                'Content-Type' => 'application/json',
+            ],
+            'body' => json_encode([
+                'trigger' => 'build',
+            ]),
         ]);
     }
 

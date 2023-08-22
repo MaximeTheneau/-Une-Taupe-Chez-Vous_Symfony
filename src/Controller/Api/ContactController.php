@@ -63,12 +63,8 @@ class ContactController extends ApiController
             );
         }
 
-        $data['name'] = htmlspecialchars($data['name']);
-        $data['message'] = htmlspecialchars($data['message']);
-        $data['subject'] = htmlspecialchars($data['subject']);
-        $data['postalCode'] = htmlspecialchars($data['postalCode']);
         
-        if ($data['subject'] === 'Webmaster') {
+        if ($data['subject'] === 'Webmaster'  ) {
             $data['subject'] = 'Demande de contact webmaster';
             $emailTo = $_ENV['MAILER_TO_WEBMASTER'];
         }
