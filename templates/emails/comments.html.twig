@@ -1,0 +1,13 @@
+<p>Nouveau commentaire sur l'article {{ posts }}</p>
+<p>{{ comment }}</p>
+<p>Par {{ user }}</p>
+<p>---</p>
+<a href="{{ url('admin_comment_delete', {'id': id}, true) }}">
+    Supprimer le commentaire
+</a>
+
+<br>
+
+<a href="{{ url('admin_comment_validate', {'id': id}, true) }}">
+    Valider le commentaire
+</a>

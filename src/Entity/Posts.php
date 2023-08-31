@@ -79,11 +79,18 @@ class Posts
     #[Groups(['api_posts_all', 'api_posts_browse', 'api_posts_category', 'api_posts_desc', 'api_posts_subcategory', 'api_posts_read'])]
     private ?Subcategory $subcategory = null;
 
+    #[ORM\OneToMany(mappedBy: 'posts', targetEntity: Comments::class, cascade: ['persist', 'remove'], orphanRemoval: true)]
+    #[Groups(['api_posts_read'])]
+    private Collection $comments;
+
+
+
     public function __construct()
     {
         $this->listPosts = new ArrayCollection();
         $this->paragraphPosts = new ArrayCollection();
         $this->subtopic = new ArrayCollection();
+        $this->comments = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -305,6 +312,43 @@ class Posts
     public function setSubcategory(?Subcategory $subcategory): self
     {
         $this->subcategory = $subcategory;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Comments>
+     */
+    public function getComments(): Collection
+    {
+        return $this->comments;
+    }
+
+    public function addComment(Comments $comment): static
+    {
+        if (!$this->comments->contains($comment)) {
+            $this->comments->add($comment);
+            $comment->setPosts($this);
+        }
+
+        return $this;
+    }
+
+    public function removeComment(Comments $comment): static
+    {
+        if ($this->comments->removeElement($comment)) {
+            // set the owning side to null (unless already changed)
+            if ($comment->getPosts() === $this) {
+                $comment->setPosts(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function setComments(Collection $comments): static
+    {
+        $this->comments = $comments;
 
         return $this;
     }
