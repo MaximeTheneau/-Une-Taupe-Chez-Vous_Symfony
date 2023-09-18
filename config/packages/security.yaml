@@ -10,7 +10,7 @@ security:
                 class: App\Entity\User
                 property: email
     firewalls:
-
+        
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
@@ -35,6 +35,8 @@ security:
         - { path: ^/api/*, roles: PUBLIC_ACCESS}
 
         - { path: ^/login, roles: PUBLIC_ACCESS}
+
+        # - { path: ^/api/comment, r}
 
         - { path: ^/*, roles: ROLE_USER}
 

@@ -4,6 +4,7 @@ namespace App\Controller\Api;
 
 use App\Entity\Comments;
 use App\Entity\Posts;
+use App\Entity\User;
 use App\Repository\CommentsRepository;
 use App\Repository\PostsRepository;
 use Symfony\Component\HttpFoundation\Request;
@@ -17,6 +18,12 @@ use Symfony\Component\Mime\NamedAddress;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\Validator\Constraints as Assert;
 use Doctrine\ORM\EntityManagerInterface;
+use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
+use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
+use Symfony\Component\Security\Csrf\CsrfToken;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+
 
 /**
  * @Route("/api/comments")
@@ -24,46 +31,55 @@ use Doctrine\ORM\EntityManagerInterface;
 class CommentsController extends ApiController
 {
     private $entityManager;
+    private $passwordHasher;
+    private $jwtManager;
+    private $csrfTokenManager;
 
-    public function __construct(EntityManagerInterface $entityManager)
+    public function __construct(
+        UserPasswordHasherInterface $passwordHasher,
+        EntityManagerInterface $entityManager, 
+        JWTTokenManagerInterface $jwtManager, 
+        CsrfTokenManagerInterface $csrfTokenManager
+    )
     {
+        $this->passwordHasher = $passwordHasher;
         $this->entityManager = $entityManager;
-
+        $this->jwtManager = $jwtManager;
+        $this->csrfTokenManager = $csrfTokenManager;
     }
     /**
     * @Route("", name="add_comments", methods={"POST"})
     */
-    public function add(Request $request, MailerInterface $mailer, PostsRepository $postsRepository, EntityManagerInterface $entityManager): JsonResponse
+    public function add(Request $request, MailerInterface $mailer, PostsRepository $postsRepository): JsonResponse
     {    
-
-
+        
         $content = $request->getContent();
         $data = json_decode($content, true);
 
         $post = $postsRepository->findOneBy(['slug' => $data['posts']]);
 
         $comment = new Comments();
-        $comment->setUser($data['user']); // Remplacez 'user' par le nom de votre champ
-        $comment->setEmail($data['email']); // Remplacez 'email' par le nom de votre champ
-        $comment->setComment($data['comment']); // Remplacez 'comment' par le nom de votre champ
-        $comment->setAccepted(false); // Par défaut, non accepté
+        $comment->setUser($data['user']); 
+        $comment->setEmail($data['email']); 
+        $comment->setComment($data['comment']); 
+        $comment->setAccepted(false);
+        $comment->setCreatedAt(new \DateTimeImmutable());
+        $post->addComment($comment); 
     
-        $post->addComment($comment); // Supposons que vous avez une méthode addComment dans l'entité Posts pour gérer la relation
-    
-        // Persistez les données dans la base de données
-        $entityManager->persist($post);
-        $entityManager->persist($comment);
-        $entityManager->flush();
+
+        $this->entityManager->persist($post);
+        $this->entityManager->persist($comment);
+        $this->entityManager->flush();
         
 
 
-        // if (empty($data['user']) || empty($data['email']) || empty($data['comment']) || empty($data['posts']) || empty($data['accepted'] )) {
+        // if (empty($data['user']) || empty($data['email']) || empty($data['comment']) || empty($data['posts'])  ) {
         //     return $this->json(
         //         [
         //             "erreur" => "Erreur de saisie",
-        //             "code_error" => 404
+        //             "code_error" => 400
         //         ],
-        //         Response::HTTP_NOT_FOUND, // 404
+        //         Response::HTTP_NOT_FOUND, // 400
         //     );
         // }
 
@@ -71,7 +87,7 @@ class CommentsController extends ApiController
         //     return $this->json(
         //         [
         //             "erreur" => "Adresse e-mail invalide",
-        //             "code_error" => 40
+        //             "code_error" => 400
         //         ],
         //         Response::HTTP_BAD_REQUEST, // 400
         //     );
@@ -87,7 +103,6 @@ class CommentsController extends ApiController
                 'emailUser' => $data['email'],
                 'comment' => $data['comment'],
                 'posts' => $data['posts'],
-                'accepted' => $data['accepted'],
                 'id' => $comment->getId(),
             ])
             ->replyTo($data['email']);
@@ -101,7 +116,6 @@ class CommentsController extends ApiController
             Response::HTTP_OK,
         );
 
-        
         }
 
     /**
@@ -127,7 +141,7 @@ class CommentsController extends ApiController
     {
 
         if ($request->isMethod('GET')) {
-            dd($request);
+
             $comment = $CommentsRepository->find($request->get('id'));
             $comment->setAccepted(true);
             $this->entityManager->persist($comment);
@@ -147,5 +161,54 @@ class CommentsController extends ApiController
 
     }
 
+    /**
+     * @Route("/verify_email", name="verify", methods={"POST"})
+     */
+    public function verifyEmail(Request $request, HttpClientInterface $httpClient, EntityManagerInterface $entityManager): JsonResponse
+    {
+    $donneesRequete = json_decode($request->getContent(), true);
+    $email = $donneesRequete['email'] ?? null;
+    if ($email) {
 
+        $urlAPI = 'https://api.mailcheck.ai/email/' . $email;
+        
+        try {
+            $reponse = $httpClient->request('GET', $urlAPI);
+            $donnees = $reponse->toArray();
+            
+            $existingUser = $entityManager->getRepository(User::class)->findOneBy(['email' => $email]);
+            
+            if ($existingUser) {
+                return new JsonResponse(['message' => true]);
+            }
+
+                if ($donnees['disposable']) {
+                    return new JsonResponse(['message' => 'L\'e-mail est jetable et n\'est pas accepté.'], 400);
+                } elseif (!$donnees['mx']) {
+                    return new JsonResponse(['message' => 'L\'e-mail est invalide.'], 400);
+                } else {
+
+                    $currentDate = new \DateTimeImmutable();
+                    $password = $currentDate->format('Ymd');
+                    $password .= random_int(1000, 9999);
+
+                    $user = new User();
+                    $user->setEmail($email);
+                    $user->setRoles(['ROLE_COMMENT']);
+                    $user->setPassword($this->passwordHasher->hashPassword($user, $password ));
+
+                    $entityManager->persist($user);
+                    $entityManager->flush();
+
+                    return new JsonResponse(['message' => true]);
+                }
+
+        } catch (\Exception $e) {
+            return new JsonResponse(['message' => 'Erreur lors de la vérification de l\'e-mail.'], 500);
+        }
+    }
+
+    return new JsonResponse(['message' => 'L\'e-mail n\'est pas présent ou n\'est pas valide.'], 400);
+
+    }
 }

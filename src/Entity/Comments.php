@@ -34,6 +34,9 @@ class Comments
     #[ORM\ManyToOne(inversedBy: 'comments')]
     private ?Posts $posts = null;
 
+    #[ORM\Column]
+    private ?\DateTimeImmutable $createdAt = null;
+
 
     public function getId(): ?int
     {
@@ -97,6 +100,18 @@ class Comments
     public function setPosts(?Posts $posts): static
     {
         $this->posts = $posts;
+
+        return $this;
+    }
+
+    public function getCreatedAt(): ?\DateTimeImmutable
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(\DateTimeImmutable $createdAt): static
+    {
+        $this->createdAt = $createdAt;
 
         return $this;
     }
