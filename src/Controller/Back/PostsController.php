@@ -119,7 +119,9 @@ class PostsController extends AbstractController
                     $slugPara = substr($slugPara, 0, 30); 
                     $paragraph->setSlug($slugPara);
 
-                } 
+                } else {
+                    $entityManager->remove($paragraph);
+                    }
 
             } 
 
@@ -129,7 +131,7 @@ class PostsController extends AbstractController
             $paragraphPosts = $form->get('paragraphPosts')->getData();
             foreach ($paragraphPosts as $paragraph) {
                 // IMAGE PARAGRAPH
-                if (!empty($paragraph->getImgPostParagh())) {
+                if ($paragraph->getImgPostParagh() !== null ) {
                     $brochureFileParagraph = $paragraph->getImgPostParagh();
                     // SLUG
                     $slugPara = $this->slugger->slug($paragraph->getSubtitle()); // slugify
@@ -149,7 +151,6 @@ class PostsController extends AbstractController
             
             $postsRepository->save($post, true);
 
-            $this->triggerNextJsBuild();
 
             return $this->redirectToRoute('app_back_posts_index', [], Response::HTTP_SEE_OTHER);
         }
@@ -160,18 +161,18 @@ class PostsController extends AbstractController
         ]);
     }
 
-    public function triggerNextJsBuild()
-    {
-        $client = HttpClient::create();
-        $response = $client->request('POST', 'http://localhost:3000/api/build-export-endpoint', [
-            'headers' => [
-                'Content-Type' => 'application/json',
-            ],
-            'body' => json_encode([
-                'trigger' => 'build',
-            ]),
-        ]);
-    }
+    // public function triggerNextJsBuild()
+    // {
+    //     $client = HttpClient::create();
+    //     $response = $client->request('POST', 'http://localhost:3000/api/build-export-endpoint', [
+    //         'headers' => [
+    //             'Content-Type' => 'application/json',
+    //         ],
+    //         'body' => json_encode([
+    //             'trigger' => 'build',
+    //         ]),
+    //     ]);
+    // }
 
     #[Route('/{id}', name: 'app_back_posts_show', methods: ['GET'])]
     public function show(Posts $post): Response
@@ -194,6 +195,14 @@ class PostsController extends AbstractController
         $imgPost = $post->getImgPost();
         if ($form->isSubmitted() && $form->isValid()) {
             
+            $deleteImage = $data['deleteImage'];
+
+    if ($deleteImage) {
+        $oldImagePath = $data['oldImagePath'];
+        if ($oldImagePath !== null) {
+            unlink($oldImagePath); // Supprimez physiquement le fichier
+        }
+    }
             // SLUG
             $slug = $this->slugger->slug($post->getTitle());
             if($post->getSlug() !== "Accueil") {
@@ -236,7 +245,8 @@ class PostsController extends AbstractController
             foreach ($paragraphPosts as $paragraph) {
                 
                 // IMAGE PARAGRAPH
-                if (!empty($paragraph->getImgPostParagh())) {
+                $uploadedImg = $paragraph->getImgPostParagh();
+                if ($uploadedImg !== null) {
                     $brochureFileParagraph = $paragraph->getImgPostParagh();
                     // Slug
                     $slugPara = $this->slugger->slug($paragraph->getSubtitle()); // slugify
@@ -251,7 +261,9 @@ class PostsController extends AbstractController
                 } else {
                     $paragraph->setAltImg($paragraph->getAltImg());
                 }
-            } 
+            }
+
+            $post->setUpdatedAt(new DateTime());
 
             $postsRepository->save($post, true);
 

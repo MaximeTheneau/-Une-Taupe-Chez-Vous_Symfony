@@ -35,6 +35,7 @@ class Comments
     private ?Posts $posts = null;
 
     #[ORM\Column]
+    #[Groups(['api_posts_read'])]
     private ?\DateTimeImmutable $createdAt = null;
 
 

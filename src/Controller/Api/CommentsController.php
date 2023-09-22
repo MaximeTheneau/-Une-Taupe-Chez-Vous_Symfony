@@ -9,6 +9,7 @@ use App\Repository\CommentsRepository;
 use App\Repository\PostsRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -19,12 +20,11 @@ use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\Validator\Constraints as Assert;
 use Doctrine\ORM\EntityManagerInterface;
 use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
-use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
-use Symfony\Component\Security\Csrf\CsrfToken;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
-
-
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
+use Lexik\Bundle\JWTAuthenticationBundle\Security\Authentication\Token\JWTUserToken;
 /**
  * @Route("/api/comments")
  */
@@ -33,67 +33,67 @@ class CommentsController extends ApiController
     private $entityManager;
     private $passwordHasher;
     private $jwtManager;
-    private $csrfTokenManager;
+    private $tokenStorage;
 
     public function __construct(
         UserPasswordHasherInterface $passwordHasher,
         EntityManagerInterface $entityManager, 
         JWTTokenManagerInterface $jwtManager, 
-        CsrfTokenManagerInterface $csrfTokenManager
+        TokenStorageInterface $tokenStorage,
     )
     {
         $this->passwordHasher = $passwordHasher;
         $this->entityManager = $entityManager;
         $this->jwtManager = $jwtManager;
-        $this->csrfTokenManager = $csrfTokenManager;
+        $this->tokenStorage = $tokenStorage;
     }
     /**
     * @Route("", name="add_comments", methods={"POST"})
     */
     public function add(Request $request, MailerInterface $mailer, PostsRepository $postsRepository): JsonResponse
-    {    
+    {   
+        
         
         $content = $request->getContent();
-        $data = json_decode($content, true);
 
-        $post = $postsRepository->findOneBy(['slug' => $data['posts']]);
+        $cookie = $request->cookies->get('jwt');
 
-        $comment = new Comments();
-        $comment->setUser($data['user']); 
-        $comment->setEmail($data['email']); 
-        $comment->setComment($data['comment']); 
-        $comment->setAccepted(false);
-        $comment->setCreatedAt(new \DateTimeImmutable());
-        $post->addComment($comment); 
-    
 
-        $this->entityManager->persist($post);
-        $this->entityManager->persist($comment);
-        $this->entityManager->flush();
+
+        if (!$cookie) {
+            return new JsonResponse('Cookie JWT non trouvé', 400);
+        }
         
+      $token = new JWTUserToken();
+      $token->setRawToken($cookie);
 
+      try {
 
-        // if (empty($data['user']) || empty($data['email']) || empty($data['comment']) || empty($data['posts'])  ) {
-        //     return $this->json(
-        //         [
-        //             "erreur" => "Erreur de saisie",
-        //             "code_error" => 400
-        //         ],
-        //         Response::HTTP_NOT_FOUND, // 400
-        //     );
-        // }
+            $tokenData = $this->jwtManager->decode($token);
 
-        // if (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
-        //     return $this->json(
-        //         [
-        //             "erreur" => "Adresse e-mail invalide",
-        //             "code_error" => 400
-        //         ],
-        //         Response::HTTP_BAD_REQUEST, // 400
-        //     );
-        // }
+            $user = $tokenData['username'];
+            $user = $this->entityManager->getRepository(User::class)->findOneBy(['email' => $user]);
+            if (!$user) {
+                return new JsonResponse('Utilisateur non trouvé', 400);
+            }
 
-        $email = (new TemplatedEmail())
+            $data = json_decode($content, true);
+
+            $post = $postsRepository->findOneBy(['id' => $data['posts']]);
+    
+            $comment = new Comments();
+            $comment->setUser($data['user']); 
+            $comment->setEmail($data['email']); 
+            $comment->setComment($data['comment']); 
+            $comment->setAccepted(false);
+            $comment->setCreatedAt(new \DateTimeImmutable());
+            $post->addComment($comment); 
+    
+            $this->entityManager->persist($post);
+            $this->entityManager->persist($comment);
+            $this->entityManager->flush();
+
+            $email = (new TemplatedEmail())
             ->to($_ENV['MAILER_TO_WEBMASTER'])
             ->from($_ENV['MAILER_TO'])
             ->subject('Nouveau Commentaire de ' . $data['user'] )
@@ -102,26 +102,59 @@ class CommentsController extends ApiController
                 'user' => $data['user'],
                 'emailUser' => $data['email'],
                 'comment' => $data['comment'],
-                'posts' => $data['posts'],
+                'posts' => $post->getTitle(),
                 'id' => $comment->getId(),
             ])
             ->replyTo($data['email']);
 
         $mailer->send($email);
 
-        return $this->json(
-            [
-                "message" => "Votre commentaire a bien été envoyé ! On le valide au plus vite !",
-            ],
-            Response::HTTP_OK,
-        );
+        $cookie = new Cookie('jwt', '', time() - 3600, '/', 'localhost', false, false, 'lax');
+
+        $response = new JsonResponse(['message' => 'Votre commentaire a bien été envoyé ! On le valide au plus vite !'], 200);
+
+        $response->headers->setCookie($cookie);
+
+        return $response;
+      } catch (\Exception $e) {
+          return new JsonResponse('Erreur de décodage du jeton JWT', 400);
+      }
+
+
+
+
+        
+
+
+        if (empty($data['user']) || empty($data['email']) || empty($data['comment']) || empty($data['posts'])  ) {
+            return $this->json(
+                [
+                    "erreur" => "Erreur de saisie",
+                    "code_error" => 400
+                ],
+                Response::HTTP_NOT_FOUND, // 400
+            );
+        }
+
+        if (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
+            return $this->json(
+                [
+                    "erreur" => "Adresse e-mail invalide",
+                    "code_error" => 400
+                ],
+                Response::HTTP_BAD_REQUEST, // 400
+            );
+        }
+
+        return new JsonResponse(['message' => 'Votre commentaire a bien été envoyé ! On le valide au plus vite !'], 200);
+
 
         }
 
     /**
      * @Route("/delete/{id}", name="admin_comment_delete", methods={"GET", "POST"})
      */
-    public function delete(Request $request, CommentsRepository $CommentsRepository): Response
+    public function delete(Request $request,  CommentsRepository $CommentsRepository): Response
     {
 
         if ($request->isMethod('GET')) {
@@ -166,47 +199,80 @@ class CommentsController extends ApiController
      */
     public function verifyEmail(Request $request, HttpClientInterface $httpClient, EntityManagerInterface $entityManager): JsonResponse
     {
-    $donneesRequete = json_decode($request->getContent(), true);
-    $email = $donneesRequete['email'] ?? null;
-    if ($email) {
+    $email = JSON_decode($request->getContent(), true)['email'];
 
-        $urlAPI = 'https://api.mailcheck.ai/email/' . $email;
-        
-        try {
-            $reponse = $httpClient->request('GET', $urlAPI);
-            $donnees = $reponse->toArray();
+
+    $urlAPI = 'https://api.mailcheck.ai/email/' . $email;
+    
+    $reponse = $httpClient->request('GET', $urlAPI);
+    $donnees = $reponse->toArray();
+    
+    $existingUser = $entityManager->getRepository(User::class)->findOneBy(['email' => $email]);
             
-            $existingUser = $entityManager->getRepository(User::class)->findOneBy(['email' => $email]);
-            
-            if ($existingUser) {
-                return new JsonResponse(['message' => true]);
-            }
+    if ($existingUser) {
 
-                if ($donnees['disposable']) {
-                    return new JsonResponse(['message' => 'L\'e-mail est jetable et n\'est pas accepté.'], 400);
-                } elseif (!$donnees['mx']) {
-                    return new JsonResponse(['message' => 'L\'e-mail est invalide.'], 400);
-                } else {
+        $token = $this->jwtManager->create($existingUser);
 
-                    $currentDate = new \DateTimeImmutable();
-                    $password = $currentDate->format('Ymd');
-                    $password .= random_int(1000, 9999);
+        // Créez un cookie
+        $cookie = new Cookie(
+            'jwt',
+            $token,
+            strtotime('+1 day'),
+            '/',        // Le chemin du cookie (par exemple, '/')
+            null,        // Le domaine du cookie (null pour le domaine actuel)
+            false,       // Désactivez l'option Secure pour permettre les connexions HTTP
+            true,       // Désactivez l'option HttpOnly pour permettre l'accès via JavaScript
+            'lax',
+        );
 
-                    $user = new User();
-                    $user->setEmail($email);
-                    $user->setRoles(['ROLE_COMMENT']);
-                    $user->setPassword($this->passwordHasher->hashPassword($user, $password ));
+    $response = new JsonResponse(['message' => true]);
+    
+    // Ajoutez le cookie à la réponse
+    $response->headers->setCookie($cookie);
+    
+    // Renvoyez la réponse
+    return $response;
 
-                    $entityManager->persist($user);
-                    $entityManager->flush();
-
-                    return new JsonResponse(['message' => true]);
-                }
-
-        } catch (\Exception $e) {
-            return new JsonResponse(['message' => 'Erreur lors de la vérification de l\'e-mail.'], 500);
-        }
     }
+
+    if ($donnees['disposable']) {
+        return new JsonResponse(['message' => 'L\'e-mail est jetable et n\'est pas accepté.'], 400);
+    } 
+    if (!$donnees['mx']) {
+        return new JsonResponse(['message' => 'L\'e-mail est invalide.'], 400);
+    } 
+    if (!$existingUser) {
+
+        $currentDate = new \DateTimeImmutable();
+        $password = $currentDate->format('Ymd');
+        $password .= random_int(1000, 9999);
+
+        $user = new User();
+        $user->setEmail($email);
+        $user->setPassword($this->passwordHasher->hashPassword($user, $password ));
+
+        $entityManager->persist($user);
+        $entityManager->flush();
+
+        $token = $this->jwtManager->create($user);
+
+
+        $cookie = new Cookie(
+            'jwt_token',
+            $token,
+            strtotime('+1 day'),
+            '/',
+            '',
+            false,  // Désactivez l'option Secure pour permettre les connexions HTTP
+            false,  // Désactivez l'option HttpOnly pour permettre l'accès via JavaScript
+            'Lax'         // Contrôle SameSite (ajustez selon vos besoins)
+        );
+
+
+        return new JsonResponse(['message' => true]);
+        
+    }
+
 
     return new JsonResponse(['message' => 'L\'e-mail n\'est pas présent ou n\'est pas valide.'], 400);
 
