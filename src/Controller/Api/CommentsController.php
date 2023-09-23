@@ -61,13 +61,13 @@ class CommentsController extends ApiController
 
 
         if (!$cookie) {
-            return new JsonResponse('Cookie JWT non trouvé', 400);
+            return new JsonResponse(['message' => 'Une erreur est survenue, veuillez réessayer plus tard !'], 400);
         }
         
       $token = new JWTUserToken();
       $token->setRawToken($cookie);
 
-      try {
+
 
             $tokenData = $this->jwtManager->decode($token);
 
@@ -116,9 +116,6 @@ class CommentsController extends ApiController
         $response->headers->setCookie($cookie);
 
         return $response;
-      } catch (\Exception $e) {
-          return new JsonResponse('Erreur de décodage du jeton JWT', 400);
-      }
 
 
 
@@ -219,9 +216,9 @@ class CommentsController extends ApiController
             $token,
             strtotime('+1 day'),
             '/',        // Le chemin du cookie (par exemple, '/')
-            null,        // Le domaine du cookie (null pour le domaine actuel)
-            false,       // Désactivez l'option Secure pour permettre les connexions HTTP
-            true,       // Désactivez l'option HttpOnly pour permettre l'accès via JavaScript
+            '',        // Le domaine du cookie (null pour le domaine actuel)
+            true,  // Désactivez l'option Secure pour permettre les connexions HTTP
+            false,  // Désactivez l'option HttpOnly pour permettre l'accès via JavaScript
             'lax',
         );
 
@@ -249,6 +246,7 @@ class CommentsController extends ApiController
 
         $user = new User();
         $user->setEmail($email);
+        $user->setRoles(['ROLE_COMMENT']);
         $user->setPassword($this->passwordHasher->hashPassword($user, $password ));
 
         $entityManager->persist($user);
@@ -258,18 +256,24 @@ class CommentsController extends ApiController
 
 
         $cookie = new Cookie(
-            'jwt_token',
+            'jwt',
             $token,
             strtotime('+1 day'),
             '/',
-            '',
+            'unetaupechezvous.fr',
             false,  // Désactivez l'option Secure pour permettre les connexions HTTP
-            false,  // Désactivez l'option HttpOnly pour permettre l'accès via JavaScript
+            true,  // Désactivez l'option HttpOnly pour permettre l'accès via JavaScript
             'Lax'         // Contrôle SameSite (ajustez selon vos besoins)
         );
 
 
-        return new JsonResponse(['message' => true]);
+        $response = new JsonResponse(['message' => true]);
+    
+        // Ajoutez le cookie à la réponse
+        $response->headers->setCookie($cookie);
+        
+        // Renvoyez la réponse
+        return $response;
         
     }
 

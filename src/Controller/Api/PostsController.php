@@ -193,16 +193,16 @@ class PostsController extends ApiController
      */
     public function read(Posts $post)
     {
-        // $filteredComments = [];
+        $filteredComments = [];
 
-        // foreach ($post->getComments() as $comment) {
-        //     if ($comment->isAccepted()) {
-        //         $filteredComments[] = $comment;
-        //     }
-        // }
-        // $filteredCommentsCollection = new ArrayCollection($filteredComments);
+        foreach ($post->getComments() as $comment) {
+            if ($comment->isAccepted()) {
+                $filteredComments[] = $comment;
+            }
+        }
+        $filteredCommentsCollection = new ArrayCollection($filteredComments);
 
-        // $post->setComments($filteredCommentsCollection);
+        $post->setComments($filteredCommentsCollection);
     
         return $this->json(
             $post,
