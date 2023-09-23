@@ -45,14 +45,19 @@
                     data-index="{{ form.paragraphPosts|length > 0 ? form.paragraphPosts|last.vars.name + 1 : 0 }}"
                     data-prototype="{{ form_widget(form.paragraphPosts.vars.prototype)|e('html_attr') }}"
                 >   
-                    {% for paragraph in form.paragraphPosts %}
-                        <li class="h-auto">
-                            {{ form_widget(paragraph.imgPostParagh) }}
-                            {{ form_widget(paragraph.altImg) }}
-                            <p >Changez le descriptif de l'image</p>
-                            {{ form_widget(paragraph) }}
-                        </li>
-                    {% endfor %}
+                {% for paragraph in form.paragraphPosts %}
+                <li class="h-auto">
+                    {% if paragraph.vars.value.getImgPostParagh() is not empty %}
+                    {% set imgUrl = 'https://res.cloudinary.com/dsn2zwbis/image/upload/unetaupechezvous/' ~ paragraph.vars.value.getImgPostParagh() %}
+                    <img src="{{ imgUrl }}" alt="imgHeader">
+                    {% endif %}
+                    {{ form_widget(paragraph.imgPostParagh) }}
+                    {{ form_widget(paragraph.altImg) }}
+                    <p >Changez le descriptif de l'image</p>
+                    {{ form_row(paragraph.subtitle) }}
+                    {{ form_row(paragraph.paragraph) }}
+                </li>
+                {% endfor %}
                 </ul>
                 <div class="flex text-lg border-gray-600 border-b button_paragraph ">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">

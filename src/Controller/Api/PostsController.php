@@ -5,6 +5,7 @@ namespace App\Controller\Api;
 use App\Entity\Posts;
 use App\Entity\Category;
 use App\Entity\Subcategory;
+use App\Repository\CommentsRepository;
 use App\Repository\PostsRepository;
 use App\Repository\SubcategoryRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -19,7 +20,8 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 use Lexik\Bundle\JWTAuthenticationBundle\Event\JWTCreatedEvent;
 use Symfony\Component\HttpFoundation\Cookie;
-
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 /**
  * @Route("/api/posts",name="api_posts_")
  */
@@ -74,7 +76,7 @@ class PostsController extends ApiController
      */
     public function subcategory(PostsRepository $postsRepository, Subcategory $subcategory): JsonResponse
     {
-        $posts = $postsRepository->findBy(['subcategory' => $subcategory]);
+        $posts = $postsRepository->findBy(['subcategory' => $subcategory], ['createdAt' => 'DESC']);
 
         return $this->json(
             $posts,
@@ -141,6 +143,7 @@ class PostsController extends ApiController
     
         $allPosts = $postsRepository->findAllPosts();
 
+
         return $this->json(
             $allPosts,
             Response::HTTP_OK,
@@ -188,22 +191,21 @@ class PostsController extends ApiController
     /**
      * @Route("/{slug}", name="read", methods={"GET"})
      */
-    public function read(Posts $posts = null)
+    public function read(Posts $post)
     {
-        if ($posts === null)
-        {
-            // on renvoie donc une 404
-            return $this->json(
-                [
-                    "erreur" => "Page non trouvée",
-                    "code_error" => 404
-                ],
-                Response::HTTP_NOT_FOUND,// 404
-            );
-        }
+        $filteredComments = [];
 
+        foreach ($post->getComments() as $comment) {
+            if ($comment->isAccepted()) {
+                $filteredComments[] = $comment;
+            }
+        }
+        $filteredCommentsCollection = new ArrayCollection($filteredComments);
+
+        $post->setComments($filteredCommentsCollection);
+    
         return $this->json(
-            $posts,
+            $post,
             Response::HTTP_OK,
             [],
             [

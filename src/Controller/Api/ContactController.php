@@ -16,7 +16,6 @@ use Symfony\Component\Mime\NamedAddress;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\Validator\Constraints as Assert;
 
-
 /**
  * @Route("/api/contact")
  */
