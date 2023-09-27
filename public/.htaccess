@@ -64,5 +64,11 @@ DirectoryIndex index.php
         # RedirectTemp cannot be used instead
     </IfModule>
 </IfModule>
-
+<VirtualHost *:8000>
+    # ...
+    ProxyPass / http://localhost:8000/
+    ProxyPassReverse / http://localhost:8000/
+    RequestHeader set X-Forwarded-For %{REMOTE_ADDR}s
+    # ...
+</VirtualHost>
 php_value upload_max_filesize 8M

@@ -185,24 +185,22 @@ class PostsController extends AbstractController
     #[Route('/{id}/edit', name: 'app_back_posts_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Posts $post, $id, ParagraphPostsRepository $paragraphPostsRepository, PostsRepository $postsRepository): Response
     {
-        // ALT IMG
-        $paragraphPosts = $paragraphPostsRepository->find($id);
+        
+        $articles = $postsRepository->findAll();
         $form = $this->createForm(PostsType::class, $post);
         $form->handleRequest($request);
 
+        $paragraphPosts = $paragraphPostsRepository->find($id);
+        
+        
         $formParagraph = $this->createForm(ParagraphPostsType::class, $paragraphPosts);
         $formParagraph->handleRequest($request);
+        
         $imgPost = $post->getImgPost();
-        if ($form->isSubmitted() && $form->isValid()) {
+        
+        
+        if ($form->isSubmitted() && $form->isValid() ) {
             
-            $deleteImage = $data['deleteImage'];
-
-    if ($deleteImage) {
-        $oldImagePath = $data['oldImagePath'];
-        if ($oldImagePath !== null) {
-            unlink($oldImagePath); // Supprimez physiquement le fichier
-        }
-    }
             // SLUG
             $slug = $this->slugger->slug($post->getTitle());
             if($post->getSlug() !== "Accueil") {
@@ -221,12 +219,27 @@ class PostsController extends AbstractController
                 $this->imageOptimizer->setPicture($brochureFile, $post->getImgPost() );
                 
             } else {
-                $post->setImgPost($slug);
+                $post->setImgPost('Accueil');
             }
             
             // SLUG PARAGRAPH
             $paragraphPosts = $form->get('paragraphPosts')->getData();
             foreach ($paragraphPosts as $paragraph) {
+                
+                if (!empty($paragraph->getLink())){
+                    $articleLink = $postsRepository->findOneBy(['id' => $paragraph->getLink()]);
+                    
+                    $titleLink = $articleLink->getSlug();
+                    $categoryLink = $articleLink->getCategory()->getSlug();
+                    if ($articleLink->getSubcategory() === null || $categoryLink === "Pages") {
+                        $paragraph->setLink($categoryLink.'/'.$titleLink);
+                    } else {
+                        $subcategoryLink = $articleLink->getSubcategory()->getSlug();
+                        $paragraph->setLink($categoryLink.'/'.$subcategoryLink.'/'.$titleLink);
+                    }
+
+                }
+
                 if (!empty($paragraph->getSubtitle())) {
 
                     // SLUG
@@ -238,9 +251,10 @@ class PostsController extends AbstractController
 
             } 
             
-           // IMAGE PARAGRAPH
-            $brochureFileParagraph = $form->get('paragraphPosts')->getData();
+           // PARAGRAPH
 
+            $brochureFileParagraph = $form->get('paragraphPosts')->getData();
+            
             $paragraphPosts = $form->get('paragraphPosts')->getData();
             foreach ($paragraphPosts as $paragraph) {
                 
@@ -261,6 +275,8 @@ class PostsController extends AbstractController
                 } else {
                     $paragraph->setAltImg($paragraph->getAltImg());
                 }
+
+
             }
 
             $post->setUpdatedAt(new DateTime());
@@ -275,9 +291,15 @@ class PostsController extends AbstractController
             return $response;
         }
 
+
+        if ($formParagraph->isSubmitted() && $formParagraph->isValid()) {
+            // Traitez le formulaire du paragraphe ici
+        }
+    
         return $this->renderForm('back/posts/edit.html.twig', [
             'post' => $post,
             'form' => $form,
+            'articles' => $articles,
         ]);
     }
 

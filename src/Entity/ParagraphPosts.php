@@ -24,8 +24,9 @@ class ParagraphPosts
     #[Groups(['api_posts_read'])]
     private ?string $paragraph = null;
 
-    #[ORM\ManyToOne(inversedBy: 'paragraphPosts')]
-    private ?Posts $posts = null;
+    #[ORM\ManyToOne(inversedBy: 'paragraphPosts', targetEntity: Posts::class)]
+    #[ORM\JoinColumn(name: 'posts_id', referencedColumnName: 'id')]
+    private $posts;
 
     #[ORM\Column(length: 500, nullable: true)]
     #[Groups(['api_posts_read'])]
@@ -37,6 +38,9 @@ class ParagraphPosts
     #[ORM\Column(length: 50, nullable: true)]
     #[Groups(['api_posts_read'])]
     private ?string $slug = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $link = null;
 
     public function getId(): ?int
     {
@@ -111,6 +115,18 @@ class ParagraphPosts
     public function setSlug(?string $slug): self
     {
         $this->slug = $slug;
+
+        return $this;
+    }
+
+    public function getLink(): ?string
+    {
+        return $this->link;
+    }
+
+    public function setLink(?string $link): static
+    {
+        $this->link = $link;
 
         return $this;
     }
