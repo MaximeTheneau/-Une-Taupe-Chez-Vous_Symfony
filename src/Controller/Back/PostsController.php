@@ -25,6 +25,7 @@ use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
 use App\Service\ImageOptimizer;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
+use Doctrine\ORM\EntityManagerInterface;
 
 #[Route('/posts')]
 class PostsController extends AbstractController
@@ -34,13 +35,16 @@ class PostsController extends AbstractController
     private $photoDir;
     private $params;
     private $projectDir;
+    private $entityManager;
 
     public function __construct(
         ContainerBagInterface $params,
         ImageOptimizer $imageOptimizer,
         SluggerInterface $slugger,
+        EntityManagerInterface $entityManager
     )
     {
+        $this->entityManager = $entityManager;
         $this->params = $params;
         $this->imageOptimizer = $imageOptimizer;
         $this->slugger = $slugger;
@@ -109,18 +113,18 @@ class PostsController extends AbstractController
             // DATE
             $post->setCreatedAt(new DateTime());
 
-            // SLUG PARAGRAPH
+            // PARAGRAPH
             $paragraphPosts = $form->get('paragraphPosts')->getData();
             foreach ($paragraphPosts as $paragraph) {
                 if (!empty($paragraph->getSubtitle())) {
-
                     // SLUG
                     $slugPara = $this->slugger->slug($paragraph->getSubtitle());
                     $slugPara = substr($slugPara, 0, 30); 
                     $paragraph->setSlug($slugPara);
 
                 } else {
-                    $entityManager->remove($paragraph);
+                    $this->entityManager->remove($paragraph);
+                    $this->entityManager->flush();
                     }
 
             } 
@@ -222,22 +226,28 @@ class PostsController extends AbstractController
                 $post->setImgPost('Accueil');
             }
             
-            // SLUG PARAGRAPH
+            // PARAGRAPH
             $paragraphPosts = $form->get('paragraphPosts')->getData();
             foreach ($paragraphPosts as $paragraph) {
-                
-                if (!empty($paragraph->getLink())){
-                    $articleLink = $postsRepository->findOneBy(['id' => $paragraph->getLink()]);
+
+                // dd($paragraph->getLinkPostSelect());
+                // LINK
+
+                if (!empty($paragraph->getLinkPostSelect())) {
                     
-                    $titleLink = $articleLink->getSlug();
+                    $articleLink = $paragraph->getLinkPostSelect();
+                    
+                    $paragraph->setLinkSubtitle($articleLink->getTitle());
+                    $slugLink = $articleLink->getSlug();
+
                     $categoryLink = $articleLink->getCategory()->getSlug();
                     if ($articleLink->getSubcategory() === null || $categoryLink === "Pages") {
-                        $paragraph->setLink($categoryLink.'/'.$titleLink);
+                        $paragraph->setLink('./'.$categoryLink.'/'.$slugLink);
                     } else {
                         $subcategoryLink = $articleLink->getSubcategory()->getSlug();
-                        $paragraph->setLink($categoryLink.'/'.$subcategoryLink.'/'.$titleLink);
+                        $paragraph->setLink('./'.$categoryLink.'/'.$subcategoryLink.'/'.$slugLink);
                     }
-
+                    
                 }
 
                 if (!empty($paragraph->getSubtitle())) {
@@ -247,7 +257,10 @@ class PostsController extends AbstractController
                     $slugPara = substr($slugPara, 0, 30); 
                     $paragraph->setSlug($slugPara);
 
-                } 
+                } else {
+                    $this->entityManager->remove($paragraph);
+                    $this->entityManager->flush();
+                    }
 
             } 
             
@@ -276,30 +289,23 @@ class PostsController extends AbstractController
                     $paragraph->setAltImg($paragraph->getAltImg());
                 }
 
-
             }
+
 
             $post->setUpdatedAt(new DateTime());
 
             $postsRepository->save($post, true);
 
-            $response = new RedirectResponse($this->generateUrl('app_back_posts_index'), Response::HTTP_SEE_OTHER);
-            $response->headers->set('Cache-Control', 'no-cache, no-store, must-revalidate');
-            $response->headers->set('Pragma', 'no-cache');
-            $response->headers->set('Expires', '0');
-            
-            return $response;
-        }
-
-
-        if ($formParagraph->isSubmitted() && $formParagraph->isValid()) {
-            // Traitez le formulaire du paragraphe ici
+            return $this->redirectToRoute('app_back_posts_edit', ['id' => $post->getId()], Response::HTTP_SEE_OTHER);
         }
     
+
+        
         return $this->renderForm('back/posts/edit.html.twig', [
             'post' => $post,
             'form' => $form,
             'articles' => $articles,
+
         ]);
     }
 

@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\ParagraphPostsRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
@@ -25,7 +27,6 @@ class ParagraphPosts
     private ?string $paragraph = null;
 
     #[ORM\ManyToOne(inversedBy: 'paragraphPosts', targetEntity: Posts::class)]
-    #[ORM\JoinColumn(name: 'posts_id', referencedColumnName: 'id')]
     private $posts;
 
     #[ORM\Column(length: 500, nullable: true)]
@@ -39,9 +40,17 @@ class ParagraphPosts
     #[Groups(['api_posts_read'])]
     private ?string $slug = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
+    #[ORM\Column(length: 500, nullable: true)]
+    #[Groups(['api_posts_read'])]
     private ?string $link = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $linkSubtitle = null;
+
+    #[ORM\ManyTone(targetEntity: Posts::class)]
+    private $linkPostSelect;
+
+    
     public function getId(): ?int
     {
         return $this->id;
@@ -119,6 +128,18 @@ class ParagraphPosts
         return $this;
     }
 
+    public function getLinkSubtitle(): ?string
+    {
+        return $this->linkSubtitle;
+    }
+
+    public function setLinkSubtitle(?string $linkSubtitle): self
+    {
+        $this->linkSubtitle = $linkSubtitle;
+
+        return $this;
+    }
+
     public function getLink(): ?string
     {
         return $this->link;
@@ -127,6 +148,18 @@ class ParagraphPosts
     public function setLink(?string $link): static
     {
         $this->link = $link;
+
+        return $this;
+    }
+
+    public function getLinkPostSelect(): ?Posts
+    {
+        return $this->linkPostSelect;
+    }
+
+    public function setLinkPostSelect(?Posts $linkPostSelect): self
+    {
+        $this->linkPostSelect = $linkPostSelect;
 
         return $this;
     }
