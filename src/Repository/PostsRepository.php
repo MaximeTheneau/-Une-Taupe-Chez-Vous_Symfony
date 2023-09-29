@@ -71,24 +71,47 @@ class PostsRepository extends ServiceEntityRepository
     
     public function findKeywordByPosts($postId)
     {
-        $qb = $this->createQueryBuilder('p')
-            ->select('k.id')
-            ->innerJoin('p.keywords', 'k')
-            ->where('p.id = :postId')
-            ->setParameter('postId', $postId);
-            
-        $keywordId = $qb->getQuery()->getSingleScalarResult();
+                // Récupérez le premier ID de mot-clé associé à l'article de référence
+                $qb = $this->createQueryBuilder('p')
+                ->select('k.id')
+                ->innerJoin('p.keywords', 'k')
+                ->where('p.id = :postId')
+                ->setParameter('postId', $postId)
+                ->setMaxResults(1);
+    
+            $result = $qb->getQuery()->getResult();
+    
+            if (!empty($result)) {
+                $keywordId = $result[0]['id'];
+    
+                // Récupérez les IDs des articles partageant le même mot-clé (y compris l'article de référence)
+                $subQuery = $this->createQueryBuilder('p2')
+                    ->select('p2.id')
+                    ->innerJoin('p2.keywords', 'k2')
+                    ->where('k2.id = :keywordId')
+                    ->setParameter('keywordId', $keywordId)
+                    ->getQuery()
+                    ->getResult();
+    
+                // Supprimez l'article de référence de la liste
+                $filteredIds = array_filter(
+                    array_column($subQuery, 'id'),
+                    function ($id) use ($postId) {
+                        return $id != $postId;
+                    }
+                );
+    
+                // Maintenant, récupérez les articles en utilisant les IDs filtrés
+                return $this->createQueryBuilder('p3')
+                    ->where('p3.id IN (:filteredIds)')
+                    ->setParameter('filteredIds', $filteredIds)
+                    ->orderBy('CASE WHEN p3.updatedAt IS NOT NULL THEN p3.updatedAt ELSE p3.createdAt END', 'DESC')
+                    ->setMaxResults(3)
+                    ->getQuery()
+                    ->getResult();
+            }
 
-        return $this->createQueryBuilder('p2')
-            ->innerJoin('p2.keywords', 'k2')
-            ->where('k2.id = :keywordId')
-            ->orderBy('CASE WHEN p2.updatedAt IS NOT NULL THEN p2.updatedAt ELSE p2.createdAt END', 'DESC')
-            ->andWhere('p2.id != :postId') // Pour exclure l'article de référence
-            ->setParameter('keywordId', $keywordId)
-            ->setParameter('postId', $postId)
-            ->setMaxResults(3)
-            ->getQuery()
-            ->getResult();
+        return []; // Aucun mot-clé trouvé, donc retourne un tableau vide
 
     }
 
