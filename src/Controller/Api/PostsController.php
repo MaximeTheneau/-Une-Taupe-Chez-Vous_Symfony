@@ -122,6 +122,7 @@ class PostsController extends ApiController
 
         $posts = $postsRepository->findByCategorySlug($slug, 3);
 
+
         return $this->json(
             $posts,
             Response::HTTP_OK,
@@ -230,6 +231,32 @@ class PostsController extends ApiController
             [],
             [
                 "groups" => ["api_posts__allSubcategory"]
+            ]
+        );
+    }
+
+    /**
+     * @Route("&filter=keyword&limit=3&id={id}", name="keyword", methods={"GET"})
+     */
+    public function postsFilterKeyword(PostsRepository $postsRepository, int $id): JsonResponse
+    {
+
+        $posts = $postsRepository->findKeywordByPosts($id);
+
+        if (count($posts) !== null) 
+        {
+            $posts = $postsRepository->findLastPosts();
+        }
+
+        return $this->json(
+            $posts,
+            Response::HTTP_OK,
+            [],
+            [
+                "groups" => 
+                [
+                    "api_posts_keyword"
+                ]
             ]
         );
     }

@@ -6,6 +6,7 @@ use App\Entity\Posts;
 use App\Entity\Category;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\ORM\EntityRepository;
 
 /**
  * @extends ServiceEntityRepository<Posts>
@@ -51,7 +52,7 @@ class PostsRepository extends ServiceEntityRepository
     public function findLastPosts()
     {
         return $this->createQueryBuilder('r')
-            ->orderBy('r.createdAt', 'DESC')
+            ->orderBy('CASE WHEN r.updatedAt IS NOT NULL THEN r.updatedAt ELSE r.createdAt END', 'DESC')
             ->setMaxResults(3)
             ->getQuery()
             ->getResult();
@@ -68,6 +69,28 @@ class PostsRepository extends ServiceEntityRepository
             ->getResult();
     }
     
+    public function findKeywordByPosts($postId)
+    {
+        $qb = $this->createQueryBuilder('p')
+            ->select('k.id')
+            ->innerJoin('p.keywords', 'k')
+            ->where('p.id = :postId')
+            ->setParameter('postId', $postId);
+            
+        $keywordId = $qb->getQuery()->getSingleScalarResult();
+
+        return $this->createQueryBuilder('p2')
+            ->innerJoin('p2.keywords', 'k2')
+            ->where('k2.id = :keywordId')
+            ->orderBy('CASE WHEN p2.updatedAt IS NOT NULL THEN p2.updatedAt ELSE p2.createdAt END', 'DESC')
+            ->andWhere('p2.id != :postId') // Pour exclure l'article de référence
+            ->setParameter('keywordId', $keywordId)
+            ->setParameter('postId', $postId)
+            ->setMaxResults(3)
+            ->getQuery()
+            ->getResult();
+
+    }
 
 //    /**
 //     * @return Posts[] Returns an array of Posts objects

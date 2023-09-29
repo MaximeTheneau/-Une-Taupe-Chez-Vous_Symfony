@@ -6,6 +6,7 @@ use App\Entity\Posts;
 use App\Entity\Category;
 use App\Entity\ListPosts;
 use App\Entity\ParagraphPosts;
+use App\Entity\Keyword;
 use App\Form\PostsType;
 use App\Form\ParagraphPostsType;
 use App\Repository\PostsRepository;
@@ -87,6 +88,7 @@ class PostsController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             
 
+
             // SLUG
             $slug = $this->slugger->slug($post->getTitle());
             $post->setSlug($slug);
@@ -156,7 +158,6 @@ class PostsController extends AbstractController
             $postsRepository->save($post, true);
 
 
-            return $this->redirectToRoute('app_back_posts_index', [], Response::HTTP_SEE_OTHER);
         }
 
         return $this->renderForm('back/posts/new.html.twig', [
@@ -199,12 +200,21 @@ class PostsController extends AbstractController
         
         $formParagraph = $this->createForm(ParagraphPostsType::class, $paragraphPosts);
         $formParagraph->handleRequest($request);
+
         
         $imgPost = $post->getImgPost();
         
         
         if ($form->isSubmitted() && $form->isValid() ) {
-            
+
+
+            // $selectedKeywords = $form->get('keywords')->getData();
+            // // Associez ces mots-clés à l'article
+            // foreach ($selectedKeywords as $keyword) {
+            //     $post->addKeyword($keyword);
+            // }
+            // dd($selectedKeywords,);
+
             // SLUG
             $slug = $this->slugger->slug($post->getTitle());
             if($post->getSlug() !== "Accueil") {

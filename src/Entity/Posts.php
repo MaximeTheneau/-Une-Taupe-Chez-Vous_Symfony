@@ -15,20 +15,23 @@ use ApiPlatform\Doctrine\Orm\Filter\DateFilter;
 
 
 #[ORM\Entity(repositoryClass: PostsRepository::class)]
+#[ApiRessource(
+    normalizationContext: ['groups' => ['api_posts_keyword']],
+)]
 class Posts
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['api_posts_browse', 'api_posts_read', 'api_posts_desc', 'api_posts_category' ])]
+    #[Groups(['api_posts_browse', 'api_posts_read', 'api_posts_desc', 'api_posts_category', 'api_posts_keyword' ])]
     private ?int $id = null;
 
     #[ORM\Column(length: 70, unique: true, type: Types::STRING)]
-    #[Groups(['api_posts_browse', 'api_posts_read', 'api_posts_desc', 'api_posts_category', 'api_posts_subcategory', 'api_posts_articles_desc', 'api_posts_all' ])]
+    #[Groups(['api_posts_browse', 'api_posts_read', 'api_posts_desc', 'api_posts_category', 'api_posts_subcategory', 'api_posts_articles_desc', 'api_posts_all', 'api_posts_keyword' ])]
     private ?string $title = null;
     
     #[ORM\Column(length: 70, unique: true, type: Types::STRING)]
-    #[Groups(['api_posts_browse', 'api_posts_read', 'api_posts_desc', 'api_posts_category', 'api_posts_subcategory', 'api_posts_all' ])]
+    #[Groups(['api_posts_browse', 'api_posts_read', 'api_posts_desc', 'api_posts_category', 'api_posts_subcategory', 'api_posts_all', 'api_posts_keyword' ])]
     private ?string $slug = null;
 
     
@@ -53,7 +56,7 @@ class Posts
     private ?string $links = null;
 
     #[ORM\OneToMany(mappedBy: 'posts', targetEntity: ParagraphPosts::class, cascade: ['persist', 'remove'], orphanRemoval: true)]
-    #[Groups(['api_posts_read'])]
+    #[Groups(['api_posts_read' ])]
     private Collection $paragraphPosts;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -62,10 +65,6 @@ class Posts
     #[ORM\ManyToOne(inversedBy: 'posts')]
     #[Groups(['api_posts_read', 'api_posts_category', 'api_posts_all', 'api_posts_desc', 'api_posts_subcategory', 'api_posts_category'])]
     private ?Category $category = null;
-
-    #[ORM\ManyToMany(targetEntity: Subtopic::class, inversedBy: 'posts')]
-    #[Groups(['api_posts_read'])]
-    private Collection $subtopic;
 
     #[ORM\Column(length: 125, nullable: true)]
     #[Groups(['api_posts_category', 'api_posts_read' ])]
@@ -83,14 +82,16 @@ class Posts
     #[Groups(['api_posts_read'])]
     private Collection $comments;
 
-
+    #[ORM\ManyToMany(targetEntity: Keyword::class, mappedBy: 'posts')]
+    #[Groups(['api_posts_read'])]
+    private Collection $keywords;
 
     public function __construct()
     {
         $this->listPosts = new ArrayCollection();
         $this->paragraphPosts = new ArrayCollection();
-        $this->subtopic = new ArrayCollection();
         $this->comments = new ArrayCollection();
+        $this->keywords = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -256,30 +257,6 @@ class Posts
         return $this;
     }
 
-    /**
-     * @return Collection<int, Subtopic>
-     */
-    public function getSubtopic(): Collection
-    {
-        return $this->subtopic;
-    }
-
-    public function addSubtopic(Subtopic $subtopic): self
-    {
-        if (!$this->subtopic->contains($subtopic)) {
-            $this->subtopic->add($subtopic);
-        }
-
-        return $this;
-    }
-
-    public function removeSubtopic(Subtopic $subtopic): self
-    {
-        $this->subtopic->removeElement($subtopic);
-
-        return $this;
-    }
-
     public function getAltImg(): ?string
     {
         return $this->altImg;
@@ -353,4 +330,30 @@ class Posts
         return $this;
     }
 
+    /**
+     * @return Collection<int, Keyword>
+     */
+    public function getKeywords(): Collection
+    {
+        return $this->keywords;
+    }
+
+    public function addKeyword(Keyword $keyword): static
+    {
+        if (!$this->keywords->contains($keyword)) {
+            $this->keywords->add($keyword);
+            $keyword->addPost($this);
+        }
+
+        return $this;
+    }
+
+    public function removeKeyword(Keyword $keyword): static
+    {
+        if ($this->keywords->removeElement($keyword)) {
+            $keyword->removePost($this);
+        }
+
+        return $this;
+    }
 }

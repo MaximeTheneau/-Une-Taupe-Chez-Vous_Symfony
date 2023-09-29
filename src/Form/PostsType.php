@@ -6,7 +6,7 @@ use App\Entity\Posts;
 use App\Entity\ListPosts;
 use App\Entity\Category;
 use App\Entity\Subcategory;
-use App\Entity\Subtopic;
+use App\Entity\Keyword;
 use Doctrine\ORM\EntityRepository;
 use App\Form\SubcategoryType;
 use Symfony\Component\Form\AbstractType;
@@ -30,14 +30,14 @@ class PostsType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-        ->add('category', EntityType::class, [
-            'label' => false,
-            'class' => Category::class,
-            'choice_label' => 'name',
-            'multiple' => false,
-            'expanded' => true,
-        ]
-            )
+            ->add('category', EntityType::class, [
+                'label' => false,
+                'class' => Category::class,
+                'choice_label' => 'name',
+                'multiple' => false,
+                'expanded' => true,
+            ]
+                )
             ->add('subcategory', EntityType::class, [
                 'label' => "Sous-catégorie de l'article",
                 'class' => Subcategory::class,
@@ -45,16 +45,17 @@ class PostsType extends AbstractType
                 'required' => false,
                 'multiple' => false,
                 'expanded' => true,
-            ]
+                ]
                 )
-            // ->add('subtopic', EntityType::class, [
-            //     'label' => "Sous-rubriques de l'article",
-            //     'class' => Subtopic::class,
-            //     'choice_label' => 'name',
-            //     'multiple' => true,
-            //     'expanded' => true,
-            // ]
-            //     )
+            ->add('keywords', EntityType::class, [
+                'class' => Keyword::class,
+                'choice_label' => 'name',
+                'multiple' => true,
+                'expanded' => true,
+                'required' => false,
+                'label' => false,
+                'by_reference' => false,
+                ])
             ->add('title', TextType::class, [
                 'label' => 'Titre',
                 'required' => true,
@@ -132,15 +133,15 @@ class PostsType extends AbstractType
                         'maxlength' => '255',
                     ]
                     ])
-                ->add('paragraphPosts', CollectionType::class, [
-                    'entry_type' => ParagraphPostsType::class,
-                    'label' => false,
-                    'required' => false,
-                    'entry_options' => ['label' => false],
-                    'allow_add' => true,
-                    'allow_delete' => true,
-                    'by_reference' => false,
-                ]);
+            ->add('paragraphPosts', CollectionType::class, [
+                'entry_type' => ParagraphPostsType::class,
+                'label' => false,
+                'required' => false,
+                'entry_options' => ['label' => false],
+                'allow_add' => true,
+                'allow_delete' => true,
+                'by_reference' => false,
+            ]);
 
                 $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {
                     $form = $event->getForm();
