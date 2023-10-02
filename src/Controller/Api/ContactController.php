@@ -42,25 +42,25 @@ class ContactController extends ApiController
         $data = json_decode($content, true);
 
 
-        if (empty($data['name']) || empty($data['email']) || empty($data['message']) || empty($data['subject']) || empty($data['postalCode'])) {
-            return $this->json(
-                [
-                    "erreur" => "Erreur de saisie",
-                    "code_error" => 404
-                ],
-                Response::HTTP_NOT_FOUND, // 404
-            );
-        }
+        // if (empty($data['name']) || empty($data['email']) || empty($data['message']) || empty($data['subject']) || empty($data['postalCode'])) {
+        //     return $this->json(
+        //         [
+        //             "erreur" => "Erreur de saisie",
+        //             "code_error" => 404
+        //         ],
+        //         Response::HTTP_NOT_FOUND, // 404
+        //     );
+        // }
 
-        if (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
-            return $this->json(
-                [
-                    "erreur" => "Adresse e-mail invalide",
-                    "code_error" => 400
-                ],
-                Response::HTTP_BAD_REQUEST, // 400
-            );
-        }
+        // if (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
+        //     return $this->json(
+        //         [
+        //             "erreur" => "Adresse e-mail invalide",
+        //             "code_error" => 400
+        //         ],
+        //         Response::HTTP_BAD_REQUEST, // 400
+        //     );
+        // }
 
         
         if ($data['subject'] === 'Webmaster'  ) {
@@ -83,7 +83,8 @@ class ContactController extends ApiController
                 'messageContact' => $data['message'],
                 'postalCodeContact' => $data['postalCode'],
             ])
-            ->replyTo($data['email']);
+                ->replyTo($data['email']);
+        
 
         $mailer->send($email);
 

@@ -135,9 +135,14 @@ class PostsController extends AbstractController
             $brochureFileParagraph = $form->get('paragraphPosts')->getData();
 
             $paragraphPosts = $form->get('paragraphPosts')->getData();
+
             foreach ($paragraphPosts as $paragraph) {
                 // IMAGE PARAGRAPH
-                if ($paragraph->getImgPostParagh() !== null ) {
+
+                $imgPostParaghFile = $paragraph->getImgPostParaghFile();
+
+                if ($imgPostParaghFile !== null ) {
+                    dd($imgPostParaghFile);
                     $brochureFileParagraph = $paragraph->getImgPostParagh();
                     // SLUG
                     $slugPara = $this->slugger->slug($paragraph->getSubtitle()); // slugify
@@ -190,6 +195,7 @@ class PostsController extends AbstractController
     #[Route('/{id}/edit', name: 'app_back_posts_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Posts $post, $id, ParagraphPostsRepository $paragraphPostsRepository, PostsRepository $postsRepository): Response
     {
+        $imgPost = $post->getImgPost();
         
         $articles = $postsRepository->findAll();
         $form = $this->createForm(PostsType::class, $post);
@@ -201,19 +207,11 @@ class PostsController extends AbstractController
         $formParagraph = $this->createForm(ParagraphPostsType::class, $paragraphPosts);
         $formParagraph->handleRequest($request);
 
-        
-        $imgPost = $post->getImgPost();
-        
-        
+        $postExist = $postsRepository->find($id);
+
+
         if ($form->isSubmitted() && $form->isValid() ) {
 
-
-            // $selectedKeywords = $form->get('keywords')->getData();
-            // // Associez ces mots-clés à l'article
-            // foreach ($selectedKeywords as $keyword) {
-            //     $post->addKeyword($keyword);
-            // }
-            // dd($selectedKeywords,);
 
             // SLUG
             $slug = $this->slugger->slug($post->getTitle());
@@ -227,22 +225,21 @@ class PostsController extends AbstractController
     
             // IMAGE Principal
             $brochureFile = $form->get('imgPost')->getData();
-            if ($brochureFile !== null) {
+
+            if (!empty($brochureFile)) {
                 
                 $post->setImgPost($slug);
                 $this->imageOptimizer->setPicture($brochureFile, $post->getImgPost() );
                 
             } else {
-                $post->setImgPost('Accueil');
+                $post->setImgPost($imgPost);
             }
             
             // PARAGRAPH
             $paragraphPosts = $form->get('paragraphPosts')->getData();
             foreach ($paragraphPosts as $paragraph) {
 
-                // dd($paragraph->getLinkPostSelect());
                 // LINK
-
                 if (!empty($paragraph->getLinkPostSelect())) {
                     
                     $articleLink = $paragraph->getLinkPostSelect();
@@ -252,10 +249,10 @@ class PostsController extends AbstractController
 
                     $categoryLink = $articleLink->getCategory()->getSlug();
                     if ($articleLink->getSubcategory() === null || $categoryLink === "Pages") {
-                        $paragraph->setLink('./'.$categoryLink.'/'.$slugLink);
+                        $paragraph->setLink('/'.$categoryLink.'/'.$slugLink);
                     } else {
                         $subcategoryLink = $articleLink->getSubcategory()->getSlug();
-                        $paragraph->setLink('./'.$categoryLink.'/'.$subcategoryLink.'/'.$slugLink);
+                        $paragraph->setLink('/'.$categoryLink.'/'.$subcategoryLink.'/'.$slugLink);
                     }
                     
                 }
@@ -278,20 +275,20 @@ class PostsController extends AbstractController
 
             $brochureFileParagraph = $form->get('paragraphPosts')->getData();
             
+
             $paragraphPosts = $form->get('paragraphPosts')->getData();
             foreach ($paragraphPosts as $paragraph) {
+
+            // IMAGE PARAGRAPH
+            if (!empty($paragraph->getImgPostParaghFile())) {
+                $brochureFileParagraph = $paragraph->getImgPostParaghFile();
+                $slugPara = $this->slugger->slug($paragraph->getSubtitle());
+                $slugPara = substr($slugPara, 0, 30);
+                $paragraph->setImgPostParagh($slugPara);
+                $this->imageOptimizer->setPicture($brochureFileParagraph, $slugPara);
+            }
+
                 
-                // IMAGE PARAGRAPH
-                $uploadedImg = $paragraph->getImgPostParagh();
-                if ($uploadedImg !== null) {
-                    $brochureFileParagraph = $paragraph->getImgPostParagh();
-                    // Slug
-                    $slugPara = $this->slugger->slug($paragraph->getSubtitle()); // slugify
-                    $slugPara = substr($slugPara, 0, 30); // 30 max
-                    $paragraph->setImgPostParagh($slugPara);// set slug to image paragraph
-                    // Cloudinary
-                    $this->imageOptimizer->setPicture($brochureFileParagraph, $slugPara ); // set image paragraph
-                }
                 // ALT IMG PARAGRAPH
                 if (empty($paragraph->getAltImg())) {
                     $paragraph->setAltImg($paragraph->getSubtitle());

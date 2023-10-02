@@ -43,10 +43,18 @@ class ParagraphPostsType extends AbstractType
                         'rows' => '7',
                         ]
                     ])
-            ->add('imgPostParagh', FileType::class, [
+            ->add('imgPostParagh', TextType::class, [
+                    'label' => 'Image du paragraphe',
+                    'required' => false,
+                    'attr' => [
+                        'class' => 'block p-2.5 w-full text-lg text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500',
+                        'placeholder' => 'Image du paragraphe (max 255 caractères)',
+                        'maxlength' => '255',
+                        ]
+                ])
+            ->add('imgPostParaghFile', FileType::class, [
                         'label' => 'Image du paragraphe',
                         'required' => false,
-                        'empty_data' => null,
                         'data_class' => null,
                         'attr' => [
                             'placeholder' => 'max 5Mo',

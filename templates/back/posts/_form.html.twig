@@ -44,8 +44,7 @@
             {{ form_widget(form.title) }}
             
             
-            {{ form_label(form.contents) }}
-            {{ form_widget(form.contents) }}
+            {{ form_row(form.contents) }}
             
             
             <div class="pt-4">
@@ -62,7 +61,7 @@
                     {% set imgUrl = 'https://res.cloudinary.com/dsn2zwbis/image/upload/unetaupechezvous/' ~ paragraph.vars.value.getImgPostParagh() %}
                     <img src="{{ imgUrl }}" alt="imgHeader">
                     {% endif %}
-                    {{ form_widget(paragraph.imgPostParagh) }}
+                    {{ form_widget(paragraph.imgPostParaghFile) }}
                     <p >Changez le descriptif de l'image</p>
                     <div class="list">
                         {{ form_widget(paragraph.altImg) }}
@@ -124,6 +123,22 @@
     <script src={{asset('js/posts.js')}}></script>
     <script type="text/javascript">
 
+const textareaContents = document.querySelector('#posts_contents');
+
+textareaContents.addEventListener('input', (e) => {
+    const length = e.target.value.length;
+    console.log(length);
+
+    const textarea = e.target;
+
+    if (length < 135) {
+        // Ajouter un arrière-plan à l'ensemble du texte du textarea
+        textarea.style.background = '#ff5e5e2e';
+    } else {
+        textarea.style.background = '#f5f5f5'; // Changez cette couleur selon vos préférences
+    }
+});
+
 const addParagraphButton = document.querySelector('.button_paragraph');
 
 
@@ -165,4 +180,6 @@ addParagraphButton.addEventListener('click', function() {
     });
    
     </script>
+
+
 {% endblock %}

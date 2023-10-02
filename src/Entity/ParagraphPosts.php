@@ -45,10 +45,14 @@ class ParagraphPosts
     private ?string $link = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['api_posts_read'])]
     private ?string $linkSubtitle = null;
 
     #[ORM\ManyTone(targetEntity: Posts::class)]
     private $linkPostSelect;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $imgPostParaghFile = null;
 
     
     public function getId(): ?int
@@ -160,6 +164,18 @@ class ParagraphPosts
     public function setLinkPostSelect(?Posts $linkPostSelect): self
     {
         $this->linkPostSelect = $linkPostSelect;
+
+        return $this;
+    }
+
+    public function getImgPostParaghFile(): ?string
+    {
+        return $this->imgPostParaghFile;
+    }
+
+    public function setImgPostParaghFile(?string $imgPostParaghFile): static
+    {
+        $this->imgPostParaghFile = $imgPostParaghFile;
 
         return $this;
     }
