@@ -49,62 +49,27 @@ class ConvertMarkdownToHtmlCommand extends Command
                 continue;
             }
             $containsTable = preg_match('/\|.*\|/', $markdownText);
+            $containsMarkdownElements = preg_match('/(\*\*|###)/', $markdownText);
+            $containsNumberedList = preg_match('/^\d+\./m', $markdownText);
+            $containsBulletedList = preg_match('/^\*/m', $markdownText);
 
-            // Convertir Markdown en HTML
-            if ($containsTable === 1) {
+            if ($containsTable === 1 || $containsMarkdownElements === 1 || $containsNumberedList === 1 || $containsBulletedList === 1) {
                 $htmlText = $markdown->transform($markdownText);
                 $paragraph->setParagraph($htmlText);
             } 
-
-            $htmlText = preg_replace_callback('/(\*\*|###|_)([\s\S]*?)(\*\*|###|_)/', function ($matches) {
-                $delimiter = $matches[1];
-                $content = $matches[2];
-                
-                if ($delimiter === '**') {
-                    // Convertir `** Contenu **` en gras (<strong>)
-                    return '<strong>' . $content . '</strong>';
-                } elseif ($delimiter === '###') {
-                    // Convertir `### Contenu ###` en titre (<h3>)
-                    return '<h3>' . $content . '</h3>';
-                } elseif ($delimiter === '_') {
-                    // Convertir `_Texte en italique_` en italique (<em>)
-                    return '<em>' . $content . '</em>';
-                }
-            }, $markdownText);
-            $paragraph->setParagraph($htmlText);
         }
 
         
         foreach ($articles as $article) {
-
-            $markdownText = $article->getContents();
-            if ($markdownText === null) {
-                continue;
-            }
             $containsTable = preg_match('/\|.*\|/', $markdownText);
+            $containsMarkdownElements = preg_match('/(\*\*|###)/', $markdownText);
+            $containsNumberedList = preg_match('/^\d+\./m', $markdownText);
+            $containsBulletedList = preg_match('/^\*/m', $markdownText);
 
-            // Convertir Markdown en HTML
-            if ($containsTable === 1) {
+            if ($containsTable === 1 || $containsMarkdownElements === 1 || $containsNumberedList === 1 || $containsBulletedList === 1) {
                 $htmlText = $markdown->transform($markdownText);
                 $article->setContents($htmlText);
             } 
-
-            $htmlText = preg_replace_callback('/(\*\*|###|_)([\s\S]*?)(\*\*|###|_)/', function ($matches) {
-                $delimiter = $matches[1];
-                $content = $matches[2];
-                
-                if ($delimiter === '**') {
-                    // Convertir `** Contenu **` en gras (<strong>)
-                    return '<strong>' . $content . '</strong>';
-                } elseif ($delimiter === '###') {
-                    // Convertir `### Contenu ###` en titre (<h3>)
-                    return '<h3>' . $content . '</h3>';
-                } elseif ($delimiter === '_') {
-                    // Convertir `_Texte en italique_` en italique (<em>)
-                    return '<em>' . $content . '</em>';
-                }
-            }, $markdownText);
-            $article->setContents($htmlText);
         }
 
         $this->entityManager->flush();

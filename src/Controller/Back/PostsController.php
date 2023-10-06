@@ -28,6 +28,7 @@ use App\Service\ImageOptimizer;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Michelf\MarkdownExtra;
 
 #[Route('/posts')]
 class PostsController extends AbstractController
@@ -38,6 +39,8 @@ class PostsController extends AbstractController
     private $params;
     private $projectDir;
     private $entityManager;
+    private $markdown;
+
 
     public function __construct(
         ContainerBagInterface $params,
@@ -52,6 +55,7 @@ class PostsController extends AbstractController
         $this->slugger = $slugger;
         $this->projectDir =  $this->params->get('app.projectDir');
         $this->photoDir =  $this->params->get('app.imgDir');
+        $this->markdown = new MarkdownExtra();
     }
     
     #[Route('/', name: 'app_back_posts_index', methods: ['GET'])]
@@ -87,8 +91,6 @@ class PostsController extends AbstractController
         
         
         if ($form->isSubmitted() && $form->isValid()) {
-            
-
 
             // SLUG
             $slug = $this->slugger->slug($post->getTitle());
@@ -201,7 +203,6 @@ class PostsController extends AbstractController
 
         $postExist = $postsRepository->find($id);
 
-
         if ($form->isSubmitted() && $form->isValid() ) {
 
 
@@ -230,7 +231,17 @@ class PostsController extends AbstractController
             // PARAGRAPH
             $paragraphPosts = $form->get('paragraphPosts')->getData();
             foreach ($paragraphPosts as $paragraph) {
+                $markdownText = $paragraph->getParagraph();
 
+                $containsTable = preg_match('/\|.*\|/', $markdownText);
+                $containsMarkdownElements = preg_match('/(\*\*|###)/', $markdownText);
+                $containsNumberedList = preg_match('/^\d+\./m', $markdownText);
+                $containsBulletedList = preg_match('/^\*/m', $markdownText);
+    
+                if ($containsTable === 1 || $containsMarkdownElements === 1 || $containsNumberedList === 1 || $containsBulletedList === 1) {
+                    $htmlText = $this->markdown->transform($markdownText);
+                    $paragraph->setParagraph($htmlText);
+                } 
                 // LINK
 
                 $articleLink = $paragraph->getLinkPostSelect();
