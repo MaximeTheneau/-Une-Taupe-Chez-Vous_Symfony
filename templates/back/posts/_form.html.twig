@@ -67,9 +67,20 @@
                         {{ form_widget(paragraph.altImg) }}
                     </div>
                     <div>
-                        
-                            {{ form_widget(paragraph.linkSubtitle) }}
+                        {{ form_row(paragraph.deleteLink) }}
+                        {{ form_widget(paragraph.linkSubtitle) }}
                         {{ form_widget(paragraph.linkPostSelect) }}
+                    </div>
+                    <div>
+                        <a href="{{ path('app_back_posts_paragraph_deleted', {'id': paragraph.vars.value.id, '_token': csrf_token('delete' ~ paragraph.vars.value.id)}) }}"
+                    
+                        class="btn">Supprimer le lien</a>
+                     
+                        {% for message in app.flashes('success') %}
+                            <div class="flash-notice">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
                     </div>
                 </li>
                 {% endfor %}
@@ -104,6 +115,7 @@
 
 
             <div class="add__link hidden">
+                
                 {{ form_label(form.links) }}
                 {{ form_widget(form.links) }}
                 {{ form_label(form.textLinks) }}
@@ -122,6 +134,12 @@
 {% block javascripts %}
     <script src={{asset('js/posts.js')}}></script>
     <script type="text/javascript">
+
+function submitForm() {
+    var form = document.getElementById('myForm');
+
+    form.submit();
+}
 
 const textareaContents = document.querySelector('#posts_contents');
 

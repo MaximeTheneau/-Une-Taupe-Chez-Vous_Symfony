@@ -16,6 +16,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 
 
@@ -97,6 +98,13 @@ class ParagraphPostsType extends AbstractType
                     'label' => 'Lien vers un autre article',
                     'required' => false,
                     'choice_value' => 'id',
+                    'placeholder' => 'Choisir un article',
+            ])
+            ->add('deleteLink', CheckboxType::class, [
+                'label' => 'Supprimer le lien',
+                'required' => false,
+                'mapped' => false,
+
             ])
             ;
     }
@@ -107,4 +115,5 @@ class ParagraphPostsType extends AbstractType
             'data_class' => ParagraphPosts::class,
         ]);
     }
+    
 }

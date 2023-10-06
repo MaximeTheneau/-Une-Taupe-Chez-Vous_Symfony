@@ -27,6 +27,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
 use App\Service\ImageOptimizer;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 #[Route('/posts')]
 class PostsController extends AbstractController
@@ -231,25 +232,32 @@ class PostsController extends AbstractController
             foreach ($paragraphPosts as $paragraph) {
 
                 // LINK
-                if (!empty($paragraph->getLinkPostSelect())) {
+
+                $articleLink = $paragraph->getLinkPostSelect();
+                if ($articleLink !== null) {
                     
-                    $articleLink = $paragraph->getLinkPostSelect();
                     
                     $paragraph->setLinkSubtitle($articleLink->getTitle());
                     $slugLink = $articleLink->getSlug();
 
                     $categoryLink = $articleLink->getCategory()->getSlug();
                     if ($articleLink->getSubcategory() === null || $categoryLink === "Pages") {
-                        $paragraph->setLink('/'.$categoryLink.'/'.$slugLink);
+                        $paragraph->setLink('/'.$slugLink);
                     } else {
                         $subcategoryLink = $articleLink->getSubcategory()->getSlug();
                         $paragraph->setLink('/'.$categoryLink.'/'.$subcategoryLink.'/'.$slugLink);
                     }
+                } 
+                $deletedLink = $form['paragraphPosts'][$paragraphPosts->indexOf($paragraph)]['deleteLink']->getData();
+
+                if ($deletedLink === true) {
+                    $paragraph->setLink(null);
+                    $paragraph->setLinkSubtitle(null);
                 }
 
-                if (!empty($paragraph->getSubtitle())) {
 
-                    // SLUG
+                // SLUG
+                if (!empty($paragraph->getSubtitle())) {
                     $slugPara = $this->slugger->slug($paragraph->getSubtitle());
                     $slugPara = substr($slugPara, 0, 30); 
                     $paragraph->setSlug($slugPara);
@@ -268,7 +276,6 @@ class PostsController extends AbstractController
                     $this->imageOptimizer->setPicture($brochureFileParagraph, $slugPara);
                 }
 
-                
                 // ALT IMG PARAGRAPH
                 if (empty($paragraph->getAltImg())) {
                     $paragraph->setAltImg($paragraph->getSubtitle());
@@ -286,12 +293,10 @@ class PostsController extends AbstractController
         }
     
 
-        
         return $this->renderForm('back/posts/edit.html.twig', [
             'post' => $post,
             'form' => $form,
             'articles' => $articles,
-
         ]);
     }
 
@@ -305,11 +310,27 @@ class PostsController extends AbstractController
         return $this->redirectToRoute('app_back_posts_index', [], Response::HTTP_SEE_OTHER);
     }
 
-    /**
-     * @Route("/post/infinite-list", name="article_infinite_list")
-     */
-    public function infiniteList(Request $request): Response
+    #[Route('/{id}/deleted', name: 'app_back_posts_paragraph_deleted', methods: ['GET', 'POST'])]
+    public function deleteParagraph(Request $request, $id, PostsRepository $postsRepository, ParagraphPosts $paragraphPosts, ParagraphPostsRepository $paragraphPostsRepository): Response
     {
+
+        $paragraph = $paragraphPostsRepository->find($id);
+
+        $post = $postsRepository->find($id);
+        $postId = $paragraph->getPosts()->getId();
+        if ($this->isCsrfTokenValid('delete' . $paragraph->getId(), $request->request->get('_token'))) {
+            dd("ok");
+                $paragraph->setLink(null);
+                $paragraph->setLinkSubtitle(null);
+
+                $this->entityManager->flush();
+
+                $this->addFlash('success', 'Le lien a bien été supprimé.');
+            
+        }
         
+        return $this->redirectToRoute('app_back_posts_edit', ['id' => $postId], Response::HTTP_SEE_OTHER);
     }
+        
+
 }
