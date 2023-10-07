@@ -68,13 +68,6 @@ class PostsRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
-    
-    public function findKeywordByPosts($posts, $postsFilteredKeyword)
-    {
-        
-        return [$filteredPostId]; // Aucun mot-clé trouvé, donc retourne un tableau vide
-
-    }
 
 //    /**
 //     * @return Posts[] Returns an array of Posts objects

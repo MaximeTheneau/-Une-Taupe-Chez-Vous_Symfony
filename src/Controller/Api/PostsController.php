@@ -243,10 +243,7 @@ class PostsController extends ApiController
     {
         $responsePosts = [];
 
-        
-        
         $post = $postsRepository->find($id);
-        $postsFilteredKeyword = $keywordRepository->findAll();
         
         $postId = $post->getId();
         $postsKeyword = $post->getKeywords()->getValues();
@@ -266,24 +263,20 @@ class PostsController extends ApiController
                 ]
             );
         }
+
         foreach ($postsKeyword as $keyword) {
             $postsKeyword = $keyword->getPosts();
     
-            // Filtrez les posts pour exclure le post actuel
             $filteredPostId = $postsKeyword->filter(function ($otherPost) use ($postId) {
                 return $otherPost->getId() != $postId;
             });
     
-            // Ajoutez les posts filtrés à notre tableau
             foreach ($filteredPostId as $filteredPost) {
                 $filteredPosts[] = $filteredPost;
             }
         }
     
-        // Maintenant, $filteredPosts contient tous les posts filtrés associés au même mot clé
-
-        // Triez les posts en fonction de updatedAt (si présent) ou createdAt (si updatedAt est null)
-        $sortedPosts = $filteredPostId->toArray(); // Convertissez la collection en un tableau
+        $sortedPosts = $filteredPostId->toArray(); 
 
         usort($sortedPosts, function ($a, $b) {
             $updatedAtA = $a->getUpdatedAt();
@@ -308,12 +301,6 @@ class PostsController extends ApiController
             $responsePosts = $postsRepository->findByCategorySlug($post->getCategory()->getSlug(), 3);
 
         }
-
-
-
-        // $response= $postsRepository->findKeywordByPosts($post, $postsFilteredKeyword);
-
-
         return $this->json(
             $responsePosts,
             Response::HTTP_OK,
