@@ -8,6 +8,7 @@ use App\Entity\Subcategory;
 use App\Repository\CommentsRepository;
 use App\Repository\PostsRepository;
 use App\Repository\SubcategoryRepository;
+use App\Repository\KeywordRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -238,18 +239,83 @@ class PostsController extends ApiController
     /**
      * @Route("&filter=keyword&limit=3&id={id}", name="keyword", methods={"GET"})
      */
-    public function postsFilterKeyword(PostsRepository $postsRepository, int $id): JsonResponse
+    public function postsFilterKeyword(PostsRepository $postsRepository, KeywordRepository $keywordRepository,  int $id): JsonResponse
     {
+        $responsePosts = [];
 
-        $posts = $postsRepository->findKeywordByPosts($id);
-
-        if (count($posts) !== null) 
+        
+        
+        $post = $postsRepository->find($id);
+        $postsFilteredKeyword = $keywordRepository->findAll();
+        
+        $postId = $post->getId();
+        $postsKeyword = $post->getKeywords()->getValues();
+        
+        if($postsKeyword === [])
         {
-            $posts = $postsRepository->findLastPosts();
+            $responsePosts = $postsRepository->findByCategorySlug($post->getCategory()->getSlug(), 3);
+            return $this->json(
+                $responsePosts,
+                Response::HTTP_OK,
+                [],
+                [
+                    "groups" => 
+                    [
+                        "api_posts_keyword"
+                    ]
+                ]
+            );
+        }
+        foreach ($postsKeyword as $keyword) {
+            $postsKeyword = $keyword->getPosts();
+    
+            // Filtrez les posts pour exclure le post actuel
+            $filteredPostId = $postsKeyword->filter(function ($otherPost) use ($postId) {
+                return $otherPost->getId() != $postId;
+            });
+    
+            // Ajoutez les posts filtrés à notre tableau
+            foreach ($filteredPostId as $filteredPost) {
+                $filteredPosts[] = $filteredPost;
+            }
+        }
+    
+        // Maintenant, $filteredPosts contient tous les posts filtrés associés au même mot clé
+
+        // Triez les posts en fonction de updatedAt (si présent) ou createdAt (si updatedAt est null)
+        $sortedPosts = $filteredPostId->toArray(); // Convertissez la collection en un tableau
+
+        usort($sortedPosts, function ($a, $b) {
+            $updatedAtA = $a->getUpdatedAt();
+            $updatedAtB = $b->getUpdatedAt();
+
+            if ($updatedAtA && $updatedAtB) {
+                return $updatedAtB <=> $updatedAtA;
+            } elseif ($updatedAtA && !$updatedAtB) {
+                return -1;
+            } elseif (!$updatedAtA && $updatedAtB) {
+                return 1;
+            } else {
+                $createdAtA = $a->getCreatedAt();
+                $createdAtB = $b->getCreatedAt();
+                return $createdAtB <=> $createdAtA;
+            }
+        });
+
+        if (count($sortedPosts) > 3) {
+            $responsePosts = array_slice($sortedPosts, 0, 3);
+        } else {
+            $responsePosts = $postsRepository->findByCategorySlug($post->getCategory()->getSlug(), 3);
+
         }
 
+
+
+        // $response= $postsRepository->findKeywordByPosts($post, $postsFilteredKeyword);
+
+
         return $this->json(
-            $posts,
+            $responsePosts,
             Response::HTTP_OK,
             [],
             [

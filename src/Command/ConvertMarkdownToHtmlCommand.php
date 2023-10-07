@@ -33,7 +33,7 @@ class ConvertMarkdownToHtmlCommand extends Command
         $this->entityManager = $entityManager;
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $repository = $this->entityManager->getRepository(Posts::class);
         $paragrahRepository = $this->entityManager->getRepository(ParagraphPosts::class);
@@ -61,6 +61,10 @@ class ConvertMarkdownToHtmlCommand extends Command
 
         
         foreach ($articles as $article) {
+            $markdownText = $article->getContents();
+            if ($markdownText === null) {
+                continue;
+            }
             $containsTable = preg_match('/\|.*\|/', $markdownText);
             $containsMarkdownElements = preg_match('/(\*\*|###)/', $markdownText);
             $containsNumberedList = preg_match('/^\d+\./m', $markdownText);

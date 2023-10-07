@@ -63,55 +63,16 @@ class PostsRepository extends ServiceEntityRepository
             ->join('p.category', 'c')
             ->andWhere('c.slug = :slug')
             ->setParameter('slug', $slug)
-            ->orderBy('p.createdAt', 'DESC')
+            ->orderBy('CASE WHEN p.updatedAt IS NOT NULL THEN p.updatedAt ELSE p.createdAt END', 'DESC')
             ->setMaxResults($limit)
             ->getQuery()
             ->getResult();
     }
     
-    public function findKeywordByPosts($postId)
+    public function findKeywordByPosts($posts, $postsFilteredKeyword)
     {
-                // Récupérez le premier ID de mot-clé associé à l'article de référence
-                $qb = $this->createQueryBuilder('p')
-                ->select('k.id')
-                ->innerJoin('p.keywords', 'k')
-                ->where('p.id = :postId')
-                ->setParameter('postId', $postId)
-                ->setMaxResults(1);
-    
-            $result = $qb->getQuery()->getResult();
-    
-            if (!empty($result)) {
-                $keywordId = $result[0]['id'];
-    
-                // Récupérez les IDs des articles partageant le même mot-clé (y compris l'article de référence)
-                $subQuery = $this->createQueryBuilder('p2')
-                    ->select('p2.id')
-                    ->innerJoin('p2.keywords', 'k2')
-                    ->where('k2.id = :keywordId')
-                    ->setParameter('keywordId', $keywordId)
-                    ->getQuery()
-                    ->getResult();
-    
-                // Supprimez l'article de référence de la liste
-                $filteredIds = array_filter(
-                    array_column($subQuery, 'id'),
-                    function ($id) use ($postId) {
-                        return $id != $postId;
-                    }
-                );
-    
-                // Maintenant, récupérez les articles en utilisant les IDs filtrés
-                return $this->createQueryBuilder('p3')
-                    ->where('p3.id IN (:filteredIds)')
-                    ->setParameter('filteredIds', $filteredIds)
-                    ->orderBy('CASE WHEN p3.updatedAt IS NOT NULL THEN p3.updatedAt ELSE p3.createdAt END', 'DESC')
-                    ->setMaxResults(3)
-                    ->getQuery()
-                    ->getResult();
-            }
-
-        return []; // Aucun mot-clé trouvé, donc retourne un tableau vide
+        
+        return [$filteredPostId]; // Aucun mot-clé trouvé, donc retourne un tableau vide
 
     }
 
