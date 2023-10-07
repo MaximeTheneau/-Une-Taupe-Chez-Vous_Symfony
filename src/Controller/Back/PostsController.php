@@ -137,7 +137,6 @@ class PostsController extends AbstractController
                  $imgPostParaghFile = $paragraph->getImgPostParaghFile();
 
                  if ($imgPostParaghFile !== null ) {
-                     dd($imgPostParaghFile);
                      $brochureFileParagraph = $paragraph->getImgPostParagh();
                      // SLUG
                      $slugPara = $this->slugger->slug($paragraph->getSubtitle()); // slugify
@@ -214,7 +213,7 @@ class PostsController extends AbstractController
                 $post->setSlug('Accueil');
             }
             
-            $image = $formParagraph->get('imgPostParagh')->getData();
+            // $image = $formParagraph->get('imgPostParagh')->getData();
     
             // IMAGE Principal
             $brochureFile = $form->get('imgPost')->getData();
@@ -230,6 +229,14 @@ class PostsController extends AbstractController
             
             // PARAGRAPH
             $paragraphPosts = $form->get('paragraphPosts')->getData();
+            $linkDelete = $formParagraph->get('deleteLink')->getData();
+
+            if ($linkDelete === true)
+            {
+                $paragraphPosts->setLink(null);
+                $paragraphPosts->setLinkSubtitle(null);
+            }
+
             foreach ($paragraphPosts as $paragraph) {
                 $markdownText = $paragraph->getParagraph();
 
@@ -240,10 +247,10 @@ class PostsController extends AbstractController
     
                 if ($containsTable === 1 || $containsMarkdownElements === 1 || $containsNumberedList === 1 || $containsBulletedList === 1) {
                     $htmlText = $this->markdown->transform($markdownText);
+
                     $paragraph->setParagraph($htmlText);
                 } 
                 // LINK
-
                 $articleLink = $paragraph->getLinkPostSelect();
                 if ($articleLink !== null) {
                     
@@ -285,15 +292,12 @@ class PostsController extends AbstractController
                     $slugPara = substr($slugPara, 0, 30);
                     $paragraph->setImgPostParagh($slugPara);
                     $this->imageOptimizer->setPicture($brochureFileParagraph, $slugPara);
+                    
+                    // ALT IMG PARAGRAPH
+                    if (empty($paragraph->getAltImg())) {
+                        $paragraph->setAltImg($paragraph->getSubtitle());
+                    } 
                 }
-
-                // ALT IMG PARAGRAPH
-                if (empty($paragraph->getAltImg())) {
-                    $paragraph->setAltImg($paragraph->getSubtitle());
-                } else {
-                    $paragraph->setAltImg($paragraph->getAltImg());
-                }
-
             } 
             
             $post->setUpdatedAt(new DateTime());
@@ -330,7 +334,6 @@ class PostsController extends AbstractController
         $post = $postsRepository->find($id);
         $postId = $paragraph->getPosts()->getId();
         if ($this->isCsrfTokenValid('delete' . $paragraph->getId(), $request->request->get('_token'))) {
-            dd("ok");
                 $paragraph->setLink(null);
                 $paragraph->setLinkSubtitle(null);
 

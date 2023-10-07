@@ -62,17 +62,25 @@
                     <img src="{{ imgUrl }}" alt="imgHeader">
                     {% endif %}
                     {{ form_widget(paragraph.imgPostParaghFile) }}
-                    <p >Changez le descriptif de l'image</p>
-                    <div class="list">
-                        {{ form_widget(paragraph.altImg) }}
-                    </div>
+                    {{ form_widget(paragraph.altImg) }}
                     <div>
-                        {{ form_row(paragraph.deleteLink) }}
-                        {{ form_widget(paragraph.linkSubtitle) }}
-                        {{ form_widget(paragraph.linkPostSelect) }}
+                        {% if paragraph.vars.value.getLinkSubtitle() is empty %}
+                            <div style="display: none;">
+                                {{ form_widget(paragraph.linkSubtitle) }}
+                                {{ form_row(paragraph.deleteLink) }}
+                            </div>
+                        {% else %}
+                            {{ form_widget(paragraph.linkSubtitle) }}
+                            {{ form_row(paragraph.deleteLink) }}
+
+                            {% endif %}
+                            {{ form_widget(paragraph.linkPostSelect) }}
                     </div>
+                    
                     <div>
-                        <a href="{{ path('app_back_posts_paragraph_deleted', {'id': paragraph.vars.value.id, '_token': csrf_token('delete' ~ paragraph.vars.value.id)}) }}"
+
+                    <!-- {{ include('back/posts/_linkDelete_form.html.twig', {'form': paragraph}) }} -->
+                            <!-- <a href="{{ path('app_back_posts_paragraph_deleted', {'id': paragraph.vars.value.id, '_token': csrf_token('delete' ~ paragraph.vars.value.id)}) }}"
                     
                         class="btn">Supprimer le lien</a>
                      
@@ -80,7 +88,7 @@
                             <div class="flash-notice">
                                 {{ message }}
                             </div>
-                        {% endfor %}
+                        {% endfor %} -->
                     </div>
                 </li>
                 {% endfor %}
@@ -127,7 +135,7 @@
                   </svg>
                   Ajouter un lien
             </div>
-            <button type="submit" class="button is-primary is-fullwidth">{{ button_label|default('Sauvegarder') }}</button>
+            <button class="button is-primary ">{{ button_label|default('Save') }}</button>
 
 {{ form_end(form) }}
 
@@ -135,11 +143,7 @@
     <script src={{asset('js/posts.js')}}></script>
     <script type="text/javascript">
 
-function submitForm() {
-    var form = document.getElementById('myForm');
 
-    form.submit();
-}
 
 const textareaContents = document.querySelector('#posts_contents');
 

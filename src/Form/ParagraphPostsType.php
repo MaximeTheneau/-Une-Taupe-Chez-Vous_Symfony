@@ -17,6 +17,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 
 
@@ -44,15 +45,7 @@ class ParagraphPostsType extends AbstractType
                         'rows' => '7',
                         ]
                     ])
-            ->add('imgPostParagh', TextType::class, [
-                    'label' => 'Image du paragraphe',
-                    'required' => false,
-                    'attr' => [
-                        'class' => 'block p-2.5 w-full text-lg text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500',
-                        'placeholder' => 'Image du paragraphe (max 255 caractères)',
-                        'maxlength' => '255',
-                        ]
-                ])
+
             ->add('imgPostParaghFile', FileType::class, [
                         'label' => 'Image du paragraphe',
                         'required' => false,
@@ -87,7 +80,7 @@ class ParagraphPostsType extends AbstractType
                     'label' => 'Sous-titre du lien',
                     'required' => false,
                     'attr' => [
-                        'class' => 'block p-2.5 w-full text-lg text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500',
+                        'class' => 'font-black block p-2.5 w-full text-lg  bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500',
                         'placeholder' => 'Sous-titre du lien (max 255 caractères)',
                         'maxlength' => '255',
                         ]
@@ -99,13 +92,27 @@ class ParagraphPostsType extends AbstractType
                     'required' => false,
                     'choice_value' => 'id',
                     'placeholder' => 'Choisir un article',
+                    'attr' => [
+                        'class' => 'font-bold'
+                        ]
             ])
-            ->add('deleteLink', CheckboxType::class, [
-                'label' => 'Supprimer le lien',
-                'required' => false,
-                'mapped' => false,
+            ->addEventListener(FormEvents::PRE_SET_DATA, function(FormEvent $e){
+                $form = $e->getForm();
+                $recipe = $e->getData();
 
-            ])
+                if($recipe && $recipe->getId()){
+                    $form->add('deleteLink', ChoiceType::class, [
+                        'mapped' => false,
+                        'label' => "Supprimer le lien ?",
+                        'choices' => [
+                            "oui" => true,
+                            "non" => false
+                        ],
+                        'expanded' => true,
+                        'data' => false
+                    ]);
+                }
+            })
             ;
     }
 
