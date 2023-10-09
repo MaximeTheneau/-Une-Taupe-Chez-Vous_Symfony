@@ -29,6 +29,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Michelf\MarkdownExtra;
+use Symfony\Component\Intl\Intl;
 
 #[Route('/posts')]
 class PostsController extends AbstractController
@@ -118,6 +119,11 @@ class PostsController extends AbstractController
             // DATE
             $post->setCreatedAt(new DateTime());
 
+
+            $post->setFormattedDate(
+                'Publié le ' . $post->getCreatedAt()->format('d F Y')
+            );
+
             // PARAGRAPH
             $paragraphPosts = $form->get('paragraphPosts')->getData();
             foreach ($paragraphPosts as $paragraph) {
@@ -153,7 +159,6 @@ class PostsController extends AbstractController
                      $paragraph->setAltImg($paragraph->getAltImg());
                  }          
             } 
-
             $postsRepository->save($post, true);
 
         }
@@ -299,8 +304,13 @@ class PostsController extends AbstractController
                     } 
                 }
             } 
-            
+            setlocale(LC_TIME, 'fr_FR.UTF-8');
+
             $post->setUpdatedAt(new DateTime());
+            $date = new datetime();
+            $formattedDate = strftime('Publié le %e %B %Y. Mis à jour le %e %B %Y', $date->getTimestamp());
+
+            $post->setFormattedDate($formattedDate);
 
             $postsRepository->save($post, true);
 

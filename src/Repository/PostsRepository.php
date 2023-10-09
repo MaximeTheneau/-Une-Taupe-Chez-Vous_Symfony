@@ -45,7 +45,7 @@ class PostsRepository extends ServiceEntityRepository
     public function findAllPosts()
     {
         return $this->createQueryBuilder('r')
-            ->orderBy('r.createdAt', 'DESC')
+            ->orderBy('CASE WHEN r.updatedAt IS NOT NULL THEN r.updatedAt ELSE r.createdAt END', 'DESC')
             ->getQuery()
             ->getResult();
     }

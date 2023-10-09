@@ -25,10 +25,13 @@ class Posts
     #[ORM\Column]
     #[Groups(['api_posts_browse', 'api_posts_read', 'api_posts_desc', 'api_posts_category', 'api_posts_keyword' ])]
     private ?int $id = null;
-
+    
     #[ORM\Column(length: 70, unique: true, type: Types::STRING)]
     #[Groups(['api_posts_browse', 'api_posts_read', 'api_posts_desc', 'api_posts_category', 'api_posts_subcategory', 'api_posts_articles_desc', 'api_posts_all', 'api_posts_keyword' ])]
     private ?string $title = null;
+    
+    #[ORM\Column(length: 135)]
+    private ?string $metaDescription = null;
     
     #[ORM\Column(length: 70, unique: true, type: Types::STRING)]
     #[Groups(['api_posts_browse', 'api_posts_read', 'api_posts_desc', 'api_posts_category', 'api_posts_subcategory', 'api_posts_all', 'api_posts_keyword' ])]
@@ -48,6 +51,9 @@ class Posts
     #[Groups(['api_posts_read', 'api_posts_category'])]
     private ?\DateTime $updatedAt = null;
 
+    #[ORM\Column(length: 255)]
+    private ?string $formattedDate = null;
+    
     #[ORM\OneToMany(mappedBy: 'posts', targetEntity: ListPosts::class, cascade: ['persist', 'remove'], orphanRemoval: true)]
     #[Groups(['api_posts_read'])]
     private Collection $listPosts;
@@ -86,8 +92,6 @@ class Posts
     #[Groups(['api_posts_read'])]
     private Collection $keywords;
 
-    #[ORM\Column(length: 135)]
-    private ?string $metaDescription = null;
 
     public function __construct()
     {
@@ -368,6 +372,18 @@ class Posts
     public function setMetaDescription(string $metaDescription): static
     {
         $this->metaDescription = $metaDescription;
+
+        return $this;
+    }
+
+    public function getFormattedDate(): ?string
+    {
+        return $this->formattedDate;
+    }
+
+    public function setFormattedDate(string $formattedDate): static
+    {
+        $this->formattedDate = $formattedDate;
 
         return $this;
     }
