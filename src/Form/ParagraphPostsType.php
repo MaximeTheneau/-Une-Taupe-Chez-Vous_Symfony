@@ -36,6 +36,7 @@ class ParagraphPostsType extends AbstractType
                     'maxlength' => '170',
                     ]
                 ])
+
             ->add('paragraph', TextareaType::class, [
                     'label' => 'Paragraphe',
                     'attr' => [

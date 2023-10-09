@@ -86,6 +86,9 @@ class Posts
     #[Groups(['api_posts_read'])]
     private Collection $keywords;
 
+    #[ORM\Column(length: 135)]
+    private ?string $metaDescription = null;
+
     public function __construct()
     {
         $this->listPosts = new ArrayCollection();
@@ -353,6 +356,18 @@ class Posts
         if ($this->keywords->removeElement($keyword)) {
             $keyword->removePost($this);
         }
+
+        return $this;
+    }
+
+    public function getMetaDescription(): ?string
+    {
+        return $this->metaDescription;
+    }
+
+    public function setMetaDescription(string $metaDescription): static
+    {
+        $this->metaDescription = $metaDescription;
 
         return $this;
     }
