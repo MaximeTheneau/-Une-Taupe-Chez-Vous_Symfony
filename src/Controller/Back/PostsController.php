@@ -34,10 +34,10 @@ use Symfony\Component\Intl\Intl;
 #[Route('/posts')]
 class PostsController extends AbstractController
 {
+    private $params;
     private $imageOptimizer;
     private $slugger;
     private $photoDir;
-    private $params;
     private $projectDir;
     private $entityManager;
     private $markdown;
@@ -50,13 +50,14 @@ class PostsController extends AbstractController
         EntityManagerInterface $entityManager
     )
     {
-        $this->entityManager = $entityManager;
         $this->params = $params;
+        $this->entityManager = $entityManager;
         $this->imageOptimizer = $imageOptimizer;
         $this->slugger = $slugger;
         $this->projectDir =  $this->params->get('app.projectDir');
         $this->photoDir =  $this->params->get('app.imgDir');
         $this->markdown = new MarkdownExtra();
+        $this->domainFront = $this->params->get('app.domain');
     }
     
     #[Route('/', name: 'app_back_posts_index', methods: ['GET'])]
@@ -159,7 +160,10 @@ class PostsController extends AbstractController
                      $paragraph->setAltImg($paragraph->getAltImg());
                  }          
             } 
+
             $postsRepository->save($post, true);
+            $this->triggerNextJsBuild();
+
 
         }
 
@@ -169,18 +173,21 @@ class PostsController extends AbstractController
         ]);
     }
 
-    // public function triggerNextJsBuild()
-    // {
-    //     $client = HttpClient::create();
-    //     $response = $client->request('POST', 'http://localhost:3000/api/build-export-endpoint', [
-    //         'headers' => [
-    //             'Content-Type' => 'application/json',
-    //         ],
-    //         'body' => json_encode([
-    //             'trigger' => 'build',
-    //         ]),
-    //     ]);
-    // }
+    public function triggerNextJsBuild()
+    {
+        $client = HttpClient::create();
+
+        $apiEndpoint = $this->domainFront . '/api/build-export-endpoint';
+
+        $response = $client->request('POST', $apiEndpoint, [
+            'headers' => [
+                'Content-Type' => 'application/json',
+            ],
+            'body' => json_encode([
+                'trigger' => 'build',
+            ]),
+        ]);
+    }
 
     #[Route('/{id}', name: 'app_back_posts_show', methods: ['GET'])]
     public function show(Posts $post): Response
@@ -312,7 +319,9 @@ class PostsController extends AbstractController
 
             $post->setFormattedDate($formattedDate);
 
+            
             $postsRepository->save($post, true);
+            $this->triggerNextJsBuild();
 
             return $this->redirectToRoute('app_back_posts_edit', ['id' => $post->getId()], Response::HTTP_SEE_OTHER);
         }

@@ -29,8 +29,9 @@ class Posts
     #[ORM\Column(length: 70, unique: true, type: Types::STRING)]
     #[Groups(['api_posts_browse', 'api_posts_read', 'api_posts_desc', 'api_posts_category', 'api_posts_subcategory', 'api_posts_articles_desc', 'api_posts_all', 'api_posts_keyword' ])]
     private ?string $title = null;
-    
+
     #[ORM\Column(length: 135)]
+    #[Groups(['api_posts_read'])]
     private ?string $metaDescription = null;
     
     #[ORM\Column(length: 70, unique: true, type: Types::STRING)]
@@ -52,6 +53,7 @@ class Posts
     private ?\DateTime $updatedAt = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['api_posts_read'])]
     private ?string $formattedDate = null;
     
     #[ORM\OneToMany(mappedBy: 'posts', targetEntity: ListPosts::class, cascade: ['persist', 'remove'], orphanRemoval: true)]

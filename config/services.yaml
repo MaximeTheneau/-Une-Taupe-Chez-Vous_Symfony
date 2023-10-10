@@ -6,6 +6,7 @@
 parameters:
     app.projectDir : '%env(resolve:APP_PROJECTDIR)%'
     app.imgDir : '%env(resolve:IMG_DIR)%'
+    app.domain : '%env(resolve:DOMAIN)%'
 
 services:
     _defaults:
