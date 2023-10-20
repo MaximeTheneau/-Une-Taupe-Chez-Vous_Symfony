@@ -53,12 +53,18 @@ class ConvertMarkdownToHtmlCommand extends Command
             $containsNumberedList = preg_match('/^\d+\./m', $markdownText);
             $containsBulletedList = preg_match('/^\*/m', $markdownText);
 
-            if ($containsTable === 1 || $containsMarkdownElements === 1 || $containsNumberedList === 1 || $containsBulletedList === 1) {
-                $htmlText = $markdown->transform($markdownText);
-                $paragraph->setParagraph($htmlText);
-            } 
-        }
+            $htmlText = $markdown->transform($markdownText);
 
+            $htmlText = preg_replace('/\>\s+\</', '><', $htmlText);
+        
+            $htmlText = preg_replace('/\s+\</', '<', $htmlText);
+        
+            $htmlText = preg_replace('/\s+$/m', '', $htmlText);
+        
+            $htmlText = preg_replace('/<!--(.*?)-->/s', '', $htmlText);
+
+            $paragraph->setParagraph($htmlText);
+        }
         
         foreach ($articles as $article) {
             $markdownText = $article->getContents();
@@ -70,10 +76,17 @@ class ConvertMarkdownToHtmlCommand extends Command
             $containsNumberedList = preg_match('/^\d+\./m', $markdownText);
             $containsBulletedList = preg_match('/^\*/m', $markdownText);
 
-            if ($containsTable === 1 || $containsMarkdownElements === 1 || $containsNumberedList === 1 || $containsBulletedList === 1) {
-                $htmlText = $markdown->transform($markdownText);
-                $article->setContents($htmlText);
-            } 
+            $htmlText = $markdown->transform($markdownText);
+            $htmlText = preg_replace('/\>\s+\</', '><', $htmlText);
+        
+            $htmlText = preg_replace('/\s+\</', '<', $htmlText);
+        
+            $htmlText = preg_replace('/\s+$/m', '', $htmlText);
+        
+            $htmlText = preg_replace('/<!--(.*?)-->/s', '', $htmlText);
+
+            $article->setContents($htmlText);
+
         }
 
         $this->entityManager->flush();

@@ -29,7 +29,8 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Michelf\MarkdownExtra;
-use Symfony\Component\Intl\Intl;
+use \IntlDateFormatter;
+use App\Service\MarkdownProcessor;
 
 #[Route('/posts')]
 class PostsController extends AbstractController
@@ -41,13 +42,15 @@ class PostsController extends AbstractController
     private $projectDir;
     private $entityManager;
     private $markdown;
+    private $markdownProcessor;
 
 
     public function __construct(
         ContainerBagInterface $params,
         ImageOptimizer $imageOptimizer,
         SluggerInterface $slugger,
-        EntityManagerInterface $entityManager
+        EntityManagerInterface $entityManager,
+        MarkdownProcessor $markdownProcessor,
     )
     {
         $this->params = $params;
@@ -58,6 +61,8 @@ class PostsController extends AbstractController
         $this->photoDir =  $this->params->get('app.imgDir');
         $this->markdown = new MarkdownExtra();
         $this->domainFront = $this->params->get('app.domain');
+        $this->markdownProcessor = $markdownProcessor;
+
     }
     
     #[Route('/', name: 'app_back_posts_index', methods: ['GET'])]
@@ -118,12 +123,14 @@ class PostsController extends AbstractController
             }
             
             // DATE
+            $formatter = new IntlDateFormatter('fr_FR', IntlDateFormatter::FULL, IntlDateFormatter::NONE, null, null, 'dd MMMM yyyy');
             $post->setCreatedAt(new DateTime());
+            $createdAt = $formatter->format($post->getCreatedAt());
+
+            $post->setFormattedDate('Publié le ' . $createdAt);
+            
 
 
-            $post->setFormattedDate(
-                'Publié le ' . $post->getCreatedAt()->format('d F Y')
-            );
 
             // PARAGRAPH
             $paragraphPosts = $form->get('paragraphPosts')->getData();
@@ -177,8 +184,7 @@ class PostsController extends AbstractController
     {
         $client = HttpClient::create();
 
-        $apiEndpoint = $this->domainFront . '/api/build-export-endpoint';
-
+        $apiEndpoint = 'https://unetaupechezvous.fr/api/build-export-endpoint';
         $response = $client->request('POST', $apiEndpoint, [
             'headers' => [
                 'Content-Type' => 'application/json',
@@ -238,7 +244,18 @@ class PostsController extends AbstractController
             } else {
                 $post->setImgPost($imgPost);
             }
-            
+            $markdownText = $post->getContents();
+
+                $containsTable = preg_match('/\|.*\|/', $markdownText);
+                $containsMarkdownElements = preg_match('/(\*\*|###)/', $markdownText);
+                $containsNumberedList = preg_match('/^\d+\./m', $markdownText);
+                $containsBulletedList = preg_match('/^\*/m', $markdownText);
+    
+                if ($containsTable === 1 || $containsMarkdownElements === 1 || $containsNumberedList === 1 || $containsBulletedList === 1) {
+                    $htmlText = $this->markdown->transform($markdownText);
+
+                    $post->setContents($htmlText);
+                } 
             // PARAGRAPH
             $paragraphPosts = $form->get('paragraphPosts')->getData();
             $linkDelete = $formParagraph->get('deleteLink')->getData();
@@ -252,16 +269,10 @@ class PostsController extends AbstractController
             foreach ($paragraphPosts as $paragraph) {
                 $markdownText = $paragraph->getParagraph();
 
-                $containsTable = preg_match('/\|.*\|/', $markdownText);
-                $containsMarkdownElements = preg_match('/(\*\*|###)/', $markdownText);
-                $containsNumberedList = preg_match('/^\d+\./m', $markdownText);
-                $containsBulletedList = preg_match('/^\*/m', $markdownText);
-    
-                if ($containsTable === 1 || $containsMarkdownElements === 1 || $containsNumberedList === 1 || $containsBulletedList === 1) {
-                    $htmlText = $this->markdown->transform($markdownText);
+                $htmlText = $this->markdownProcessor->processMarkdown($markdownText);
 
-                    $paragraph->setParagraph($htmlText);
-                } 
+                $paragraph->setParagraph($htmlText);
+
                 // LINK
                 $articleLink = $paragraph->getLinkPostSelect();
                 if ($articleLink !== null) {
@@ -271,16 +282,20 @@ class PostsController extends AbstractController
                     $slugLink = $articleLink->getSlug();
 
                     $categoryLink = $articleLink->getCategory()->getSlug();
-                    if ($articleLink->getSubcategory() === null || $categoryLink === "Pages") {
+                    if ($categoryLink === "Pages") {
                         $paragraph->setLink('/'.$slugLink);
-                    } else {
+                    }                     
+                    if ($categoryLink === "Annuaire") {
+                        $paragraph->setLink('/'.$categoryLink.'/'.$slugLink);
+                    } 
+                    if ($categoryLink === "Articles") {
                         $subcategoryLink = $articleLink->getSubcategory()->getSlug();
                         $paragraph->setLink('/'.$categoryLink.'/'.$subcategoryLink.'/'.$slugLink);
                     }
                 } 
-                $deletedLink = $form['paragraphPosts'][$paragraphPosts->indexOf($paragraph)]['deleteLink']->getData();
+                $deletedLink = $form['paragraphPosts'];
 
-                if ($deletedLink === true) {
+                if ($deletedLink[$paragraphPosts->indexOf($paragraph)]['deleteLink']->getData() === true) {
                     $paragraph->setLink(null);
                     $paragraph->setLinkSubtitle(null);
                 }
@@ -311,17 +326,18 @@ class PostsController extends AbstractController
                     } 
                 }
             } 
-            setlocale(LC_TIME, 'fr_FR.UTF-8');
 
+            // DATE
+            $formatter = new IntlDateFormatter('fr_FR', IntlDateFormatter::FULL, IntlDateFormatter::NONE, null, null, 'dd MMMM yyyy');
             $post->setUpdatedAt(new DateTime());
-            $date = new datetime();
-            $formattedDate = strftime('Publié le %e %B %Y. Mis à jour le %e %B %Y', $date->getTimestamp());
+            $updatedDate = $formatter->format($post->getUpdatedAt());
+            $createdAt = $formatter->format($post->getCreatedAt());
 
-            $post->setFormattedDate($formattedDate);
-
+            $post->setFormattedDate('Publié le ' . $createdAt . '. Mise à jour le ' . $updatedDate);
+            
             
             $postsRepository->save($post, true);
-            $this->triggerNextJsBuild();
+            // $this->triggerNextJsBuild();
 
             return $this->redirectToRoute('app_back_posts_edit', ['id' => $post->getId()], Response::HTTP_SEE_OTHER);
         }
