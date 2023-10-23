@@ -244,18 +244,13 @@ class PostsController extends AbstractController
             } else {
                 $post->setImgPost($imgPost);
             }
+            // MARKDOWN TO HTML
             $markdownText = $post->getContents();
 
-                $containsTable = preg_match('/\|.*\|/', $markdownText);
-                $containsMarkdownElements = preg_match('/(\*\*|###)/', $markdownText);
-                $containsNumberedList = preg_match('/^\d+\./m', $markdownText);
-                $containsBulletedList = preg_match('/^\*/m', $markdownText);
-    
-                if ($containsTable === 1 || $containsMarkdownElements === 1 || $containsNumberedList === 1 || $containsBulletedList === 1) {
-                    $htmlText = $this->markdown->transform($markdownText);
+            $htmlText = $this->markdownProcessor->processMarkdown($markdownText);
 
-                    $post->setContents($htmlText);
-                } 
+            $post->setContents($htmlText);
+
             // PARAGRAPH
             $paragraphPosts = $form->get('paragraphPosts')->getData();
             $linkDelete = $formParagraph->get('deleteLink')->getData();
@@ -267,6 +262,8 @@ class PostsController extends AbstractController
             }
 
             foreach ($paragraphPosts as $paragraph) {
+
+                // MARKDOWN TO HTML
                 $markdownText = $paragraph->getParagraph();
 
                 $htmlText = $this->markdownProcessor->processMarkdown($markdownText);
@@ -276,7 +273,6 @@ class PostsController extends AbstractController
                 // LINK
                 $articleLink = $paragraph->getLinkPostSelect();
                 if ($articleLink !== null) {
-                    
                     
                     $paragraph->setLinkSubtitle($articleLink->getTitle());
                     $slugLink = $articleLink->getSlug();
