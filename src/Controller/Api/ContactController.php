@@ -87,7 +87,6 @@ class ContactController extends ApiController
         
 
         $mailer->send($email);
-
         return $this->json(
             [
                 "message" => "Votre message a bien été envoyé",

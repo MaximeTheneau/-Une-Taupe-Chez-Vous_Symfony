@@ -17,6 +17,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\HttpClient\HttpClient;
 use DateTime;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
@@ -43,6 +44,7 @@ class PostsController extends AbstractController
     private $entityManager;
     private $markdown;
     private $markdownProcessor;
+    private $messageBus;
 
 
     public function __construct(
@@ -51,6 +53,7 @@ class PostsController extends AbstractController
         SluggerInterface $slugger,
         EntityManagerInterface $entityManager,
         MarkdownProcessor $markdownProcessor,
+        MessageBusInterface $messageBus,
     )
     {
         $this->params = $params;
@@ -62,7 +65,7 @@ class PostsController extends AbstractController
         $this->markdown = new MarkdownExtra();
         $this->domainFront = $this->params->get('app.domain');
         $this->markdownProcessor = $markdownProcessor;
-
+        $this->messageBus = $messageBus;
     }
     
     #[Route('/', name: 'app_back_posts_index', methods: ['GET'])]
@@ -171,7 +174,6 @@ class PostsController extends AbstractController
             $postsRepository->save($post, true);
             $this->triggerNextJsBuild();
 
-
         }
 
         return $this->renderForm('back/posts/new.html.twig', [
@@ -182,17 +184,13 @@ class PostsController extends AbstractController
 
     public function triggerNextJsBuild()
     {
-        $client = HttpClient::create();
+        $payload = json_decode($request->getContent(), true);
+       
+        $this->messageBus->dispatch(new UpdateNextAppMessage());
 
-        $apiEndpoint = 'https://unetaupechezvous.fr/api/build-export-endpoint';
-        $response = $client->request('POST', $apiEndpoint, [
-            'headers' => [
-                'Content-Type' => 'application/json',
-            ],
-            'body' => json_encode([
-                'trigger' => 'build',
-            ]),
-        ]);
+        exec('node https://unetaupechezvous.fr/api/build-export-endpoint', $output, $returnCode);
+
+        return new JsonResponse(['message' => 'Webhook received'], 200);
     }
 
     #[Route('/{id}', name: 'app_back_posts_show', methods: ['GET'])]
@@ -296,7 +294,6 @@ class PostsController extends AbstractController
                     $paragraph->setLinkSubtitle(null);
                 }
 
-
                 // SLUG
                 if (!empty($paragraph->getSubtitle())) {
                     $slugPara = $this->slugger->slug($paragraph->getSubtitle());
@@ -333,7 +330,7 @@ class PostsController extends AbstractController
             
             
             $postsRepository->save($post, true);
-            // $this->triggerNextJsBuild();
+            $this->triggerNextJsBuild();
 
             return $this->redirectToRoute('app_back_posts_edit', ['id' => $post->getId()], Response::HTTP_SEE_OTHER);
         }

@@ -60,22 +60,22 @@ class CommentsController extends ApiController
 
 
 
-        if (!$cookie) {
-            return new JsonResponse(['message' => 'Une erreur est survenue, veuillez réessayer plus tard !'], 400);
-        }
+        // if (!$cookie) {
+        //     return new JsonResponse(['message' => 'Une erreur est survenue, veuillez réessayer plus tard !'], 400);
+    //     // }
         
-      $token = new JWTUserToken();
-      $token->setRawToken($cookie);
+    //   $token = new JWTUserToken();
+    //   $token->setRawToken($cookie);
 
 
 
-            $tokenData = $this->jwtManager->decode($token);
+    //         $tokenData = $this->jwtManager->decode($token);
 
-            $user = $tokenData['username'];
-            $user = $this->entityManager->getRepository(User::class)->findOneBy(['email' => $user]);
-            if (!$user) {
-                return new JsonResponse('Utilisateur non trouvé', 400);
-            }
+            // $user = $tokenData['username'];
+            // $user = $this->entityManager->getRepository(User::class)->findOneBy(['email' => $user]);
+            // if (!$user) {
+            //     return new JsonResponse('Utilisateur non trouvé', 400);
+            // }
 
             $data = json_decode($content, true);
 
