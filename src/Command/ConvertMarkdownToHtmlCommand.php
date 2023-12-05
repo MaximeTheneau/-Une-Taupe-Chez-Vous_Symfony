@@ -55,11 +55,14 @@ class ConvertMarkdownToHtmlCommand extends Command
 
             $htmlText = $markdown->transform($markdownText);
 
-            $htmlText = preg_replace('/\>\s+\</', '><', $htmlText);
-        
-            $htmlText = preg_replace('/\s+\</', '<', $htmlText);
-        
-            $htmlText = preg_replace('/\s+$/m', '', $htmlText);
+            // Supprimer les espaces inutiles après les balises ouvrantes <p>
+            $htmlText = preg_replace('/<p>\s+/', '<p>', $htmlText);
+
+            // Supprimer les espaces inutiles avant les balises fermantes </p>
+            $htmlText = preg_replace('/\s+<\/p>/', '</p>', $htmlText);
+
+            // Supprimer les espaces inutiles à la fin des lignes à l'intérieur des balises <p>
+            $htmlText = preg_replace('/\s+<\/p>\s+/', '</p>', $htmlText);
         
             $htmlText = preg_replace('/<!--(.*?)-->/s', '', $htmlText);
 

@@ -30,7 +30,7 @@ class Posts
     #[Groups(['api_posts_browse', 'api_posts_read', 'api_posts_desc', 'api_posts_category', 'api_posts_subcategory', 'api_posts_articles_desc', 'api_posts_all', 'api_posts_keyword' ])]
     private ?string $title = null;
 
-    #[ORM\Column(length: 135)]
+    #[ORM\Column(length: 1000)]
     #[Groups(['api_posts_read'])]
     private ?string $metaDescription = null;
     
@@ -93,6 +93,9 @@ class Posts
     #[ORM\ManyToMany(targetEntity: Keyword::class, mappedBy: 'posts')]
     #[Groups(['api_posts_read'])]
     private Collection $keywords;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $url = null;
 
 
     public function __construct()
@@ -386,6 +389,18 @@ class Posts
     public function setFormattedDate(string $formattedDate): static
     {
         $this->formattedDate = $formattedDate;
+
+        return $this;
+    }
+
+    public function getUrl(): ?string
+    {
+        return $this->url;
+    }
+
+    public function setUrl(?string $url): static
+    {
+        $this->url = $url;
 
         return $this;
     }

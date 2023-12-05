@@ -32,6 +32,8 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Michelf\MarkdownExtra;
 use \IntlDateFormatter;
 use App\Service\MarkdownProcessor;
+use App\Service\UrlGeneratorService;
+use App\Message\UpdateNextAppMessage;
 
 #[Route('/posts')]
 class PostsController extends AbstractController
@@ -45,7 +47,7 @@ class PostsController extends AbstractController
     private $markdown;
     private $markdownProcessor;
     private $messageBus;
-
+    private $urlGeneratorService;
 
     public function __construct(
         ContainerBagInterface $params,
@@ -54,6 +56,7 @@ class PostsController extends AbstractController
         EntityManagerInterface $entityManager,
         MarkdownProcessor $markdownProcessor,
         MessageBusInterface $messageBus,
+        UrlGeneratorService $urlGeneratorService,
     )
     {
         $this->params = $params;
@@ -66,6 +69,7 @@ class PostsController extends AbstractController
         $this->domainFront = $this->params->get('app.domain');
         $this->markdownProcessor = $markdownProcessor;
         $this->messageBus = $messageBus;
+        $this->urlGeneratorService = $urlGeneratorService;
     }
     
     #[Route('/', name: 'app_back_posts_index', methods: ['GET'])]
@@ -104,7 +108,18 @@ class PostsController extends AbstractController
 
             // SLUG
             $slug = $this->slugger->slug($post->getTitle());
-            $post->setSlug($slug);
+            if($post->getSlug() !== "Accueil") {
+                $post->setSlug($slug);
+                $categorySlug = $post->getCategory() ? $post->getCategory()->getSlug() : null;
+                $subcategorySlug = $post->getSubcategory() ? $post->getSubcategory()->getSlug() : null;
+            
+                $url = $this->urlGeneratorService->generatePath($slug, $categorySlug, $subcategorySlug);
+                $post->setUrl($url);
+            } else {
+                $post->setSlug('Accueil');
+                $url = '';
+                $post->setUrl($url);
+            }
 
 
             // IMAGE Principal
@@ -225,8 +240,15 @@ class PostsController extends AbstractController
             $slug = $this->slugger->slug($post->getTitle());
             if($post->getSlug() !== "Accueil") {
                 $post->setSlug($slug);
+                $categorySlug = $post->getCategory() ? $post->getCategory()->getSlug() : null;
+                $subcategorySlug = $post->getSubcategory() ? $post->getSubcategory()->getSlug() : null;
+            
+                $url = $this->urlGeneratorService->generatePath($slug, $categorySlug, $subcategorySlug);
+                $post->setUrl($url);
             } else {
                 $post->setSlug('Accueil');
+                $url = '';
+                $post->setUrl($url);
             }
             
             // $image = $formParagraph->get('imgPostParagh')->getData();
@@ -251,13 +273,13 @@ class PostsController extends AbstractController
 
             // PARAGRAPH
             $paragraphPosts = $form->get('paragraphPosts')->getData();
-            $linkDelete = $formParagraph->get('deleteLink')->getData();
+            // $linkDelete = $formParagraph->get('deleteLink')->getData();
 
-            if ($linkDelete === true)
-            {
-                $paragraphPosts->setLink(null);
-                $paragraphPosts->setLinkSubtitle(null);
-            }
+            // if ($linkDelete === true)
+            // {
+            //     $paragraphPosts->setLink(null);
+            //     $paragraphPosts->setLinkSubtitle(null);
+            // }
 
             foreach ($paragraphPosts as $paragraph) {
 
@@ -330,7 +352,7 @@ class PostsController extends AbstractController
             
             
             $postsRepository->save($post, true);
-            $this->triggerNextJsBuild();
+            // $this->triggerNextJsBuild();
 
             return $this->redirectToRoute('app_back_posts_edit', ['id' => $post->getId()], Response::HTTP_SEE_OTHER);
         }
