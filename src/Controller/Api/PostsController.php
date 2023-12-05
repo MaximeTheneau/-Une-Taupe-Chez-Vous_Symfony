@@ -160,6 +160,27 @@ class PostsController extends ApiController
     }
 
     /**
+     * @Route("/sitemap", name="sitemap", methods={"GET"})
+     */
+    public function sitemap(PostsRepository $postsRepository ): JsonResponse
+    {
+    
+        $allPosts = $postsRepository->findAllPosts();
+
+        return $this->json(
+            $allPosts,
+            Response::HTTP_OK,
+            [],
+            [
+                "groups" => 
+                [
+                    "api_posts_sitemap"
+                ]
+            ]
+        );
+    }
+
+    /**
      * @Route("/thumbnail/{slug}", name="thumbnail", methods={"GET"})
      */
     public function thumbnail(PostsRepository $postsRepository, Posts $posts = null ): JsonResponse

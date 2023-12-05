@@ -35,7 +35,7 @@ class Posts
     private ?string $metaDescription = null;
     
     #[ORM\Column(length: 70, unique: true, type: Types::STRING)]
-    #[Groups(['api_posts_browse', 'api_posts_read', 'api_posts_desc', 'api_posts_category', 'api_posts_subcategory', 'api_posts_all', 'api_posts_keyword' ])]
+    #[Groups(['api_posts_browse', 'api_posts_read', 'api_posts_desc', 'api_posts_category', 'api_posts_subcategory', 'api_posts_all', 'api_posts_keyword', 'api_posts_sitemap' ])]
     private ?string $slug = null;
 
     
@@ -64,7 +64,7 @@ class Posts
     private ?string $links = null;
 
     #[ORM\OneToMany(mappedBy: 'posts', targetEntity: ParagraphPosts::class, cascade: ['persist', 'remove'], orphanRemoval: true)]
-    #[Groups(['api_posts_read' ])]
+    #[Groups(['api_posts_read', 'api_posts_sitemap' ])]
     private Collection $paragraphPosts;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -95,6 +95,7 @@ class Posts
     private Collection $keywords;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['api_posts_all', 'api_posts_category', 'api_posts_desc', 'api_posts_subcategory', 'api_posts_browse', 'api_posts_read', 'api_posts_keyword', 'api_posts_sitemap'  ])]
     private ?string $url = null;
 
 
