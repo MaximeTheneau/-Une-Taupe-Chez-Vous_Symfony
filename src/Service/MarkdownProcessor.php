@@ -3,17 +3,17 @@
 namespace App\Service;
 
 use Michelf\MarkdownExtra;
-use MatthiasMullie\Minify;
+// use voku\helper\HtmlMin;
 
 class MarkdownProcessor
 {
     private $markdown;
-    private $minifier;
+    // private $minifier;
 
     public function __construct()
     {
         $this->markdown = new MarkdownExtra();
-        $this->minifier = new Minify\HTML();
+        // $this->minifier = new HtmlMin();
     }
 
     public function processMarkdown($markdownText)
@@ -27,14 +27,8 @@ class MarkdownProcessor
             return $this->markdown->transform($markdownText);
         }
         
-        $minifiedHtml = $this->minifyHtml($markdownText);
-        return $minifiedHtml;
-    }
+        // $minifiedHtml = $this->minifier->minify();
 
-    private function minifyHtml($html)
-    {
-        $this->minifier($html);
-
-        return $html;
+        return $markdownText;
     }
 }
