@@ -3,15 +3,17 @@
 namespace App\Service;
 
 use Michelf\MarkdownExtra;
+use MatthiasMullie\Minify;
 
 class MarkdownProcessor
 {
     private $markdown;
+    private $minifier;
 
     public function __construct()
     {
         $this->markdown = new MarkdownExtra();
-
+        $this->minifier = new Minify\HTML();
     }
 
     public function processMarkdown($markdownText)
@@ -31,17 +33,7 @@ class MarkdownProcessor
 
     private function minifyHtml($html)
     {
-        // Supprimer les espaces inutiles après les balises ouvrantes <p>
-        $html = preg_replace('/<p>\s+/', '<p>', $html);
-
-        // Supprimer les espaces inutiles avant les balises fermantes </p>
-        $html = preg_replace('/\s+<\/p>/', '</p>', $html);
-
-        // Supprimer les espaces inutiles à la fin des lignes à l'intérieur des balises <p>
-        $html = preg_replace('/\s+<\/p>\s+/', '</p>', $html);
-
-        // Supprimer les commentaires HTML
-        $html = preg_replace('/<!--(.*?)-->/s', '', $html);
+        $this->minifier($html);
 
         return $html;
     }
