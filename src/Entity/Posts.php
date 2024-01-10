@@ -98,6 +98,10 @@ class Posts
     #[Groups(['api_posts_all', 'api_posts_category', 'api_posts_desc', 'api_posts_subcategory', 'api_posts_browse', 'api_posts_read', 'api_posts_keyword', 'api_posts_sitemap'  ])]
     private ?string $url = null;
 
+    #[ORM\Column(length: 5000)]
+    #[Groups(['api_posts_read'])]
+    private ?string $contentsHTML = null;
+
 
     public function __construct()
     {
@@ -402,6 +406,18 @@ class Posts
     public function setUrl(?string $url): static
     {
         $this->url = $url;
+
+        return $this;
+    }
+
+    public function getContentsHTML(): ?string
+    {
+        return $this->contentsHTML;
+    }
+
+    public function setContentsHTML(string $contentsHTML): static
+    {
+        $this->contentsHTML = $contentsHTML;
 
         return $this;
     }

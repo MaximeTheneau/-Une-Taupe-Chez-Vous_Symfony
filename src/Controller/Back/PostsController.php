@@ -34,6 +34,7 @@ use \IntlDateFormatter;
 use App\Service\MarkdownProcessor;
 use App\Service\UrlGeneratorService;
 use App\Message\UpdateNextAppMessage;
+use Symfony\Component\String\UnicodeString;
 
 #[Route('/posts')]
 class PostsController extends AbstractController
@@ -147,8 +148,18 @@ class PostsController extends AbstractController
 
             $post->setFormattedDate('Publié le ' . $createdAt);
             
+            // MARKDOWN TO HTML
+            $contentsText = $post->getContents();
+            
+            $htmlText = $this->markdownProcessor->processMarkdown($contentsText);
+            
+            $cleanedText = strip_tags($htmlText);
+            $cleanedText = new UnicodeString($cleanedText);
+            $cleanedText = $cleanedText->ascii();
 
+            $post->setContents($cleanedText);
 
+            $post->setContentsHTML($htmlText);
 
             // PARAGRAPH
             $paragraphPosts = $form->get('paragraphPosts')->getData();
@@ -187,7 +198,7 @@ class PostsController extends AbstractController
             } 
 
             $postsRepository->save($post, true);
-            $this->triggerNextJsBuild();
+            // $this->triggerNextJsBuild();
 
         }
 
@@ -251,8 +262,6 @@ class PostsController extends AbstractController
                 $post->setUrl($url);
             }
             
-            // $image = $formParagraph->get('imgPostParagh')->getData();
-    
             // IMAGE Principal
             $brochureFile = $form->get('imgPost')->getData();
 
@@ -264,12 +273,19 @@ class PostsController extends AbstractController
             } else {
                 $post->setImgPost($imgPost);
             }
+
             // MARKDOWN TO HTML
-            $markdownText = $post->getContents();
+            $contentsText = $post->getContents();
+            
+            $htmlText = $this->markdownProcessor->processMarkdown($contentsText);
+            
+            $cleanedText = strip_tags($htmlText);
+            $cleanedText = new UnicodeString($cleanedText);
+            $cleanedText = $cleanedText->ascii();
 
-            $htmlText = $this->markdownProcessor->processMarkdown($markdownText);
+            $post->setContents($cleanedText);
 
-            $post->setContents($htmlText);
+            $post->setContentsHTML($htmlText);
 
             // PARAGRAPH
             $paragraphPosts = $form->get('paragraphPosts')->getData();
