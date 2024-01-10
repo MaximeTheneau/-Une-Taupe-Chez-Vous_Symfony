@@ -63,6 +63,25 @@ class ContactController extends ApiController
         // }
 
         
+        if ($data['emailReturn']) {
+            $emailReturn = (new TemplatedEmail())
+            ->to($data['email'])
+            ->from($_ENV['MAILER_TO'])
+            ->subject('Votre message a bien été envoyé')
+            ->htmlTemplate('emails/contactReturn.html.twig')
+            ->context([
+                'emailContact' => $data['email'],
+                'subjectContact' => $data['subject'],
+                'nameContact' => $data['name'],
+                'messageContact' => $data['message'],
+                'postalCodeContact' => $data['postalCode'],
+                'phoneContact' => $data['phone'],
+            ]);
+
+            $mailer->send($emailReturn);
+            
+        }
+
         if ($data['subject'] === 'Webmaster'  ) {
             $data['subject'] = 'Demande de contact webmaster';
             $emailTo = $_ENV['MAILER_TO_WEBMASTER'];
@@ -70,6 +89,7 @@ class ContactController extends ApiController
         else {
             $emailTo = $_ENV['MAILER_TO'];
         }
+
 
         $email = (new TemplatedEmail())
             ->to($emailTo)
@@ -82,6 +102,7 @@ class ContactController extends ApiController
                 'nameContact' => $data['name'],
                 'messageContact' => $data['message'],
                 'postalCodeContact' => $data['postalCode'],
+                'phoneContact' => $data['phone'],
             ])
                 ->replyTo($data['email']);
         
