@@ -215,6 +215,8 @@ class PostsController extends AbstractController
         $response = $client->request('POST', $apiEndpoint, [
             'headers' => [
                 'Content-Type' => 'application/json',
+                'Accept' => 'application/json',
+                'Access-Control-Allow-Origin', 'https://back.unetaupechezvous.fr'
             ],
             'body' => json_encode([
                 'payload' => 'build',
