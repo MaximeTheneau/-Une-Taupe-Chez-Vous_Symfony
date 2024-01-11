@@ -220,7 +220,6 @@ class PostsController extends AbstractController
                 'payload' => 'build',
             ]),
         ]);
-        return new JsonResponse(['message' => 'Webhook received'], 200);
     }
 
     #[Route('/{id}', name: 'app_back_posts_show', methods: ['GET'])]
