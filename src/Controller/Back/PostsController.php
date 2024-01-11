@@ -208,6 +208,9 @@ class PostsController extends AbstractController
         ]);
     }
 
+    /**
+     * @Route("/trigger-nextjs-build", name="app_back_posts_trigger_nextjs_build", methods={"POST"})
+     */
     public function triggerNextJsBuild()
     {
         $client = HttpClient::create();
@@ -221,6 +224,13 @@ class PostsController extends AbstractController
             'body' => json_encode([
                 'payload' => 'build',
             ]),
+        ]);
+
+        $data = $response->toArray();
+
+        return new JsonResponse([
+            'message' => 'Next.js build triggered',
+            'data' => $data,
         ]);
     }
 
