@@ -212,7 +212,6 @@ class PostsController extends AbstractController
     {
         $client = HttpClient::create();
         $apiEndpoint = 'https://' . $this->domainFront . '/api/build-export-endpoint';
-        dd($apiEndpoint);
         $response = $client->request('POST', $apiEndpoint, [
             'headers' => [
                 'Content-Type' => 'application/json',
