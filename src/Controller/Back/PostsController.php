@@ -198,7 +198,7 @@ class PostsController extends AbstractController
             } 
 
             $postsRepository->save($post, true);
-            // $this->triggerNextJsBuild();
+            $this->triggerNextJsBuild();
 
         }
 
@@ -210,12 +210,16 @@ class PostsController extends AbstractController
 
     public function triggerNextJsBuild()
     {
-        $payload = json_decode($request->getContent(), true);
-       
-        $this->messageBus->dispatch(new UpdateNextAppMessage());
-
-        exec('node https://unetaupechezvous.fr/api/build-export-endpoint', $output, $returnCode);
-
+        $client = HttpClient::create();
+        $apiEndpoint = $this->domainFront . '/api/build-export-endpoint';
+        $response = $client->request('POST', $apiEndpoint, [
+            'headers' => [
+                'Content-Type' => 'application/json',
+            ],
+            'body' => json_encode([
+                'payload' => 'build',
+            ]),
+        ]);
         return new JsonResponse(['message' => 'Webhook received'], 200);
     }
 
@@ -368,7 +372,7 @@ class PostsController extends AbstractController
             
             
             $postsRepository->save($post, true);
-            // $this->triggerNextJsBuild();
+            $this->triggerNextJsBuild();
 
             return $this->redirectToRoute('app_back_posts_edit', ['id' => $post->getId()], Response::HTTP_SEE_OTHER);
         }
