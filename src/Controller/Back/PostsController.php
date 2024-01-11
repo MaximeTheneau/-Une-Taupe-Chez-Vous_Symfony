@@ -211,7 +211,8 @@ class PostsController extends AbstractController
     public function triggerNextJsBuild()
     {
         $client = HttpClient::create();
-        $apiEndpoint = $this->domainFront . '/api/build-export-endpoint';
+        $apiEndpoint = 'https://' . $this->domainFront . '/api/build-export-endpoint';
+        dd($apiEndpoint);
         $response = $client->request('POST', $apiEndpoint, [
             'headers' => [
                 'Content-Type' => 'application/json',
