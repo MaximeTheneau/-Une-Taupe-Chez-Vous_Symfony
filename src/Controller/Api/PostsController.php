@@ -78,7 +78,7 @@ class PostsController extends ApiController
      */
     public function subcategory(PostsRepository $postsRepository, Subcategory $subcategory): JsonResponse
     {
-        $posts = $postsRepository->findBy(['subcategory' => $subcategory], ['createdAt' => 'DESC']);
+        $posts = $postsRepository->findAllPosts(['subcategory' => $subcategory], ['createdAt' => 'DESC']);
 
         return $this->json(
             $posts,
