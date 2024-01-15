@@ -58,7 +58,7 @@ class PostsController extends ApiController
     public function category(PostsRepository $postsRepository, Category $category): JsonResponse
     {
         $posts = $postsRepository->findBy(
-            ['category' => $category, 'draft' => false, 'draft' => null],
+            ['category' => $category, 'draft' => null],
             ['createdAt' => 'DESC']
         );
 
@@ -82,7 +82,7 @@ class PostsController extends ApiController
     public function subcategory(PostsRepository $postsRepository, Subcategory $subcategory): JsonResponse
     {
         $posts = $postsRepository->findBy(
-            ['subcategory' => $subcategory, 'draft' => false, 'draft' => null],
+            ['subcategory' => $subcategory, 'draft' => null],
             ['createdAt' => 'DESC']
         );
 
@@ -105,7 +105,7 @@ class PostsController extends ApiController
     */
     public function limit(PostsRepository $postsRepository, Category $category): JsonResponse
     {
-        $posts = $postsRepository->findBy(['category' => $category], ['createdAt' => 'ASC'], 3);
+        $posts = $postsRepository->findBy(['category' => $category, 'draft' => null], ['createdAt' => 'ASC'], 3);
 
 
         return $this->json(
@@ -295,14 +295,12 @@ class PostsController extends ApiController
                 ]
             );
         }
-
         foreach ($postsKeyword as $keyword) {
             $postsKeyword = $keyword->getPosts();
     
             $filteredPostId = $postsKeyword->filter(function ($otherPost) use ($postId) {
-                return $otherPost->getId() != $postId;
+                return $otherPost->getId() != $postId && !$otherPost->isDraft();
             });
-    
             foreach ($filteredPostId as $filteredPost) {
                 $filteredPosts[] = $filteredPost;
             }

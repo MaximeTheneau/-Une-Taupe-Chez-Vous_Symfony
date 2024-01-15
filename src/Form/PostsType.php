@@ -36,7 +36,8 @@ class PostsType extends AbstractType
                 'required' => false,
                 'attr' => [
                     'class' => 'input mb-3',
-                ]
+                ],
+                'by_reference' => false,
             ])
             ->add('category', EntityType::class, [
                 'label' => false,
