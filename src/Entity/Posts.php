@@ -102,6 +102,9 @@ class Posts
     #[Groups(['api_posts_read'])]
     private ?string $contentsHTML = null;
 
+    #[ORM\Column(nullable: true)]
+    private ?bool $draft = null;
+
 
     public function __construct()
     {
@@ -418,6 +421,18 @@ class Posts
     public function setContentsHTML(string $contentsHTML): static
     {
         $this->contentsHTML = $contentsHTML;
+
+        return $this;
+    }
+
+    public function isDraft(): ?bool
+    {
+        return $this->draft;
+    }
+
+    public function setDraft(?bool $draft): static
+    {
+        $this->draft = $draft;
 
         return $this;
     }

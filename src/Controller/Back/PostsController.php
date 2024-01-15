@@ -209,7 +209,7 @@ class PostsController extends AbstractController
     }
 
     /**
-     * @Route("/trigger-nextjs-build", name="app_back_posts_trigger_nextjs_build", methods={"POST"})
+     * @Route("/api/build-export-endpoint", name="app_back_posts_trigger_nextjs_build", methods={"POST"})
      */
     public function triggerNextJsBuild()
     {
@@ -381,7 +381,7 @@ class PostsController extends AbstractController
             
             
             $postsRepository->save($post, true);
-            $this->triggerNextJsBuild();
+            // $this->triggerNextJsBuild();
 
             return $this->redirectToRoute('app_back_posts_edit', ['id' => $post->getId()], Response::HTTP_SEE_OTHER);
         }

@@ -45,6 +45,7 @@ class PostsRepository extends ServiceEntityRepository
     public function findAllPosts()
     {
         return $this->createQueryBuilder('r')
+            ->andWhere('r.draft IS NULL OR r.draft = false')
             ->orderBy('CASE WHEN r.updatedAt IS NOT NULL THEN r.updatedAt ELSE r.createdAt END', 'DESC')
             ->getQuery()
             ->getResult();
@@ -60,11 +61,21 @@ class PostsRepository extends ServiceEntityRepository
     public function findByCategorySlug(string $slug, int $limit)
     {
         return $this->createQueryBuilder('p')
+            ->andWhere('p.draft IS NULL OR p.draft = false')
             ->join('p.category', 'c')
             ->andWhere('c.slug = :slug')
             ->setParameter('slug', $slug)
             ->orderBy('CASE WHEN p.updatedAt IS NOT NULL THEN p.updatedAt ELSE p.createdAt END', 'DESC')
             ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function findAllNonDraftPosts(): array
+    {
+        return $this->createQueryBuilder('p')
+            ->andWhere('p.draft IS NULL OR p.draft = :draft')
+            ->setParameter('draft', false, \Doctrine\DBAL\Types\Type::BOOLEAN) // Spécifiez le type du paramètre
             ->getQuery()
             ->getResult();
     }

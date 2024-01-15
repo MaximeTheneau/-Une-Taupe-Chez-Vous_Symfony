@@ -21,6 +21,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 use Lexik\Bundle\JWTAuthenticationBundle\Event\JWTCreatedEvent;
 use Symfony\Component\HttpFoundation\Cookie;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 /**
@@ -56,7 +57,7 @@ class PostsController extends ApiController
      */
     public function category(PostsRepository $postsRepository, Category $category): JsonResponse
     {
-        $posts = $postsRepository->findBy(['category' => $category], ['createdAt' => 'DESC']);
+        $posts = $postsRepository->findAllPosts(['category' => $category], ['createdAt' => 'DESC']);
 
         return $this->json(
             $posts,
@@ -77,7 +78,9 @@ class PostsController extends ApiController
      */
     public function subcategory(PostsRepository $postsRepository, Subcategory $subcategory): JsonResponse
     {
-        $posts = $postsRepository->findBy(['subcategory' => $subcategory], ['createdAt' => 'DESC']);
+        $posts = $postsRepository->findAllPosts(['subcategory' => $subcategory], ['createdAt' => 'DESC']);
+
+        
 
         return $this->json(
             $posts,
@@ -167,6 +170,7 @@ class PostsController extends ApiController
     
         $allPosts = $postsRepository->findAllPosts();
 
+
         return $this->json(
             $allPosts,
             Response::HTTP_OK,
@@ -216,6 +220,9 @@ class PostsController extends ApiController
      */
     public function read(Posts $post)
     {
+        if ($post->isDraft()) {
+            throw new NotFoundHttpException('Post not found');
+        }
         $filteredComments = [];
 
         foreach ($post->getComments() as $comment) {
