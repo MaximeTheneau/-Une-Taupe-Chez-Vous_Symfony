@@ -70,7 +70,9 @@ class PostsRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
-
+    /**
+     * @return Post[]
+     */
     public function findAllNonDraftPosts(): array
     {
         return $this->createQueryBuilder('p')

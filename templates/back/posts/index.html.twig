@@ -13,8 +13,8 @@
             </thead>
             <tbody>
             {% for post in posts %}
-                <tr>
-                    <td>{{ post.title }}</td>
+            <tr {% if post.draft %}class="text-red-500"{% endif %}>
+                <td>{{ post.title }}</td>
                     <td>
                         {% if post.subcategory %}
                             {{ post.subcategory.name }}

@@ -57,7 +57,10 @@ class PostsController extends ApiController
      */
     public function category(PostsRepository $postsRepository, Category $category): JsonResponse
     {
-        $posts = $postsRepository->findBy(['category' => $category], ['createdAt' => 'DESC']);
+        $posts = $postsRepository->findBy(
+            ['category' => $category, 'draft' => false, 'draft' => null],
+            ['createdAt' => 'DESC']
+        );
 
         return $this->json(
             $posts,
@@ -78,7 +81,10 @@ class PostsController extends ApiController
      */
     public function subcategory(PostsRepository $postsRepository, Subcategory $subcategory): JsonResponse
     {
-        $posts = $postsRepository->findAllPosts(['subcategory' => $subcategory], ['createdAt' => 'DESC']);
+        $posts = $postsRepository->findBy(
+            ['subcategory' => $subcategory, 'draft' => false, 'draft' => null],
+            ['createdAt' => 'DESC']
+        );
 
         return $this->json(
             $posts,
