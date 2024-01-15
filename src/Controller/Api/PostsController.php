@@ -57,7 +57,7 @@ class PostsController extends ApiController
      */
     public function category(PostsRepository $postsRepository, Category $category): JsonResponse
     {
-        $posts = $postsRepository->findAllPosts(['category' => $category], ['createdAt' => 'DESC']);
+        $posts = $postsRepository->findBy(['category' => $category], ['createdAt' => 'DESC']);
 
         return $this->json(
             $posts,
@@ -97,7 +97,7 @@ class PostsController extends ApiController
     }
 
     /**
-    * @Route("&limit=3&category={name}", name="category", methods={"GET"})
+    * @Route("&limit=3&category={slug}", name="category", methods={"GET"})
     */
     public function limit(PostsRepository $postsRepository, Category $category): JsonResponse
     {
