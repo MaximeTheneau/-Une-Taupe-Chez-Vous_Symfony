@@ -289,7 +289,7 @@ class PostsController extends ApiController
             $postsKeyword = $keyword->getPosts();
     
             $filteredPostId = $postsKeyword->filter(function ($otherPost) use ($postId) {
-                return $otherPost->getId() != $postId;
+                return $otherPost->getId() != $postId && !$otherPost->isDraft();
             });
     
             foreach ($filteredPostId as $filteredPost) {
