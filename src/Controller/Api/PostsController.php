@@ -21,7 +21,6 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 use Lexik\Bundle\JWTAuthenticationBundle\Event\JWTCreatedEvent;
 use Symfony\Component\HttpFoundation\Cookie;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 /**
@@ -57,10 +56,7 @@ class PostsController extends ApiController
      */
     public function category(PostsRepository $postsRepository, Category $category): JsonResponse
     {
-        $posts = $postsRepository->findBy(
-            ['category' => $category, 'draft' => null],
-            ['createdAt' => 'DESC']
-        );
+        $posts = $postsRepository->findBy(['category' => $category, 'draft' => false], ['createdAt' => 'DESC']);
 
         return $this->json(
             $posts,
@@ -81,10 +77,7 @@ class PostsController extends ApiController
      */
     public function subcategory(PostsRepository $postsRepository, Subcategory $subcategory): JsonResponse
     {
-        $posts = $postsRepository->findBy(
-            ['subcategory' => $subcategory, 'draft' => null],
-            ['createdAt' => 'DESC']
-        );
+        $posts = $postsRepository->findBy(['subcategory' => $subcategory, 'draft' => false],  ['createdAt' => 'DESC']);
 
         return $this->json(
             $posts,
@@ -101,11 +94,11 @@ class PostsController extends ApiController
     }
 
     /**
-    * @Route("&limit=3&category={slug}", name="category", methods={"GET"})
+    * @Route("&limit=3&category={name}", name="category", methods={"GET"})
     */
     public function limit(PostsRepository $postsRepository, Category $category): JsonResponse
     {
-        $posts = $postsRepository->findBy(['category' => $category, 'draft' => null], ['createdAt' => 'ASC'], 3);
+        $posts = $postsRepository->findBy(['category' => $category, 'draft' => false], ['createdAt' => 'ASC'], 3);
 
 
         return $this->json(
@@ -174,7 +167,6 @@ class PostsController extends ApiController
     
         $allPosts = $postsRepository->findAllPosts();
 
-
         return $this->json(
             $allPosts,
             Response::HTTP_OK,
@@ -224,9 +216,6 @@ class PostsController extends ApiController
      */
     public function read(Posts $post)
     {
-        if ($post->isDraft()) {
-            throw new NotFoundHttpException('Post not found');
-        }
         $filteredComments = [];
 
         foreach ($post->getComments() as $comment) {
@@ -295,12 +284,14 @@ class PostsController extends ApiController
                 ]
             );
         }
+
         foreach ($postsKeyword as $keyword) {
             $postsKeyword = $keyword->getPosts();
     
             $filteredPostId = $postsKeyword->filter(function ($otherPost) use ($postId) {
-                return $otherPost->getId() != $postId && !$otherPost->isDraft();
+                return $otherPost->getId() != $postId;
             });
+    
             foreach ($filteredPostId as $filteredPost) {
                 $filteredPosts[] = $filteredPost;
             }

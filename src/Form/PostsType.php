@@ -37,7 +37,6 @@ class PostsType extends AbstractType
                 'attr' => [
                     'class' => 'input mb-3',
                 ],
-                'by_reference' => false,
             ])
             ->add('category', EntityType::class, [
                 'label' => false,
@@ -165,10 +164,9 @@ class PostsType extends AbstractType
                 $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {
                     $form = $event->getForm();
                     $listPosts = $event->getData()->getParagraphPosts();
-        
-                    
                 });
     }
+    
 
     public function configureOptions(OptionsResolver $resolver): void
     {

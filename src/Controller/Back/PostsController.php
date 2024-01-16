@@ -198,7 +198,7 @@ class PostsController extends AbstractController
             } 
 
             $postsRepository->save($post, true);
-            $this->triggerNextJsBuild();
+            // $this->triggerNextJsBuild();
 
         }
 

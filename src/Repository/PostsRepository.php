@@ -45,7 +45,7 @@ class PostsRepository extends ServiceEntityRepository
     public function findAllPosts()
     {
         return $this->createQueryBuilder('r')
-            ->andWhere('r.draft IS NULL OR r.draft = false')
+            ->andWhere('r.draft = false')
             ->orderBy('CASE WHEN r.updatedAt IS NOT NULL THEN r.updatedAt ELSE r.createdAt END', 'DESC')
             ->getQuery()
             ->getResult();
@@ -61,7 +61,7 @@ class PostsRepository extends ServiceEntityRepository
     public function findByCategorySlug(string $slug, int $limit)
     {
         return $this->createQueryBuilder('p')
-            ->andWhere('p.draft IS NULL OR p.draft = false')
+            ->andWhere('p.draft = false')
             ->join('p.category', 'c')
             ->andWhere('c.slug = :slug')
             ->setParameter('slug', $slug)
