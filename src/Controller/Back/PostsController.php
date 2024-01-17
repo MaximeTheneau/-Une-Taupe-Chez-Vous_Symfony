@@ -338,6 +338,7 @@ class PostsController extends AbstractController
                         $paragraph->setLink('/'.$categoryLink.'/'.$subcategoryLink.'/'.$slugLink);
                     }
                 } 
+                
                 $deletedLink = $form['paragraphPosts'];
 
                 if ($deletedLink[$paragraphPosts->indexOf($paragraph)]['deleteLink']->getData() === true) {
