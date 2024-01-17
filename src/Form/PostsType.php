@@ -160,7 +160,6 @@ class PostsType extends AbstractType
                 'allow_delete' => true,
                 'by_reference' => false,
             ]);
-
                 $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {
                     $form = $event->getForm();
                     $listPosts = $event->getData()->getParagraphPosts();
