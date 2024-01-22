@@ -27,6 +27,7 @@ class Posts
     private ?int $id = null;
 
     #[ORM\Column(length: 70)]
+    #[Groups(['api_posts_read'])]
     private ?string $heading = null;
     
     #[ORM\Column(length: 70, unique: true, type: Types::STRING)]
