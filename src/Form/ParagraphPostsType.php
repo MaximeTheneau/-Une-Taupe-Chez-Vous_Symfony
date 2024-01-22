@@ -97,11 +97,11 @@ class ParagraphPostsType extends AbstractType
                         'class' => 'font-bold'
                         ]
             ])
-            ->addEventListener(FormEvents::PRE_SET_DATA, function(FormEvent $e){
+            ->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $e) {
                 $form = $e->getForm();
                 $recipe = $e->getData();
-
-                if($recipe && $recipe->getId()){
+            
+                if ($recipe && $recipe->getId()) {
                     $form->add('deleteLink', ChoiceType::class, [
                         'mapped' => false,
                         'label' => "Supprimer le lien ?",
@@ -110,7 +110,6 @@ class ParagraphPostsType extends AbstractType
                             "non" => false
                         ],
                         'expanded' => true,
-                        'data' => false
                     ]);
                 }
             })

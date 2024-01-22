@@ -302,13 +302,6 @@ class PostsController extends AbstractController
 
             // PARAGRAPH
             $paragraphPosts = $form->get('paragraphPosts')->getData();
-            // $linkDelete = $formParagraph->get('deleteLink')->getData();
-
-            // if ($linkDelete === true)
-            // {
-            //     $paragraphPosts->setLink(null);
-            //     $paragraphPosts->setLinkSubtitle(null);
-            // }
 
             foreach ($paragraphPosts as $paragraph) {
 
@@ -339,12 +332,12 @@ class PostsController extends AbstractController
                     }
                 } 
                 
-                $deletedLink = $form['paragraphPosts'];
+                // $deletedLink = $form['paragraphPosts'];
 
-                if ($deletedLink[$paragraphPosts->indexOf($paragraph)]['deleteLink']->getData() === true) {
-                    $paragraph->setLink(null);
-                    $paragraph->setLinkSubtitle(null);
-                }
+                // if ($deletedLink[$paragraphPosts->indexOf($paragraph)]['deleteLink']->getData() === true) {
+                //     $paragraph->setLink(null);
+                //     $paragraph->setLinkSubtitle(null);
+                // }
 
                 // SLUG
                 if (!empty($paragraph->getSubtitle())) {

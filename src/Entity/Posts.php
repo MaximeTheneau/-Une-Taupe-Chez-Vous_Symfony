@@ -25,6 +25,9 @@ class Posts
     #[ORM\Column]
     #[Groups(['api_posts_browse', 'api_posts_read', 'api_posts_desc', 'api_posts_category', 'api_posts_keyword' ])]
     private ?int $id = null;
+
+    #[ORM\Column(length: 70)]
+    private ?string $heading = null;
     
     #[ORM\Column(length: 70, unique: true, type: Types::STRING)]
     #[Groups(['api_posts_browse', 'api_posts_read', 'api_posts_desc', 'api_posts_category', 'api_posts_subcategory', 'api_posts_articles_desc', 'api_posts_all', 'api_posts_keyword' ])]
@@ -37,7 +40,6 @@ class Posts
     #[ORM\Column(length: 70, unique: true, type: Types::STRING)]
     #[Groups(['api_posts_browse', 'api_posts_read', 'api_posts_desc', 'api_posts_category', 'api_posts_subcategory', 'api_posts_all', 'api_posts_keyword', 'api_posts_sitemap' ])]
     private ?string $slug = null;
-
     
     #[ORM\Column(length: 5000, nullable: true, type: Types::STRING)]
     #[Type(type: Types::string)]
@@ -104,7 +106,6 @@ class Posts
 
     #[ORM\Column(nullable: true)]
     private ?bool $draft = null;
-
 
     public function __construct()
     {
@@ -433,6 +434,18 @@ class Posts
     public function setDraft(?bool $draft): static
     {
         $this->draft = $draft;
+
+        return $this;
+    }
+
+    public function getHeading(): ?string
+    {
+        return $this->heading;
+    }
+
+    public function setHeading(string $heading): static
+    {
+        $this->heading = $heading;
 
         return $this;
     }
