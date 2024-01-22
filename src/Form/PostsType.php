@@ -72,6 +72,7 @@ class PostsType extends AbstractType
                     'placeholder' => 'Titre de l\'article* (max 70 caractères)',
                     'id' => 'post_contents',
                     'maxlength' => '70',
+                    'minlength' => '40',
                     ]
             ])
             ->add('title', TextType::class, [
