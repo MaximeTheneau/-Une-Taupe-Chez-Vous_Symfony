@@ -271,7 +271,7 @@ class PostsController extends AbstractController
                 $post->setUrl($url);
             } else {
                 $post->setSlug('Accueil');
-                $url = '';
+                $url = '/';
                 $post->setUrl($url);
             }
             
@@ -293,10 +293,6 @@ class PostsController extends AbstractController
             $htmlText = $this->markdownProcessor->processMarkdown($contentsText);
             
             $cleanedText = strip_tags($htmlText);
-            $cleanedText = new UnicodeString($cleanedText);
-            $cleanedText = $cleanedText->ascii();
-
-            $post->setContents($cleanedText);
 
             $post->setContentsHTML($htmlText);
 

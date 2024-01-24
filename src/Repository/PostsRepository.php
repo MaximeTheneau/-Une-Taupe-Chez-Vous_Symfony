@@ -60,19 +60,21 @@ class PostsRepository extends ServiceEntityRepository
     }
     public function findByCategorySlug(string $slug, int $limit)
     {
+        $homePageSlug  = 'Accueil';
+
         return $this->createQueryBuilder('p')
             ->andWhere('p.draft = false')
             ->join('p.category', 'c')
             ->andWhere('c.slug = :slug')
+            ->andWhere('p.slug != :homePageSlug')
             ->setParameter('slug', $slug)
+            ->setParameter('homePageSlug', $homePageSlug)
             ->orderBy('CASE WHEN p.updatedAt IS NOT NULL THEN p.updatedAt ELSE p.createdAt END', 'DESC')
             ->setMaxResults($limit)
             ->getQuery()
             ->getResult();
     }
-    /**
-     * @return Post[]
-     */
+
     public function findAllNonDraftPosts(): array
     {
         return $this->createQueryBuilder('p')
@@ -82,6 +84,16 @@ class PostsRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    public function findAllPostsExcludingSlugs(array $excludeSlugs): array
+    {
+        return $this->createQueryBuilder('p')
+            ->andWhere('p.draft = false')
+            ->andWhere('p.slug NOT IN (:excludeSlugs)') // Exclude specified slugs
+            ->setParameter('excludeSlugs', $excludeSlugs)
+            ->orderBy('CASE WHEN p.updatedAt IS NOT NULL THEN p.updatedAt ELSE p.createdAt END', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
 //    /**
 //     * @return Posts[] Returns an array of Posts objects
 //     */

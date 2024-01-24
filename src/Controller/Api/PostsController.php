@@ -165,8 +165,10 @@ class PostsController extends ApiController
     public function sitemap(PostsRepository $postsRepository ): JsonResponse
     {
     
-        $allPosts = $postsRepository->findAllPosts();
+        $excludeSlugs = ['search'];
 
+        $allPosts = $postsRepository->findAllPostsExcludingSlugs($excludeSlugs);
+    
         return $this->json(
             $allPosts,
             Response::HTTP_OK,
@@ -268,7 +270,6 @@ class PostsController extends ApiController
         
         $postId = $post->getId();
         $postsKeyword = $post->getKeywords()->getValues();
-        
         if($postsKeyword === [])
         {
             $responsePosts = $postsRepository->findByCategorySlug($post->getCategory()->getSlug(), 3);
