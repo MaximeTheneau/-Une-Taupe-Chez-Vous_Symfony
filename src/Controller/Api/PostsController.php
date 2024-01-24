@@ -288,18 +288,17 @@ class PostsController extends ApiController
 
         foreach ($postsKeyword as $keyword) {
             $postsKeyword = $keyword->getPosts();
-    
             $filteredPostId = $postsKeyword->filter(function ($otherPost) use ($postId) {
-                return $otherPost->getId() != $postId && !$otherPost->isDraft();
+                return $otherPost->getId() != $postId && !$otherPost->isDraft() && $otherPost->getSlug() !== 'Accueil';
             });
-    
+            
             foreach ($filteredPostId as $filteredPost) {
                 $filteredPosts[] = $filteredPost;
             }
         }
-    
-        $sortedPosts = $filteredPostId->toArray(); 
-
+        
+        $sortedPosts = $filteredPosts; 
+        
         usort($sortedPosts, function ($a, $b) {
             $updatedAtA = $a->getUpdatedAt();
             $updatedAtB = $b->getUpdatedAt();
@@ -316,7 +315,7 @@ class PostsController extends ApiController
                 return $createdAtB <=> $createdAtA;
             }
         });
-
+        
         if (count($sortedPosts) > 3) {
             $responsePosts = array_slice($sortedPosts, 0, 3);
         } else {

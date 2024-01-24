@@ -60,7 +60,7 @@ class PostsRepository extends ServiceEntityRepository
     }
     public function findByCategorySlug(string $slug, int $limit)
     {
-        $homePageSlug  = 'Accueil';
+        $homePageSlug = 'Accueil';
 
         return $this->createQueryBuilder('p')
             ->andWhere('p.draft = false')
@@ -73,7 +73,7 @@ class PostsRepository extends ServiceEntityRepository
             ->setMaxResults($limit)
             ->getQuery()
             ->getResult();
-    }
+        }
 
     public function findAllNonDraftPosts(): array
     {
