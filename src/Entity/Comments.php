@@ -43,7 +43,7 @@ class Comments
     #[ORM\JoinColumn(name: 'parent_id', referencedColumnName: 'id', nullable: true)]
     private $parent;
     
-    #[ORM\OneToMany(targetEntity: 'Comments' , mappedBy: 'parent', cascade: ['remove'])]
+    #[ORM\OneToMany(targetEntity: Comments::class , mappedBy: 'parent', cascade: ['persist', 'remove'], orphanRemoval: true)]
     #[Groups(['api_posts_read'])]
     private $replies;
 
@@ -148,6 +148,28 @@ class Comments
     public function setParent(?Comments $parent): static
     {
         $this->parent = $parent;
+
+        return $this;
+    }
+
+    public function removeComments(Comments $comment): static
+    {
+        // Supprimer le commentaire de la collection principale
+        if ($this->comments->removeElement($comment)) {
+            // set the owning side to null (unless already changed)
+            if ($comment->getPosts() === $this) {
+                $comment->setPosts(null);
+            }
+        }
+
+        // Supprimer le commentaire de la collection de réponses
+        if ($this->replies->contains($comment)) {
+            $this->replies->removeElement($comment);
+            // set the owning side to null (unless already changed)
+            if ($comment->getParent() === $this) {
+                $comment->setParent(null);
+            }
+        }
 
         return $this;
     }
