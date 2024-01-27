@@ -43,7 +43,7 @@ class Comments
     #[ORM\JoinColumn(name: 'parent_id', referencedColumnName: 'id', nullable: true)]
     private $parent;
     
-    #[ORM\OneToMany(targetEntity: 'Comments' , mappedBy: 'parent')]
+    #[ORM\OneToMany(targetEntity: 'Comments' , mappedBy: 'parent', cascade: ['remove'])]
     #[Groups(['api_posts_read'])]
     private $replies;
 
