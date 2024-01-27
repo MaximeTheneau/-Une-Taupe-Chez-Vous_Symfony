@@ -4,6 +4,7 @@
 
 {% block body %}
     <h1>Comments</h1>
+    <a href="https://unetaupechezvous.fr{{comment.posts.url}}" target="_blank">Voir l'article</a>
     <h2>De {{ comment.user }}</h2>
     <h4>Le {{ comment.createdAt|date('d/m/Y') }}</h4>
     <p>{{ comment.comment }}</p>
