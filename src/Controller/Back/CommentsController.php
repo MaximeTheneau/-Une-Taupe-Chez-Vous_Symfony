@@ -142,7 +142,7 @@ class CommentsController extends AbstractController
             $mailer->send($email);
 
             $emailReturn = (new TemplatedEmail())
-                ->to($_ENV['MAILER_TO_WEBMASTER'])
+                ->to($_ENV['MAILER'])
                 ->from($_ENV['MAILER_TO'])
                 ->subject('Votre commentaire sur Une Taupe Chez Vous' )
                 ->htmlTemplate('emails/reply_notification_email_To.html.twig')
