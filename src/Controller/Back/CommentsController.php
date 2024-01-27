@@ -136,6 +136,19 @@ class CommentsController extends AbstractController
 
             $mailer->send($email);
 
+            $emailReturn = (new TemplatedEmail())
+                ->to($_ENV['MAILER_TO_WEBMASTER'])
+                ->from($_ENV['MAILER_TO'])
+                ->subject('Votre commentaire sur Une Taupe Chez Vous' )
+                ->htmlTemplate('emails/reply_notification_email_To.html.twig')
+                ->context([
+                    'username' => $reply->getUser(),
+                    'articleTitle' => $articleComment->getTitle(),
+                    'articleLink' => 'https://unetaupechezvous.fr' . $articleComment->getUrl(),
+                    'replyContent' => $reply->getComment(),
+                ]);
+            $mailer->send($emailReturn);
+
             return $this->redirectToRoute('app_back_comments_index');
         }
 
