@@ -117,11 +117,16 @@ class CommentsController extends AbstractController
             
             $reply->setCreatedAt(new \DateTimeImmutable());
             $reply->setAccepted(true);
+            
+            $articleComment = $comment->getPosts();
+           
+            $reply->setPosts($articleComment);
+
             $entityManager->persist($reply);
             $entityManager->flush();
             
             $userComment = $reply->getParent();
-            $articleComment = $reply->getPosts();
+
             $email = (new TemplatedEmail())
                 ->to($userComment->getEmail())
                 ->from($_ENV['MAILER_TO'])
@@ -137,7 +142,7 @@ class CommentsController extends AbstractController
             $mailer->send($email);
 
             $emailReturn = (new TemplatedEmail())
-                ->to($_ENV['MAILER_TO'])
+                ->to($_ENV['MAILER_TO_WEBMASTER'])
                 ->from($_ENV['MAILER_TO'])
                 ->subject('Votre commentaire sur Une Taupe Chez Vous' )
                 ->htmlTemplate('emails/reply_notification_email_To.html.twig')
