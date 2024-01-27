@@ -21,7 +21,8 @@ class CommentsType extends AbstractType
         ->add('posts', EntityType::class, [
             'class' => Posts::class,
             'choice_label' => 'title',
-            'label' => 'Commentaire'
+            'label' => 'Commentaire',
+            'attr' => ['style' => 'display:none'],
         ])
     ;
     }

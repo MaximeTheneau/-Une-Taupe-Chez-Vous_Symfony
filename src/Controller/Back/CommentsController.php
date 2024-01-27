@@ -10,6 +10,8 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Bridge\Twig\Mime\TemplatedEmail;
+use Symfony\Component\Mailer\MailerInterface;
 
 #[Route('/comments')]
 class CommentsController extends AbstractController
@@ -42,11 +44,33 @@ class CommentsController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', name: 'app_back_comments_show', methods: ['GET'])]
-    public function show(Comments $comment): Response
+    #[Route('/{id}', name: 'app_back_comments_show', methods: ['GET', 'POST'])]
+    public function show(Request $request, Comments $comment, EntityManagerInterface $entityManager): Response
     {
+
+        // Créez une nouvelle instance de l'entité Comment pour représenter la réponse
+        $reply = new Comments(); // Assurez-vous que Comment est le nom correct de votre entité
+
+        // Créez le formulaire pour la réponse
+        $form = $this->createForm(CommentsType::class, $reply); // Assurez-vous d'ajuster le nom du formulaire selon votre application
+
+        // Gérez la soumission du formulaire
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            // Associez la réponse au commentaire parent
+            $reply->setParent($comment);
+
+            // Enregistrez la réponse dans la base de données
+            $entityManager->persist($reply);
+            $entityManager->flush();
+
+            // Redirigez ou effectuez d'autres actions nécessaires
+            return $this->redirectToRoute('app_back_comments_show', ['id' => $comment->getId()]);
+        }
         return $this->render('back/comments/show.html.twig', [
             'comment' => $comment,
+            'form' => $form->createView(), // Passez le formulaire au modèle Twig
         ]);
     }
 
@@ -77,5 +101,45 @@ class CommentsController extends AbstractController
         }
 
         return $this->redirectToRoute('app_back_comments_index', [], Response::HTTP_SEE_OTHER);
+    }
+
+    #[Route('/{id}/reply', name: 'app_back_comments_reply', methods: ['POST'])]
+    public function replyToComment(Request $request, Comments $comment, EntityManagerInterface $entityManager, MailerInterface $mailer): Response
+    {
+
+        $reply = new Comments(); 
+
+        $form = $this->createForm(CommentsType::class, $reply); 
+
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $reply->setParent($comment);
+            
+            $reply->setCreatedAt(new \DateTimeImmutable());
+            $reply->setAccepted(true);
+            $entityManager->persist($reply);
+            $entityManager->flush();
+            
+            $userComment = $reply->getParent();
+            $articleComment = $reply->getPosts();
+            $email = (new TemplatedEmail())
+                ->to($userComment->getEmail())
+                ->from($_ENV['MAILER_TO'])
+                ->subject('Réponse à votre commentaire sur Une Taupe Chez Vous' )
+                ->htmlTemplate('emails/reply_notification_email.html.twig')
+                ->context([
+                    'username' => $userComment->getUser(),
+                    'articleTitle' => $articleComment->getTitle(),
+                    'articleLink' => 'https://unetaupechezvous.fr' . $articleComment->getUrl(),
+                    'replyContent' => $reply->getComment(),
+                ]);
+
+            $mailer->send($email);
+
+            return $this->redirectToRoute('app_back_comments_index');
+        }
+
+
+        return $this->redirectToRoute('app_back_comments_index');
     }
 }

@@ -2,14 +2,11 @@
 
 namespace App\Entity;
 
-use App\Repository\CommentsRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
+use App\Repository\CommentsReplyRepository;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Serializer\Annotation\Groups;
 
-#[ORM\Entity(repositoryClass: CommentsRepository::class)]
-class Comments
+#[ORM\Entity(repositoryClass: CommentsReplyRepository::class)]
+class CommentsReply
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -19,7 +16,7 @@ class Comments
 
     #[ORM\Column(length: 70)]
     #[Groups(['api_posts_read'])]
-    private ?string $User = null;
+    private ?string $User = 'Laurent Theneau';
 
     #[ORM\Column(length: 255)]
     private ?string $email = null;
@@ -31,21 +28,12 @@ class Comments
 
     #[ORM\Column]
     private ?bool $accepted = false;
-
     #[ORM\ManyToOne(inversedBy: 'comments')]
     private ?Posts $posts = null;
 
     #[ORM\Column]
     #[Groups(['api_posts_read'])]
     private ?\DateTimeImmutable $createdAt = null;
-
-    #[ORM\ManyToOne(inversedBy: 'replies', targetEntity: 'Comments')]
-    #[ORM\JoinColumn(name: 'parent_id', referencedColumnName: 'id', nullable: true)]
-    private $parent;
-    
-    #[ORM\OneToMany(targetEntity: 'Comments' , mappedBy: 'parent')]
-    #[Groups(['api_posts_read'])]
-    private $replies;
 
     public function getId(): ?int
     {
@@ -90,7 +78,6 @@ class Comments
 
     public function isAccepted(): ?bool
     {
-
         return $this->accepted;
     }
 
@@ -124,32 +111,4 @@ class Comments
 
         return $this;
     }
-
-    /**
-     * @return ArrayCollection|Comment[]
-     */
-    public function getReplies()
-    {
-        return $this->replies;
-    }
-
-    public function setReplies($replies): static
-    {
-        $this->replies = $replies;
-
-        return $this;
-    }
-
-    public function getParent(): ?Comments
-    {
-        return $this->parent;
-    }
-
-    public function setParent(?Comments $parent): static
-    {
-        $this->parent = $parent;
-
-        return $this;
-    }
-
 }
