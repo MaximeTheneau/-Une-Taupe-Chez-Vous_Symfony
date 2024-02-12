@@ -39,7 +39,21 @@ class ContactController extends ApiController
         {
 
         $content = $request->getContent();
-        $data = json_decode($content, true);
+        $data = $request->request->all();
+
+        $imagePath = null;
+        $uploadedFile = $request->files->get('image');
+
+
+        if ($uploadedFile) {
+            $imagePath = $uploadedFile->getPathname();
+            $fileName = uniqid() . '.' . $uploadedFile->guessExtension();
+            $uploadedFile->move(
+                $this->getParameter('app.imgDir'),
+                $fileName
+            );
+            $imagePath = $this->getParameter('app.projectDir') . 'upload/img/' . $fileName;
+        }
 
 
         // if (empty($data['name']) || empty($data['email']) || empty($data['message']) || empty($data['subject']) || empty($data['postalCode'])) {
@@ -76,6 +90,7 @@ class ContactController extends ApiController
                 'messageContact' => $data['message'],
                 'postalCodeContact' => $data['postalCode'],
                 'phoneContact' => $data['phone'],
+                // 'imageContact' =>  $uploadedFile,
             ]);
 
             $mailer->send($emailReturn);
@@ -103,6 +118,7 @@ class ContactController extends ApiController
                 'messageContact' => $data['message'],
                 'postalCodeContact' => $data['postalCode'],
                 'phoneContact' => $data['phone'],
+                'imageContact' =>  $imagePath,
             ])
                 ->replyTo($data['email']);
         

@@ -5,3 +5,7 @@
 <p>Message : {{ messageContact }}</p>
 <p>Code Postal : {{ postalCodeContact }}</p>
 <p>Numéro de téléphone : {{ phoneContact }}</p>
+
+{% if imageContact is not null %}
+    <img src="{{ imageContact }}" alt="Image contact" />
+{% endif %}
