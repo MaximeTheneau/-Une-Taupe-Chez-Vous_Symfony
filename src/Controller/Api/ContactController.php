@@ -53,7 +53,7 @@ class ContactController extends ApiController
                     $this->getParameter('app.imgDir'),
                     $fileName
                 );
-                $imagePath = $this->getParameter('app.projectDir') . 'upload/img/' . $fileName;
+                $imagePath =  'https://back.unetaupechezvous.fr/upload/img/' . $fileName;
             } else {
                 // Ce n'est pas une image, renvoyez une erreur de format d'image
                 return $this->json(
