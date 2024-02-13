@@ -25,3 +25,4 @@ symfony.conf
 
 ###> Image Uploads ###
 /public/upload/*
+###< Image Uploads ###
