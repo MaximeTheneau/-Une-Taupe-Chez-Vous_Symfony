@@ -24,4 +24,4 @@ symfony.conf
 ###< lexik/jwt-authentication-bundle ###
 
 ###> Image Uploads ###
-/public/upload/
+/public/upload/*
