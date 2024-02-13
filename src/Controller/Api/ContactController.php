@@ -44,15 +44,26 @@ class ContactController extends ApiController
         $imagePath = null;
         $uploadedFile = $request->files->get('image');
 
-
         if ($uploadedFile) {
-            $imagePath = $uploadedFile->getPathname();
-            $fileName = uniqid() . '.' . $uploadedFile->guessExtension();
-            $uploadedFile->move(
-                $this->getParameter('app.imgDir'),
-                $fileName
-            );
-            $imagePath = $this->getParameter('app.projectDir') . 'upload/img/' . $fileName;
+            $mimeType = $uploadedFile->getMimeType();
+            if (strpos($mimeType, 'image/') === 0) {
+                $imagePath = $uploadedFile->getPathname();
+                $fileName = uniqid() . '.' . $uploadedFile->guessExtension();
+                $uploadedFile->move(
+                    $this->getParameter('app.imgDir'),
+                    $fileName
+                );
+                $imagePath = $this->getParameter('app.projectDir') . 'upload/img/' . $fileName;
+            } else {
+                // Ce n'est pas une image, renvoyez une erreur de format d'image
+                return $this->json(
+                    [
+                        "erreur" => "Le fichier téléchargé n'est pas une image",
+                        "code_error" => Response::HTTP_BAD_REQUEST
+                    ],
+                    Response::HTTP_BAD_REQUEST // 400
+                );
+            }
         }
 
 
@@ -75,7 +86,6 @@ class ContactController extends ApiController
         //         Response::HTTP_BAD_REQUEST, // 400
         //     );
         // }
-
         
         if ($data['emailReturn']) {
             $emailReturn = (new TemplatedEmail())
@@ -90,7 +100,9 @@ class ContactController extends ApiController
                 'messageContact' => $data['message'],
                 'postalCodeContact' => $data['postalCode'],
                 'phoneContact' => $data['phone'],
-                // 'imageContact' =>  $uploadedFile,
+                'imageContact' =>  $imagePath,
+                'dateContact' => $data['date'],
+
             ]);
 
             $mailer->send($emailReturn);
@@ -119,6 +131,7 @@ class ContactController extends ApiController
                 'postalCodeContact' => $data['postalCode'],
                 'phoneContact' => $data['phone'],
                 'imageContact' =>  $imagePath,
+                'dateContact' => $data['date'],
             ])
                 ->replyTo($data['email']);
         

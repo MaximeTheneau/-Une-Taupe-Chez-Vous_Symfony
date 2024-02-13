@@ -5,7 +5,11 @@
 <p>Message : {{ messageContact }}</p>
 <p>Code Postal : {{ postalCodeContact }}</p>
 <p>Numéro de téléphone : {{ phoneContact }}</p>
-
+{% if dateContact is not null %}
+    <p>
+        Le Client souhaite être contacté le {{ dateContact|date('d/m/Y') }} à {{ dateContact|date('H:i') }}
+    </p>
+{% endif %}
 {% if imageContact is not null %}
     <img src="{{ imageContact }}" alt="Image contact" />
 {% endif %}
