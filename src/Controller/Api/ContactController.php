@@ -59,23 +59,23 @@ class ContactController extends ApiController
                 return $this->json(
                     [
                         "erreur" => "Le fichier téléchargé n'est pas une image",
-                        "code_error" => Response::HTTP_BAD_REQUEST
+                        "code_error" => Response::HTTP_FORBIDDEN
                     ],
-                    Response::HTTP_BAD_REQUEST // 400
+                    Response::HTTP_FORBIDDEN
                 );
             }
         }
 
 
-        // if (empty($data['name']) || empty($data['email']) || empty($data['message']) || empty($data['subject']) || empty($data['postalCode'])) {
-        //     return $this->json(
-        //         [
-        //             "erreur" => "Erreur de saisie",
-        //             "code_error" => 404
-        //         ],
-        //         Response::HTTP_NOT_FOUND, // 404
-        //     );
-        // }
+        if (strlen($data['postalCode']) !== 5) {
+            return $this->json(
+                [
+                    "erreur" => "Erreur lors de la saisie du code postal (5 chiffres attendus)",
+                    "code_error" => Response::HTTP_FORBIDDEN
+                ],
+                Response::HTTP_FORBIDDEN
+            );
+        }
 
         // if (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
         //     return $this->json(
@@ -94,15 +94,21 @@ class ContactController extends ApiController
             ->subject('Votre message a bien été envoyé')
             ->htmlTemplate('emails/contactReturn.html.twig')
             ->context([
-                'emailContact' => $data['email'],
                 'subjectContact' => $data['subject'],
                 'nameContact' => $data['name'],
-                'messageContact' => $data['message'],
-                'postalCodeContact' => $data['postalCode'],
+                'statusContact' => $data['status'],
+                'nameSocietyContact' => $data['nameSociety'],
+                'siretContact' => $data['siret'],
+                'emailContact' => $data['email'],
                 'phoneContact' => $data['phone'],
-                'imageContact' =>  $imagePath,
+                'postalCodeContact' => $data['postalCode'],
+                'adressContact' => $data['adress'],
+                'messageContact' => $data['message'],
                 'dateContact' => $data['date'],
-
+                'surfaceContact' => $data['surface'],
+                'interventionContact' => $data['intervention'],
+                'interventionOtherContact' => $data['interventionOther'],
+                'imageContact' =>  $imagePath,
             ]);
 
             $mailer->send($emailReturn);
@@ -124,14 +130,21 @@ class ContactController extends ApiController
             ->subject($data['subject'] . ' de ' . $data['name'])
             ->htmlTemplate('emails/contact.html.twig')
             ->context([
-                'emailContact' => $data['email'],
                 'subjectContact' => $data['subject'],
                 'nameContact' => $data['name'],
-                'messageContact' => $data['message'],
-                'postalCodeContact' => $data['postalCode'],
+                'statusContact' => $data['status'],
+                'nameSocietyContact' => $data['nameSociety'],
+                'siretContact' => $data['siret'],
+                'emailContact' => $data['email'],
                 'phoneContact' => $data['phone'],
-                'imageContact' =>  $imagePath,
+                'postalCodeContact' => $data['postalCode'],
+                'adressContact' => $data['adress'],
+                'messageContact' => $data['message'],
                 'dateContact' => $data['date'],
+                'surfaceContact' => $data['surface'],
+                'interventionContact' => $data['intervention'],
+                'interventionOtherContact' => $data['interventionOther'],
+                'imageContact' =>  $imagePath,
             ])
                 ->replyTo($data['email']);
         

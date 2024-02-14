@@ -7,15 +7,35 @@
 
 <p>Verifier vos données :</p>
 <p>Nom : {{ nameContact }}</p>
+{% if nameSocietyContact is not empty %}
+    <p>Nom de l'entreprise : {{ nameSocietyContact }}</p>
+{% endif %}
 <p>Email : {{ emailContact }}</p>
 <p>Objet : {{ subjectContact }}</p>
-<p>Message : {{ messageContact }}</p>
-<p>Code Postal : {{ postalCodeContact }}</p>
-<p>Numéro de téléphone : {{ phoneContact }}</p>
-{% if dateContact is not null %}
-    <p>Vous souhaitez être contacté le {{ dateContact|date('d/m/Y') }} à {{ dateContact|date('H:i') }}</p>
+{% if messageContact is not empty %}
+    <p>Message : {{ messageContact }}</p>
 {% endif %}
-{% if imageContact is not null %}
+<p>Code Postal : {{ postalCodeContact }}</p>
+{% if adressContact is not empty %}
+    <p>Adresse : {{ adressContact }}</p>
+{% endif %}
+{% if phoneContact is not empty %}
+    <p>Numéro de téléphone : {{ phoneContact }}</p>
+{% endif %}{% if dateContact is not empty  %}
+    <p>Vous souhaitez être contacté le {{ dateContact }} à {{ dateContact }}</p>
+{% endif %}
+{% if interventionContact is not empty %}
+    <p>
+        Intervention : {{ interventionContact }}
+        {% if interventionOtherContact is not empty %}
+            ({{ interventionOtherContact }})
+        {% endif %}
+    </p>
+{% endif %}
+{% if surfaceContact is not empty %}
+    <p>Surface : environs {{ surfaceContact }} m2</p>
+{% endif %}
+{% if imageContact is not empty %}
     <img src="{{ imageContact }}" alt="Image contact" />
 {% endif %}
 
