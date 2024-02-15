@@ -78,7 +78,7 @@ class Posts
     private ?Category $category = null;
 
     #[ORM\Column(length: 125, nullable: true)]
-    #[Groups(['api_posts_category', 'api_posts_read' ])]
+    #[Groups(['api_posts_category', 'api_posts_read',  'api_posts_desc', 'api_posts_keyword', 'api_posts_all', 'api_posts_category', 'api_posts_subcategory'])]
     private ?string $altImg = null;
 
     #[ORM\Column(length: 500, nullable: true)]
