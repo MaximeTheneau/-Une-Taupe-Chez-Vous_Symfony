@@ -208,9 +208,6 @@ class PostsController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/api/build-export-endpoint", name="app_back_posts_trigger_nextjs_build", methods={"POST"})
-     */
     public function triggerNextJsBuild()
     {
         $client = HttpClient::create();
@@ -224,15 +221,27 @@ class PostsController extends AbstractController
             'x-hub-signature-256' => 'sha256=' . $calculatedSignature,
         ];
 
-        // Effectuer la demande
-        $response = $client->request('POST', $apiEndpoint, [
-            'headers' => $headers,
-            'body' => $body,
-        ]);
-
-        return new JsonResponse([
-            'message' => 'Next.js build triggered',
-        ]);
+        
+        try {
+            // Effectuer la demande HTTP POST avec les en-têtes et le corps spécifiés
+            $response = $client->request('POST', $apiEndpoint, [
+                'headers' => $headers,
+                'json' => ['action' => 'trigger_build'],
+            ]);
+    
+            // Traiter la réponse de l'API Next.js
+            $statusCode = $response->getStatusCode();
+            if ($statusCode === 200) {
+                // La demande a réussi, retourner une réponse JSON avec le statut 'ok'
+                return new JsonResponse(['status' => 'ok']);
+            } else {
+                // La demande a échoué avec un code d'état autre que 200, retourner une réponse avec le code d'état
+                return new JsonResponse(['error' => 'Request failed with status code ' . $statusCode], $statusCode);
+            }
+        } catch (Throwable $e) {
+            // Gérer les erreurs de transport telles que les erreurs de connexion, etc.
+            return new JsonResponse(['error' => 'An error occurred while processing the request: ' . $e->getMessage()], 500);
+        }
     }
 
     #[Route('/{id}', name: 'app_back_posts_show', methods: ['GET'])]
