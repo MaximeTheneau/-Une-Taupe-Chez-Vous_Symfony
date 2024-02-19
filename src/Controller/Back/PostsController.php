@@ -197,8 +197,8 @@ class PostsController extends AbstractController
                  }          
             } 
 
+            $this->triggerNextJsBuild();
             $postsRepository->save($post, true);
-            // $this->triggerNextJsBuild();
 
         }
 
@@ -215,20 +215,23 @@ class PostsController extends AbstractController
     {
         $client = HttpClient::create();
         $apiEndpoint = 'https://' . $this->domainFront . '/api/build-export-endpoint';
-        $response = $client->request('POST', $apiEndpoint, [
-            'headers' => [
-                'Content-Type' => 'application/json'
-            ],
-            'body' => json_encode([
-                'payload' => 'build',
-            ]),
-        ]);
 
-        $data = $response->toArray();
+        $authToken = $this->params->get('app.authToken');
+        $body = json_encode(['payload' => 'build']);
+        $calculatedSignature = hash_hmac('sha256', $body, $authToken);
+        $headers = [
+            'Content-Type' => 'application/json',
+            'x-hub-signature-256' => 'sha256=' . $calculatedSignature,
+        ];
+
+        // Effectuer la demande
+        $response = $client->request('POST', $apiEndpoint, [
+            'headers' => $headers,
+            'body' => $body,
+        ]);
 
         return new JsonResponse([
             'message' => 'Next.js build triggered',
-            'data' => $data,
         ]);
     }
 
