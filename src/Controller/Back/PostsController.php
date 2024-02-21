@@ -204,12 +204,18 @@ class PostsController extends AbstractController
                  }          
             } 
 
-            $this->triggerNextJsBuild->triggerBuild();
+            $result = $this->triggerNextJsBuild->triggerBuild();
 
             $postsRepository->save($post, true);
+            return $this->redirectToRoute('app_back_posts_index', [
+                'error' => $result['error'],
+            ], Response::HTTP_SEE_OTHER);
 
         }
-        return $this->redirectToRoute('app_back_posts_index', [], Response::HTTP_SEE_OTHER);
+        return $this->renderForm('back/posts/new.html.twig', [
+            'post' => $post,
+            'form' => $form,
+        ]);
     }
 
 
@@ -353,7 +359,7 @@ class PostsController extends AbstractController
             $postsRepository->save($post, true);
             
             $result = $this->triggerNextJsBuild->triggerBuild();
-            
+
             return $this->redirectToRoute('app_back_posts_index', [
                 'error' => $result['error'],
             ], Response::HTTP_SEE_OTHER);
