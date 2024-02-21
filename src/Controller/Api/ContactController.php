@@ -87,7 +87,7 @@ class ContactController extends ApiController
         //     );
         // }
         
-        if (isset($data['emailReturn'], $data['subject'], $data['siret'], $data['status'])) {
+        if ($data['emailReturn'] === true) {
             $emailReturn = (new TemplatedEmail())
             ->to($data['email'])
             ->from($_ENV['MAILER_TO'])
@@ -100,9 +100,9 @@ class ContactController extends ApiController
                 'phoneContact' => $data['phone'],
                 'postalCodeContact' => $data['postalCode'],
                 'messageContact' => $data['message'],
-                'dateContact' => $data['date'],
                 'imageContact' =>  $imagePath,
                 ],
+                isset($data['date']) ? ['dateContact' => $data['date']] : [],
                 isset($data['status']) ? ['statusContact' => $data['status']] : [],
                 isset($data['nameSociety']) ? ['nameSocietyContact' => $data['nameSociety']] : [],
                 isset($data['siret']) ? ['siretContact' => $data['siret']] : [],
