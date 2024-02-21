@@ -2,22 +2,42 @@
 
 namespace App\Service;
 
+use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\String\UnicodeString;
 
 class TriggerNextJsBuild
 {
-
-
-    public function triggerBuild(): array
+    public function triggerBuild(): Response
     {
-        exec('npm run build-next  ../', $output, $return_var);
-    
-        if ($return_var !== 0) {
-            $error = 'Une erreur est survenue lors de l\'exécution de la commande : ' . implode("\n", $output);
-            return ['error' => $error];
-        } else {
-            return ['error' => null];
-        }
+        #$url = 'https://' . $_ENV['NGINX_DOMAIN'] . '/api/ne';
+        $url = 'http://localhost:3000/api/build-export-endpoint';
+        $data = [
+            'name' => 'NextJsBuild',
+            'project' => 'your-project-id',
+            'force' => true,
+        ];
 
+        $calculatedSignature =  hash_hmac('sha256', json_encode($data), $_ENV['APP_AUTHTOKEN']);
+        $headers = [
+            'Content-Type: application/json',
+            'x-hub-signature-256: ' .'sha256=' . $calculatedSignature,
+        ];
+
+        $client = HttpClient::create();
+
+        $response = $client->request('POST', $url, [
+            'headers' => $headers,
+            'json' => $data,
+        ]);
+
+        $statusCode = $response->getStatusCode();
+        $content = $response->getContent();
+
+        if ($statusCode === Response::HTTP_OK) {
+            return new Response($content );
+        }
+            
+        return new Response('Une erreur est survenue lors de la requête.', $statusCode);
     }
 }

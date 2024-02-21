@@ -208,7 +208,6 @@ class PostsController extends AbstractController
 
             $postsRepository->save($post, true);
             return $this->redirectToRoute('app_back_posts_index', [
-                'error' => $result['error'],
             ], Response::HTTP_SEE_OTHER);
 
         }
@@ -358,10 +357,10 @@ class PostsController extends AbstractController
             
             $postsRepository->save($post, true);
             
-            $result = $this->triggerNextJsBuild->triggerBuild();
+            $response = $this->triggerNextJsBuild->triggerBuild();
 
             return $this->redirectToRoute('app_back_posts_index', [
-                'error' => $result['error'],
+                'error' => $response->getContent(),
             ], Response::HTTP_SEE_OTHER);
         }
     
