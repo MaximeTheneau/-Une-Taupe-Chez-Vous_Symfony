@@ -86,70 +86,82 @@ class ContactController extends ApiController
         //         Response::HTTP_BAD_REQUEST, // 400
         //     );
         // }
-        
-        if ($data['emailReturn'] === true) {
-            $emailReturn = (new TemplatedEmail())
-            ->to($data['email'])
-            ->from($_ENV['MAILER_TO'])
-            ->subject('Votre message a bien été envoyé')
-            ->htmlTemplate('emails/contactReturn.html.twig')
-            ->context(array_merge([
-                'subjectContact' => $data['subject'],
-                'nameContact' => $data['name'],
-                'emailContact' => $data['email'],
-                'phoneContact' => $data['phone'],
-                'postalCodeContact' => $data['postalCode'],
-                'messageContact' => $data['message'],
-                'imageContact' =>  $imagePath,
-                ],
-                isset($data['date']) ? ['dateContact' => $data['date']] : [],
-                isset($data['status']) ? ['statusContact' => $data['status']] : [],
-                isset($data['nameSociety']) ? ['nameSocietyContact' => $data['nameSociety']] : [],
-                isset($data['siret']) ? ['siretContact' => $data['siret']] : [],
-                isset($data['surface']) ? ['surfaceContact' => $data['surface']] : [],
-                isset($data['intervention']) ? ['interventionContact' => $data['intervention']] : [],
-                isset($data['interventionOther']) ? ['interventionOtherContact' => $data['interventionOther']] : []
-            ));
+        try {
 
-            $mailer->send($emailReturn);
+            if ($data['emailReturn'] === true) {
+                $emailReturn = (new TemplatedEmail())
+                ->to($data['email'])
+                ->from($_ENV['MAILER_TO'])
+                ->subject('Votre message a bien été envoyé')
+                ->htmlTemplate('emails/contactReturn.html.twig')
+                ->context(array_merge([
+                    'subjectContact' => $data['subject'],
+                    'nameContact' => $data['name'],
+                    'emailContact' => $data['email'],
+                    'phoneContact' => $data['phone'],
+                    'postalCodeContact' => $data['postalCode'],
+                    'messageContact' => $data['message'],
+                    'imageContact' =>  $imagePath,
+                    ],
+                    isset($data['date']) ? ['dateContact' => $data['date']] : [],
+                    isset($data['status']) ? ['statusContact' => $data['status']] : [],
+                    isset($data['nameSociety']) ? ['nameSocietyContact' => $data['nameSociety']] : [],
+                    isset($data['siret']) ? ['siretContact' => $data['siret']] : [],
+                    isset($data['surface']) ? ['surfaceContact' => $data['surface']] : [],
+                    isset($data['intervention']) ? ['interventionContact' => $data['intervention']] : [],
+                    isset($data['interventionOther']) ? ['interventionOtherContact' => $data['interventionOther']] : []
+                ));
+
+                $mailer->send($emailReturn);
+                
+            }
+
+            if ($data['subject'] === 'Webmaster'  ) {
+                $data['subject'] = 'Demande de contact webmaster';
+                $emailTo = $_ENV['MAILER_TO_WEBMASTER'];
+            }
+            else {
+                $emailTo = $_ENV['MAILER_TO'];
+            }
+
+            $email = (new TemplatedEmail())
+                ->to($emailTo)
+                ->from($_ENV['MAILER_TO'])
+                ->subject($data['subject'] . ' de ' . $data['name'])
+                ->htmlTemplate('emails/contact.html.twig')
+                ->context(array_merge([
+                    'subjectContact' => $data['subject'],
+                    'nameContact' => $data['name'],
+                    'emailContact' => $data['email'],
+                    'phoneContact' => $data['phone'],
+                    'postalCodeContact' => $data['postalCode'],
+                    'messageContact' => $data['message'],
+                    'imageContact' =>  $imagePath,
+                    'dateContact' => $data['datesss'],
+                ],
+                    isset($data['date']) ? ['dateContact' => $data['date']] : [],
+                    isset($data['status']) ? ['statusContact' => $data['status']] : [],
+                    isset($data['nameSociety']) ? ['nameSocietyContact' => $data['nameSociety']] : [],
+                    isset($data['siret']) ? ['siretContact' => $data['siret']] : [],
+                    isset($data['surface']) ? ['surfaceContact' => $data['surface']] : [],
+                    isset($data['intervention']) ? ['interventionContact' => $data['intervention']] : [],
+                    isset($data['interventionOther']) ? ['interventionOtherContact' => $data['interventionOther']] : []
+                ))
+                ->replyTo($data['email']);
             
-        } 
 
-        if ($data['subject'] === 'Webmaster'  ) {
-            $data['subject'] = 'Demande de contact webmaster';
-            $emailTo = $_ENV['MAILER_TO_WEBMASTER'];
-        }
-        else {
-            $emailTo = $_ENV['MAILER_TO'];
-        }
-
-
-        $email = (new TemplatedEmail())
-            ->to($emailTo)
-            ->from($_ENV['MAILER_TO'])
-            ->subject($data['subject'] . ' de ' . $data['name'])
-            ->htmlTemplate('emails/contact.html.twig')
-            ->context(array_merge([
-                'subjectContact' => $data['subject'],
-                'nameContact' => $data['name'],
-                'emailContact' => $data['email'],
-                'phoneContact' => $data['phone'],
-                'postalCodeContact' => $data['postalCode'],
-                'messageContact' => $data['message'],
-                'imageContact' =>  $imagePath,
+            $mailer->send($email);
+                    
+            }
+        catch (\Exception $e) {
+            return $this->json(
+                [
+                    "erreur" => "Erreur lors de l'envoie de l'email, veuillez réessayer plus tard",
+                    "code_error" => Response::HTTP_FORBIDDEN
                 ],
-                isset($data['date']) ? ['dateContact' => $data['date']] : [],
-                isset($data['status']) ? ['statusContact' => $data['status']] : [],
-                isset($data['nameSociety']) ? ['nameSocietyContact' => $data['nameSociety']] : [],
-                isset($data['siret']) ? ['siretContact' => $data['siret']] : [],
-                isset($data['surface']) ? ['surfaceContact' => $data['surface']] : [],
-                isset($data['intervention']) ? ['interventionContact' => $data['intervention']] : [],
-                isset($data['interventionOther']) ? ['interventionOtherContact' => $data['interventionOther']] : []
-            ))
-            ->replyTo($data['email']);
-        
-
-        $mailer->send($email);
+                Response::HTTP_FORBIDDEN
+            );
+        }
         return $this->json(
             [
                 "message" => "Votre message a bien été envoyé",
