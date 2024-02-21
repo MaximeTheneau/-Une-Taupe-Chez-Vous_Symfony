@@ -87,7 +87,7 @@ class ContactController extends ApiController
         //     );
         // }
         
-        if ($data['emailReturn']) {
+        if (isset($data['emailReturn'], $data['subject'], $data['siret'], $data['status'])) {
             $emailReturn = (new TemplatedEmail())
             ->to($data['email'])
             ->from($_ENV['MAILER_TO'])
@@ -96,7 +96,7 @@ class ContactController extends ApiController
             ->context([
                 'subjectContact' => $data['subject'],
                 'nameContact' => $data['name'],
-                'statusContact' => $data['status'],
+                isset($data['status']) ? 'statusContact' : '',
                 'nameSocietyContact' => $data['nameSociety'],
                 'siretContact' => $data['siret'],
                 'emailContact' => $data['email'],
@@ -113,7 +113,7 @@ class ContactController extends ApiController
 
             $mailer->send($emailReturn);
             
-        }
+        } 
 
         if ($data['subject'] === 'Webmaster'  ) {
             $data['subject'] = 'Demande de contact webmaster';
@@ -132,17 +132,18 @@ class ContactController extends ApiController
             ->context([
                 'subjectContact' => $data['subject'],
                 'nameContact' => $data['name'],
-                'statusContact' => $data['status'],
-                'nameSocietyContact' => $data['nameSociety'],
-                'siretContact' => $data['siret'],
+                isset($data['status']) ? 'statusContact' : '',
+                isset($data['nameSociety']) ? 'nameSocietyContact' : '',
+                isset($data['siret']) ? 'siretContact' : '',
                 'emailContact' => $data['email'],
                 'phoneContact' => $data['phone'],
                 'postalCodeContact' => $data['postalCode'],
                 'adressContact' => $data['adress'],
                 'messageContact' => $data['message'],
                 'dateContact' => $data['date'],
-                'surfaceContact' => $data['surface'],
-                'interventionContact' => $data['intervention'],
+                isset($data['surface']) ? 'surfaceContact' : '',
+                isset($data['intervention']) ? 'interventionContact' : '',
+                isset($data['interventionOther']) ? 'interventionOtherContact' : '',
                 'interventionOtherContact' => $data['interventionOther'],
                 'imageContact' =>  $imagePath,
             ])

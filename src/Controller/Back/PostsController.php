@@ -19,6 +19,8 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\HttpClient\HttpClient;
+use Symfony\Component\Process\Process;
+use Symfony\Component\Process\Exception\ProcessFailedException;
 use DateTime;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -33,6 +35,7 @@ use Michelf\MarkdownExtra;
 use \IntlDateFormatter;
 use App\Service\MarkdownProcessor;
 use App\Service\UrlGeneratorService;
+use App\Service\TriggerNextJsBuild;
 use App\Message\UpdateNextAppMessage;
 use Symfony\Component\String\UnicodeString;
 
@@ -49,6 +52,7 @@ class PostsController extends AbstractController
     private $markdownProcessor;
     private $messageBus;
     private $urlGeneratorService;
+    private $triggerNextJsBuil;
 
     public function __construct(
         ContainerBagInterface $params,
@@ -58,6 +62,7 @@ class PostsController extends AbstractController
         MarkdownProcessor $markdownProcessor,
         MessageBusInterface $messageBus,
         UrlGeneratorService $urlGeneratorService,
+        TriggerNextJsBuild $triggerNextJsBuild,
     )
     {
         $this->params = $params;
@@ -71,6 +76,7 @@ class PostsController extends AbstractController
         $this->markdownProcessor = $markdownProcessor;
         $this->messageBus = $messageBus;
         $this->urlGeneratorService = $urlGeneratorService;
+        $this->triggerNextJsBuild = $triggerNextJsBuild;
     }
     
     #[Route('/', name: 'app_back_posts_index', methods: ['GET'])]
@@ -85,7 +91,6 @@ class PostsController extends AbstractController
     public function categoryPage(PostsRepository $postsRepository, Category $category): Response
     {
         $posts = $postsRepository->findBy(['category' => $category]);
-    
         return $this->render('back/posts/index.html.twig', [
             'posts' => $posts,
             'category' => $category,
@@ -197,52 +202,14 @@ class PostsController extends AbstractController
                  }          
             } 
 
-            $this->triggerNextJsBuild();
+            $this->triggerNextJsBuild->triggerBuild();
+
             $postsRepository->save($post, true);
 
         }
-
-        return $this->renderForm('back/posts/new.html.twig', [
-            'post' => $post,
-            'form' => $form,
-        ]);
+        return $this->redirectToRoute('app_back_posts_index', [], Response::HTTP_SEE_OTHER);
     }
 
-    public function triggerNextJsBuild()
-    {
-        $client = HttpClient::create();
-        $apiEndpoint = 'https://' . $this->domainFront . '/api/build-export-endpoint';
-
-        $authToken = $this->params->get('app.authToken');
-        $body = json_encode(['payload' => 'build']);
-        $calculatedSignature = hash_hmac('sha256', $body, $authToken);
-        $headers = [
-            'Content-Type' => 'application/json',
-            'x-hub-signature-256' => 'sha256=' . $calculatedSignature,
-        ];
-
-        
-        try {
-            // Effectuer la demande HTTP POST avec les en-têtes et le corps spécifiés
-            $response = $client->request('POST', $apiEndpoint, [
-                'headers' => $headers,
-                'json' => ['action' => 'trigger_build'],
-            ]);
-    
-            // Traiter la réponse de l'API Next.js
-            $statusCode = $response->getStatusCode();
-            if ($statusCode === 200) {
-                // La demande a réussi, retourner une réponse JSON avec le statut 'ok'
-                return new JsonResponse(['status' => 'ok']);
-            } else {
-                // La demande a échoué avec un code d'état autre que 200, retourner une réponse avec le code d'état
-                return new JsonResponse(['error' => 'Request failed with status code ' . $statusCode], $statusCode);
-            }
-        } catch (Throwable $e) {
-            // Gérer les erreurs de transport telles que les erreurs de connexion, etc.
-            return new JsonResponse(['error' => 'An error occurred while processing the request: ' . $e->getMessage()], 500);
-        }
-    }
 
     #[Route('/{id}', name: 'app_back_posts_show', methods: ['GET'])]
     public function show(Posts $post): Response
@@ -381,14 +348,13 @@ class PostsController extends AbstractController
 
             $post->setFormattedDate('Publié le ' . $createdAt . '. Mise à jour le ' . $updatedDate);
             
-            
-            $postsRepository->save($post, true);
-            // $this->triggerNextJsBuild();
+            $this->triggerNextJsBuild->triggerBuild();
 
-            return $this->redirectToRoute('app_back_posts_edit', ['id' => $post->getId()], Response::HTTP_SEE_OTHER);
+            $postsRepository->save($post, true);
+
+            return $this->redirectToRoute('app_back_posts_index', [], Response::HTTP_SEE_OTHER);
         }
     
-
         return $this->renderForm('back/posts/edit.html.twig', [
             'post' => $post,
             'form' => $form,

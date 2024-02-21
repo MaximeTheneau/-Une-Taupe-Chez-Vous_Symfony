@@ -31,44 +31,44 @@
     </style>
 </head>
 <h1>Objet : {{ subjectContact }} </h1>
-{% if statusContact is not empty %}
+{% if statusContact is defined %}
     <p>Status : {{ statusContact }}</p>
 {% endif %}
 <h2>De le part de: {{ nameContact }}</h2>
-{% if phoneContact is not empty %}
+{% if phoneContact is defined %}
     <p>Numéro de téléphone : {{ phoneContact }}</p>
 {% endif %}
-{% if adressContact is not empty %}
+{% if adressContact is defined %}
     <p>Adresse : {{ adressContact }}</p>
 {% endif %}
 <p>Code Postal : {{ postalCodeContact }}</p>
-{% if siretContact is not empty %}
+{% if siretContact is defined %}
     <p>SIRET : {{ siretContact }}</p>
 {% endif %}
-{% if nameSocietyContact is not empty %}
+{% if nameSocietyContact is defined %}
     <p>Nom de l'entreprise : {{ nameSocietyContact }}</p>
 {% endif %}
 <p>Email : {{emailContact}}</p>
-{% if messageContact is not empty %}
+{% if messageContact is defined %}
     <p>Message : {{ messageContact }}</p>
 {% endif %}
-{% if interventionContact is not empty %}
+{% if interventionContact is defined %}
     <p>
         Intervention : {{ interventionContact }}
-        {% if interventionOtherContact is not empty %}
+        {% if interventionOtherContact is defined %}
             ({{ interventionOtherContact }})
         {% endif %}
     </p>
 {% endif %}
-{% if surfaceContact is not empty %}
+{% if surfaceContact is defined %}
     <p>Surface : environs {{ surfaceContact }} m2</p>
 {% endif %}
 
-{% if dateContact is not empty %}
+{% if dateContact is defined %}
     <p>
         Le Client souhaite être contacté le {{ dateContact|date('d.m') }} à {{ dateContact|date('H:i') }}
     </p>
 {% endif %}
-{% if imageContact is not empty %}
+{% if imageContact is defined %}
     <img src="{{ imageContact }}" alt="Image contact" />
 {% endif %}

@@ -3,6 +3,12 @@
 {% block title %}Posts index{% endblock %}
 
 {% block body %}
+{% set errors  = app.request.get('errors') %}
+{% for error in errors %}
+    <div class="error">{{ error }}</div>
+{% endfor %}
+
+
         <table class="w-9/12 text-left text-sm font-light m-auto">
             <thead>
                 <tr class="border-b dark:border-neutral-500">
