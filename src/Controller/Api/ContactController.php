@@ -137,7 +137,6 @@ class ContactController extends ApiController
                     'postalCodeContact' => $data['postalCode'],
                     'messageContact' => $data['message'],
                     'imageContact' =>  $imagePath,
-                    'dateContact' => $data['datesss'],
                 ],
                     isset($data['date']) ? ['dateContact' => $data['date']] : [],
                     isset($data['status']) ? ['statusContact' => $data['status']] : [],
