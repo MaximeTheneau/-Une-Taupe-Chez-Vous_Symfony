@@ -66,7 +66,6 @@ class ContactController extends ApiController
             }
         }
 
-
         if (strlen($data['postalCode']) !== 5) {
             return $this->json(
                 [
@@ -88,7 +87,7 @@ class ContactController extends ApiController
         // }
         try {
 
-            if ($data['emailReturn'] === true) {
+            if (isset($data['emailReturn']) && $data['emailReturn'] === 'true') {
                 $emailReturn = (new TemplatedEmail())
                 ->to($data['email'])
                 ->from($_ENV['MAILER_TO'])
