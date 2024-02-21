@@ -144,7 +144,6 @@ class ContactController extends ApiController
                 isset($data['surface']) ? 'surfaceContact' : '',
                 isset($data['intervention']) ? 'interventionContact' : '',
                 isset($data['interventionOther']) ? 'interventionOtherContact' : '',
-                'interventionOtherContact' => $data['interventionOther'],
                 'imageContact' =>  $imagePath,
             ])
                 ->replyTo($data['email']);
