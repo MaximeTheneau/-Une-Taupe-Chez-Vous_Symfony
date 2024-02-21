@@ -80,10 +80,12 @@ class PostsController extends AbstractController
     }
     
     #[Route('/', name: 'app_back_posts_index', methods: ['GET'])]
-    public function index(PostsRepository $postsRepository): Response
+    public function index(PostsRepository $postsRepository, Request $request ): Response
     {
+        $error = $request->query->get('error');
         return $this->render('back/posts/index.html.twig', [
             'posts' => $postsRepository->findAll(),
+            'error' => $error,
         ]);
     }
 
@@ -348,11 +350,13 @@ class PostsController extends AbstractController
 
             $post->setFormattedDate('Publié le ' . $createdAt . '. Mise à jour le ' . $updatedDate);
             
-            $this->triggerNextJsBuild->triggerBuild();
-
             $postsRepository->save($post, true);
-
-            return $this->redirectToRoute('app_back_posts_index', [], Response::HTTP_SEE_OTHER);
+            
+            $result = $this->triggerNextJsBuild->triggerBuild();
+            
+            return $this->redirectToRoute('app_back_posts_index', [
+                'error' => $result['error'],
+            ], Response::HTTP_SEE_OTHER);
         }
     
         return $this->renderForm('back/posts/edit.html.twig', [
@@ -392,6 +396,4 @@ class PostsController extends AbstractController
         
         return $this->redirectToRoute('app_back_posts_edit', ['id' => $postId], Response::HTTP_SEE_OTHER);
     }
-        
-
 }
