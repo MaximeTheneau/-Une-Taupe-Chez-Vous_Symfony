@@ -93,23 +93,23 @@ class ContactController extends ApiController
             ->from($_ENV['MAILER_TO'])
             ->subject('Votre message a bien été envoyé')
             ->htmlTemplate('emails/contactReturn.html.twig')
-            ->context([
+            ->context(array_merge([
                 'subjectContact' => $data['subject'],
                 'nameContact' => $data['name'],
-                isset($data['status']) ? 'statusContact' : '',
-                'nameSocietyContact' => $data['nameSociety'],
-                'siretContact' => $data['siret'],
                 'emailContact' => $data['email'],
                 'phoneContact' => $data['phone'],
                 'postalCodeContact' => $data['postalCode'],
-                'adressContact' => $data['adress'],
                 'messageContact' => $data['message'],
                 'dateContact' => $data['date'],
-                'surfaceContact' => $data['surface'],
-                'interventionContact' => $data['intervention'],
-                'interventionOtherContact' => $data['interventionOther'],
                 'imageContact' =>  $imagePath,
-            ]);
+                ],
+                isset($data['status']) ? ['statusContact' => $data['status']] : [],
+                isset($data['nameSociety']) ? ['nameSocietyContact' => $data['nameSociety']] : [],
+                isset($data['siret']) ? ['siretContact' => $data['siret']] : [],
+                isset($data['surface']) ? ['surfaceContact' => $data['surface']] : [],
+                isset($data['intervention']) ? ['interventionContact' => $data['intervention']] : [],
+                isset($data['interventionOther']) ? ['interventionOtherContact' => $data['interventionOther']] : []
+            ));
 
             $mailer->send($emailReturn);
             
@@ -129,24 +129,24 @@ class ContactController extends ApiController
             ->from($_ENV['MAILER_TO'])
             ->subject($data['subject'] . ' de ' . $data['name'])
             ->htmlTemplate('emails/contact.html.twig')
-            ->context([
+            ->context(array_merge([
                 'subjectContact' => $data['subject'],
                 'nameContact' => $data['name'],
-                isset($data['status']) ? 'statusContact' : '',
-                isset($data['nameSociety']) ? 'nameSocietyContact' : '',
-                isset($data['siret']) ? 'siretContact' : '',
                 'emailContact' => $data['email'],
                 'phoneContact' => $data['phone'],
                 'postalCodeContact' => $data['postalCode'],
-                'adressContact' => $data['adress'],
                 'messageContact' => $data['message'],
                 'dateContact' => $data['date'],
-                isset($data['surface']) ? 'surfaceContact' : '',
-                isset($data['intervention']) ? 'interventionContact' : '',
-                isset($data['interventionOther']) ? 'interventionOtherContact' : '',
                 'imageContact' =>  $imagePath,
-            ])
-                ->replyTo($data['email']);
+                ],
+                isset($data['status']) ? ['statusContact' => $data['status']] : [],
+                isset($data['nameSociety']) ? ['nameSocietyContact' => $data['nameSociety']] : [],
+                isset($data['siret']) ? ['siretContact' => $data['siret']] : [],
+                isset($data['surface']) ? ['surfaceContact' => $data['surface']] : [],
+                isset($data['intervention']) ? ['interventionContact' => $data['intervention']] : [],
+                isset($data['interventionOther']) ? ['interventionOtherContact' => $data['interventionOther']] : []
+            ))
+            ->replyTo($data['email']);
         
 
         $mailer->send($email);
