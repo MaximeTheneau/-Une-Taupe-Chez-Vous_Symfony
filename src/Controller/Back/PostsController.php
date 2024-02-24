@@ -204,7 +204,7 @@ class PostsController extends AbstractController
                  }          
             } 
 
-            $result = $this->triggerNextJsBuild->triggerBuild();
+            // $result = $this->triggerNextJsBuild->triggerBuild();
 
             $postsRepository->save($post, true);
             return $this->redirectToRoute('app_back_posts_index', [
