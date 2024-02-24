@@ -351,7 +351,7 @@ class PostsController extends AbstractController
             $listPosts = $post->getListPosts();
             if ($listPosts !== null) {
                 foreach ($listPosts as $listPost) {
-                    if ($listPost->getTitle() === null ) {
+                    if ($listPost->getTitle() === null || $listPost->getLinkPostSelect() === null || $listPost->getLinkPostSelect()->getUrl() === null) {
                         $listPost->setLinkSubtitle(null);
                         $listPost->setLink(null);
                     } else {
