@@ -354,10 +354,10 @@ class PostsController extends AbstractController
                     if ($listPost->getTitle() === null ) {
                         $listPost->setLinkSubtitle(null);
                         $listPost->setLink(null);
+                    } else {
+                        $listPost->setLinkSubtitle($listPost->getLinkPostSelect()->getTitle());
+                        $listPost->setLink($listPost->getLinkPostSelect()->getUrl());
                     }
-
-                    $listPost->setLinkSubtitle($listPost->getLinkPostSelect()->getTitle());
-                    $listPost->setLink($listPost->getLinkPostSelect()->getUrl());
                 }
             }
             // DATE
