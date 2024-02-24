@@ -351,20 +351,8 @@ class PostsController extends AbstractController
             $listPosts = $post->getListPosts();
             if ($listPosts !== null) {
                 foreach ($listPosts as $listPost) {
-                    $listPost->setLinkSubtitle($listPost->getTitle());
-                    
-                    $slugLink = $listPost->getPosts()->getSlug();
-                    $categoryLink = $listPost->getPosts()->getCategory()->getSlug();
-                    if ($categoryLink === "Pages") {
-                        $listPost->setLink('/'.$slugLink);
-                    }                     
-                    if ($categoryLink === "Annuaire") {
-                        $listPost->setLink('/'.$categoryLink.'/'.$slugLink);
-                    } 
-                    if ($categoryLink === "Articles") {
-                        $subcategoryLink = $listPost->getPosts()->getSubcategory()->getSlug();
-                        $listPost->setLink('/'.$categoryLink.'/'.$subcategoryLink.'/'.$slugLink);
-                    }
+                    $listPost->setLinkSubtitle($listPost->getLinkPostSelect()->getTitle());
+                    $listPost->setLink($listPost->getLinkPostSelect()->getUrl());
                 }
             }
             // DATE
