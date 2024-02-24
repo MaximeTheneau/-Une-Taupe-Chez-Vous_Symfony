@@ -11,7 +11,7 @@ class TriggerNextJsBuild
     public function triggerBuild(): Response
     {
         #$url = 'https://' . $_ENV['NGINX_DOMAIN'] . '/api/ne';
-        $url = 'http://localhost:3000/api/build-export-endpoint';
+        $url = 'http://localhost:3001/api/build-export-endpoint';
         $data = [
             'name' => 'NextJsBuild',
             'project' => 'your-project-id',

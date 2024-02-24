@@ -313,6 +313,8 @@ class PostsController extends AbstractController
                         $paragraph->setLink('/'.$categoryLink.'/'.$subcategoryLink.'/'.$slugLink);
                     }
                 } 
+
+              
                 
                 // $deletedLink = $form['paragraphPosts'];
 
@@ -346,7 +348,25 @@ class PostsController extends AbstractController
                     } 
                 }
             } 
-
+            $listPosts = $post->getListPosts();
+            if ($listPosts !== null) {
+                foreach ($listPosts as $listPost) {
+                    $listPost->setLinkSubtitle($listPost->getTitle());
+                    
+                    $slugLink = $listPost->getPosts()->getSlug();
+                    $categoryLink = $listPost->getPosts()->getCategory()->getSlug();
+                    if ($categoryLink === "Pages") {
+                        $listPost->setLink('/'.$slugLink);
+                    }                     
+                    if ($categoryLink === "Annuaire") {
+                        $listPost->setLink('/'.$categoryLink.'/'.$slugLink);
+                    } 
+                    if ($categoryLink === "Articles") {
+                        $subcategoryLink = $listPost->getPosts()->getSubcategory()->getSlug();
+                        $listPost->setLink('/'.$categoryLink.'/'.$subcategoryLink.'/'.$slugLink);
+                    }
+                }
+            }
             // DATE
             $formatter = new IntlDateFormatter('fr_FR', IntlDateFormatter::FULL, IntlDateFormatter::NONE, null, null, 'dd MMMM yyyy');
             $post->setUpdatedAt(new DateTime());
@@ -357,10 +377,10 @@ class PostsController extends AbstractController
             
             $postsRepository->save($post, true);
             
-            $response = $this->triggerNextJsBuild->triggerBuild();
+            // $response = $this->triggerNextJsBuild->triggerBuild();
 
             return $this->redirectToRoute('app_back_posts_index', [
-                'error' => $response->getContent(),
+                // 'error' => $response->getContent(),
             ], Response::HTTP_SEE_OTHER);
         }
     

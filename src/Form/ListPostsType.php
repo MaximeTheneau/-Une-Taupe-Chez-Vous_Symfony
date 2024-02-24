@@ -2,6 +2,7 @@
 
 namespace App\Form;
 
+use App\Entity\Posts;
 use App\Entity\ListPosts;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -39,8 +40,26 @@ class ListPostsType extends AbstractType
                     'maxlength' => '5000',
                 ]
             ])
-            
-            
+            ->add('linkSubtitle', TextType::class, [
+                'label' => 'Sous-titre du lien',
+                'required' => false,
+                'attr' => [
+                    'class' => 'font-black block p-2.5 w-full text-lg  bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500',
+                    'placeholder' => 'Sous-titre du lien (max 255 caractères)',
+                    'maxlength' => '255',
+                    ]
+        ])
+        ->add('linkPostSelect', EntityType::class, [
+                'class' => Posts::class,
+                'choice_label' => 'title',
+                'label' => 'Lien vers un autre article',
+                'required' => false,
+                'choice_value' => 'id',
+                'placeholder' => 'Choisir un article',
+                'attr' => [
+                    'class' => 'font-bold'
+                    ]
+        ])
         ;
     }
 

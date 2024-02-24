@@ -27,6 +27,17 @@ class ListPosts
     #[Groups(['api_posts_read'])]
     private ?string $description = null;
 
+    #[ORM\Column(length: 500, nullable: true)]
+    #[Groups(['api_posts_read'])]
+    private ?string $link = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['api_posts_read'])]
+    private ?string $linkSubtitle = null;
+
+    #[ORM\ManyTone(targetEntity: Posts::class)]
+    private $linkPostSelect;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -64,6 +75,42 @@ class ListPosts
     public function setDescription(?string $description): self
     {
         $this->description = $description;
+
+        return $this;
+    }
+
+    public function getLinkSubtitle(): ?string
+    {
+        return $this->linkSubtitle;
+    }
+
+    public function setLinkSubtitle(?string $linkSubtitle): self
+    {
+        $this->linkSubtitle = $linkSubtitle;
+
+        return $this;
+    }
+
+    public function getLink(): ?string
+    {
+        return $this->link;
+    }
+
+    public function setLink(?string $link): static
+    {
+        $this->link = $link;
+
+        return $this;
+    }
+
+    public function getLinkPostSelect(): ?Posts
+    {
+        return $this->linkPostSelect;
+    }
+
+    public function setLinkPostSelect(?Posts $linkPostSelect): self
+    {
+        $this->linkPostSelect = $linkPostSelect;
 
         return $this;
     }
