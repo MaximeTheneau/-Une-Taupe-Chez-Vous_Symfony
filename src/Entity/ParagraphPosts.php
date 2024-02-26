@@ -55,6 +55,14 @@ class ParagraphPosts
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $imgPostParaghFile = null;
 
+    #[ORM\Column(nullable: true)]
+    #[Groups(['api_posts_read'])]
+    private ?int $imgWidth = null;
+
+    #[ORM\Column(nullable: true)]
+    #[Groups(['api_posts_read'])]
+    private ?int $imgHeight = null;
+
     
     public function getId(): ?int
     {
@@ -177,6 +185,30 @@ class ParagraphPosts
     public function setImgPostParaghFile(?string $imgPostParaghFile): static
     {
         $this->imgPostParaghFile = $imgPostParaghFile;
+
+        return $this;
+    }
+
+    public function getImgWidth(): ?int
+    {
+        return $this->imgWidth;
+    }
+
+    public function setImgWidth(?int $imgWidth): static
+    {
+        $this->imgWidth = $imgWidth;
+
+        return $this;
+    }
+
+    public function getImgHeight(): ?int
+    {
+        return $this->imgHeight;
+    }
+
+    public function setImgHeight(?int $imgHeight): static
+    {
+        $this->imgHeight = $imgHeight;
 
         return $this;
     }

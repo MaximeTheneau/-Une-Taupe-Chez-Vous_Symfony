@@ -108,6 +108,14 @@ class Posts
     #[ORM\Column(nullable: true)]
     private ?bool $draft = null;
 
+    #[ORM\Column( nullable: true)]
+    #[Groups(['api_posts_read'])]
+    private ?int $imgWidth = null;
+
+    #[ORM\Column(nullable: true)]
+    #[Groups(['api_posts_read'])]
+    private ?int $imgHeight = null;
+
     public function __construct()
     {
         $this->listPosts = new ArrayCollection();
@@ -447,6 +455,30 @@ class Posts
     public function setHeading(string $heading): static
     {
         $this->heading = $heading;
+
+        return $this;
+    }
+
+    public function getImgWidth(): ?int
+    {
+        return $this->imgWidth;
+    }
+
+    public function setImgWidth(?string $imgWidth): static
+    {
+        $this->imgWidth = $imgWidth;
+
+        return $this;
+    }
+
+    public function getImgHeight(): ?int
+    {
+        return $this->imgHeight;
+    }
+
+    public function setImgHeight(?int $imgHeight): static
+    {
+        $this->imgHeight = $imgHeight;
 
         return $this;
     }

@@ -137,7 +137,7 @@ class PostsController extends AbstractController
                 $post->setAltImg('Une Taupe Chez Vous ! image de présentation');
             } else {
                 $post->setImgPost($slug);
-                $this->imageOptimizer->setPicture($brochureFile, $slug );
+                $this->imageOptimizer->setPicture($brochureFile, $slug, $post );
                 
             }
 
@@ -193,7 +193,7 @@ class PostsController extends AbstractController
                      $slugPara = substr($slugPara, 0, 30); // 30 max
                      $paragraph->setImgPostParagh($slugPara);// set slug to image paragraph
                      // Cloudinary
-                     $this->imageOptimizer->setPicture($brochureFileParagraph, $slugPara ); // set image paragraph
+                     $this->imageOptimizer->setPicture($brochureFileParagraph, $slugPara, $paragraph ); // set image paragraph
                  } 
  
                  // ALT IMG PARAGRAPH
@@ -267,7 +267,7 @@ class PostsController extends AbstractController
             if (!empty($brochureFile)) {
                 
                 $post->setImgPost($slug);
-                $this->imageOptimizer->setPicture($brochureFile, $post->getImgPost() );
+                $this->imageOptimizer->setPicture($brochureFile, $post->getImgPost(), $post );
                 
             } else {
                 $post->setImgPost($imgPost);
@@ -340,7 +340,7 @@ class PostsController extends AbstractController
                     $slugPara = $this->slugger->slug($paragraph->getSubtitle());
                     $slugPara = substr($slugPara, 0, 30);
                     $paragraph->setImgPostParagh($slugPara);
-                    $this->imageOptimizer->setPicture($brochureFileParagraph, $slugPara);
+                    $this->imageOptimizer->setPicture($brochureFileParagraph, $slugPara, $paragraph);
                     
                     // ALT IMG PARAGRAPH
                     if (empty($paragraph->getAltImg())) {

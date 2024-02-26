@@ -47,15 +47,19 @@ class ImageOptimizer
             $this->uploadApi = new UploadApi();
     }
 
-    public function setPicture( $brochureFile, $slug ): void
+    public function setPicture( $brochureFile, $slug, $post ): void
     {   
         // Save Local File
 
         $img = $this->imagine->open($brochureFile)
-            ->thumbnail(new Box(1000, 1000))
+            ->strip()
+            ->thumbnail(new Box(2560, 1200))
             ->save($this->photoDir.$slug.'.webp', ['webp_quality' => 80]);
 
-        
+        // Size Image
+        $post->setImgWidth($img->getSize()->getWidth());
+        $post->setImgHeight($img->getSize()->getHeight());
+
         // Save Cloudinary File
 
         $this->uploadApi->upload($this->photoDir.$slug.'.webp', array(
