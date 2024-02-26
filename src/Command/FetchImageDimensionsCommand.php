@@ -47,7 +47,7 @@ class FetchImageDimensionsCommand extends Command
         $posts = $this->entityManager->getRepository(Posts::class)->findAll();
 
         foreach ($paragraphPosts as $paragraphPost) {
-            $url = $paragraphPost->getImgPostParagraph(); 
+            $url = $paragraphPost->getImgPostParagh(); 
             try {
                 if ($url === null) {
                     continue;
