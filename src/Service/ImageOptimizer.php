@@ -15,6 +15,7 @@ use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 use Symfony\Component\Serializer\SerializerInterface;
 use Cloudinary\Configuration\Configuration;
 use Cloudinary\Api\Upload\UploadApi;
+use Symfony\Component\HttpClient\HttpClient;
 
 class ImageOptimizer
 {
@@ -24,8 +25,8 @@ class ImageOptimizer
     private $photoDir;
     private $projectDir;
     private $imagine;
-    private $cloudinary;
     private $uploadApi;
+
 
     public function __construct(
         SluggerInterface $slugger,
@@ -60,6 +61,14 @@ class ImageOptimizer
         $post->setImgWidth($img->getSize()->getWidth());
         $post->setImgHeight($img->getSize()->getHeight());
 
+        // Delete File if exists
+        $httpClient = HttpClient::create();
+        $response = $httpClient->request('GET',  'https://res.cloudinary.com/dsn2zwbis/image/upload/fl_getinfo/unetaupechezvous/' . $slug . '.webp');
+
+        if ($response->getStatusCode() === 200) {
+            $this->uploadApi->destroy($slug);
+        }
+        
         // Save Cloudinary File
 
         $this->uploadApi->upload($this->photoDir.$slug.'.webp', array(
