@@ -89,6 +89,16 @@ class ImageOptimizer
 
     }
 
+    public function deletedPicture($slug): void
+    {
+        $httpClient = HttpClient::create();
+        $response = $httpClient->request('GET',  'https://res.cloudinary.com/dsn2zwbis/image/upload/fl_getinfo/unetaupechezvous/' . $slug . '.webp');
+
+        if ($response->getStatusCode() === 200) {
+            $this->uploadApi->destroy($slug);
+        }
+    }
+
 }
 
 
