@@ -22,7 +22,6 @@ class TriggerNextJsBuild
             'Content-Type: application/json',
             'x-hub-signature-256: ' .'sha256=' . $calculatedSignature,
             'x-' . $_ENV['NGINX_DOMAIN'] . '-event' => 'build',
-
         ];
 
         $client = HttpClient::create();
