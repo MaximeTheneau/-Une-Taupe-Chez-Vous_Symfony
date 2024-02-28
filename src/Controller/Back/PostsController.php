@@ -273,14 +273,6 @@ class PostsController extends AbstractController
                 $post->setImgPost($imgPost);
             }
 
-            // MARKDOWN TO HTML
-            $contentsText = $post->getContents();
-            
-            $htmlText = $this->markdownProcessor->processMarkdown($contentsText);
-            
-            $cleanedText = strip_tags($htmlText);
-
-            $post->setContentsHTML($htmlText);
 
             // PARAGRAPH
             $paragraphPosts = $form->get('paragraphPosts')->getData();

@@ -10,6 +10,7 @@ class TriggerNextJsBuild
 {
     public function triggerBuild(): Response
     {
+        
         $url = 'https://' . $_ENV['NGINX_DOMAIN'] . '/api/webhook';
         $data = [
             'name' => 'NextJsBuild',
@@ -21,11 +22,10 @@ class TriggerNextJsBuild
         $headers = [
             'Content-Type: application/json',
             'x-hub-signature-256: ' .'sha256=' . $calculatedSignature,
-            'x-' . $_ENV['NGINX_DOMAIN'] . '-event' => 'build',
+            'x-taupe-event: ' . 'build',
         ];
 
         $client = HttpClient::create();
-
         $response = $client->request('POST', $url, [
             'headers' => $headers,
             'json' => $data,
