@@ -28,6 +28,7 @@
     "dev": "encore dev",
     "watch": "encore dev --watch",
     "build": "encore production --progress",
-    "build-next": "cd /var/www/html/Une-Taupe-Chez-Vous_Next.js && npm run build"
+    "build-next": "cd /var/www/html/Une-Taupe-Chez-Vous_Next.js && npm run build",
+    "clean": "sudo rm -rf public/build"
   }
 }

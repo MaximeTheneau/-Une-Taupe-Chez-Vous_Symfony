@@ -149,6 +149,13 @@ class ContactController extends ApiController
             
 
             $mailer->send($email);
+
+            return $this->json(
+                [
+                    "message" => "Votre message a bien été envoyé",
+                ],
+                Response::HTTP_OK,
+            );
                     
             }
         catch (\Exception $e) {
@@ -171,14 +178,6 @@ class ContactController extends ApiController
                 Response::HTTP_FORBIDDEN
             );
         }
-        return $this->json(
-            [
-                "message" => "Votre message a bien été envoyé",
-            ],
-            Response::HTTP_OK,
-        );
-
-        
         }
                 
         /**
