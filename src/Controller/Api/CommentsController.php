@@ -47,7 +47,7 @@ class CommentsController extends ApiController
         $this->tokenStorage = $tokenStorage;
     }
 
-    #[Route('', name: 'add_comments', methods: [''])]
+    #[Route('', name: 'add_comments', methods: ['POST'])]
     public function add(Request $request, MailerInterface $mailer, PostsRepository $postsRepository): JsonResponse
     {   
         
