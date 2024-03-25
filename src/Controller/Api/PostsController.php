@@ -23,16 +23,12 @@ use Lexik\Bundle\JWTAuthenticationBundle\Event\JWTCreatedEvent;
 use Symfony\Component\HttpFoundation\Cookie;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-/**
- * @Route("/api/posts",name="api_posts_")
- */
+
+#[Route('/api/posts', name: 'api_posts_')]
 class PostsController extends ApiController
 {
 
-
-    /**
-     * @Route("/home", name="browse", methods={"GET"})
-     */
+    #[Route('/home', name: 'browse', methods: ['GET'])]
     public function browse(PostsRepository $postsRepository ): JsonResponse
     {
     
@@ -51,9 +47,7 @@ class PostsController extends ApiController
         );
     }
 
-    /**
-     * @Route("&category={name}", name="articles", methods={"GET"})
-     */
+    #[Route('&category={name}', name: 'articles', methods: ['GET'])]
     public function category(PostsRepository $postsRepository, Category $category): JsonResponse
     {
         $posts = $postsRepository->findBy(['category' => $category, 'draft' => false], ['createdAt' => 'DESC']);
@@ -72,9 +66,7 @@ class PostsController extends ApiController
         );
     }
 
-    /**
-     * @Route("&subcategory={slug}", name="subcategory", methods={"GET"})
-     */
+    #[Route('&subcategory={slug}', name: 'subcategory', methods: ['GET'])]
     public function subcategory(PostsRepository $postsRepository, Subcategory $subcategory): JsonResponse
     {
         $posts = $postsRepository->findBy(['subcategory' => $subcategory, 'draft' => false],  ['createdAt' => 'DESC']);
@@ -93,9 +85,7 @@ class PostsController extends ApiController
         );
     }
 
-    /**
-    * @Route("&limit=3&category={name}", name="category", methods={"GET"})
-    */
+    #[Route('&limit=3&category={name}', name: 'category', methods: ['GET'])]
     public function limit(PostsRepository $postsRepository, Category $category): JsonResponse
     {
         $posts = $postsRepository->findBy(['category' => $category, 'draft' => false], ['createdAt' => 'ASC'], 3);
@@ -115,9 +105,7 @@ class PostsController extends ApiController
         );
     }
         
-    /**
-     * @Route("&limit=3&filter=desc&category={slug}", name="desc", methods={"GET"})
-     */
+    #[Route('&limit=3&filter=desc&category={slug}', name: 'desc', methods: ['GET'])]
     public function desc(PostsRepository $postsRepository, string $slug ): JsonResponse
     {
 
@@ -137,9 +125,7 @@ class PostsController extends ApiController
         );
     }
 
-    /**
-     * @Route("/all", name="all", methods={"GET"})
-     */
+    #[Route('/all', name: 'all', methods: ['GET'])]
     public function all(PostsRepository $postsRepository ): JsonResponse
     {
     
@@ -159,9 +145,7 @@ class PostsController extends ApiController
         );
     }
 
-    /**
-     * @Route("/sitemap", name="sitemap", methods={"GET"})
-     */
+    #[Route('/sitemap', name: 'sitemap', methods: ['GET'])]
     public function sitemap(PostsRepository $postsRepository ): JsonResponse
     {
     
@@ -182,9 +166,7 @@ class PostsController extends ApiController
         );
     }
 
-    /**
-     * @Route("/thumbnail/{slug}", name="thumbnail", methods={"GET"})
-     */
+    #[Route('/thumbnail/{slug}', name: 'thumbnail', methods: ['GET'])]
     public function thumbnail(PostsRepository $postsRepository, Posts $posts = null ): JsonResponse
     {
     
@@ -213,9 +195,7 @@ class PostsController extends ApiController
         );
     }
 
-    /**
-     * @Route("/{slug}", name="read", methods={"GET"})
-     */
+    #[Route('/{slug}', name: 'read', methods: ['GET'])]
     public function read(Posts $post)
     {
         $filteredComments = [];
@@ -241,9 +221,7 @@ class PostsController extends ApiController
             ]);
     }
 
-    /**
-    *@Route("&filter=subcategory", name="allSubcategory", methods={"GET"})
-    */
+    #[Route('&filter=subcategory', name: 'allSubcategory', methods: ['GET'])]
     public function allSubcategory(SubcategoryRepository $subcategories ): JsonResponse
     {
     
@@ -259,9 +237,7 @@ class PostsController extends ApiController
         );
     }
 
-    /**
-     * @Route("&filter=keyword&limit=3&id={id}", name="keyword", methods={"GET"})
-     */
+    #[Route('&filter=keyword&limit=3&id={id}', name: 'keyword', methods: ['GET'])]
     public function postsFilterKeyword(PostsRepository $postsRepository, KeywordRepository $keywordRepository,  int $id): JsonResponse
     {
         $responsePosts = [];

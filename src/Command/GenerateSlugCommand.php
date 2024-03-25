@@ -11,6 +11,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Doctrine\ORM\EntityManagerInterface;
+
 #[AsCommand(
     name: 'app:generate-slug',
     description: 'Add a short description for your command',
@@ -27,15 +28,8 @@ class GenerateSlugCommand extends Command
 
         parent::__construct();
     }
-    protected function configure(): void
-    {
-        $this
-            ->addArgument('arg1', InputArgument::OPTIONAL, 'Argument description')
-            ->addOption('option1', null, InputOption::VALUE_NONE, 'Option description')
-        ;
-    }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $articles = $this->entityManager->getRepository(ParagraphPosts::class)->findAll();
 
@@ -50,6 +44,6 @@ class GenerateSlugCommand extends Command
 
         $output->writeln('Slugs generated successfully.');
 
-        return 0;
+        return Command::SUCCESS;
     }
 }

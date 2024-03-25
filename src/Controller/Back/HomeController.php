@@ -11,10 +11,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class HomeController extends AbstractController
 {
-    /**
-     * @Route("/", name="app_back_home", methods={"GET"})
-     */
-
+    #[Route('/', name: 'app_back_home', methods: ['GET'])]
     public function home(): Response
     {
         

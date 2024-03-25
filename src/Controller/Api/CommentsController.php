@@ -25,9 +25,8 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Lexik\Bundle\JWTAuthenticationBundle\Security\Authentication\Token\JWTUserToken;
-/**
- * @Route("/api/comments")
- */
+
+#[Route('/api/comments')]
 class CommentsController extends ApiController
 {
     private $entityManager;
@@ -47,9 +46,8 @@ class CommentsController extends ApiController
         $this->jwtManager = $jwtManager;
         $this->tokenStorage = $tokenStorage;
     }
-    /**
-    * @Route("", name="add_comments", methods={"POST"})
-    */
+
+    #[Route('', name: 'add_comments', methods: [''])]
     public function add(Request $request, MailerInterface $mailer, PostsRepository $postsRepository): JsonResponse
     {   
         
@@ -117,12 +115,6 @@ class CommentsController extends ApiController
 
         return $response;
 
-
-
-
-        
-
-
         if (empty($data['user']) || empty($data['email']) || empty($data['comment']) || empty($data['posts'])  ) {
             return $this->json(
                 [
@@ -148,9 +140,7 @@ class CommentsController extends ApiController
 
         }
 
-    /**
-     * @Route("/delete/{id}", name="admin_comment_delete", methods={"GET", "POST"})
-     */
+    #[Route('/delete/{id}', name: 'admin_comment_delete', methods: ["GET", "POST"])]
     public function delete(Request $request,  CommentsRepository $CommentsRepository): Response
     {
 
@@ -164,9 +154,7 @@ class CommentsController extends ApiController
         }
     }
 
-    /**
-     * @Route("/validate/{id}", name="admin_comment_validate", methods={"GET", "POST"})
-     */
+    #[Route('/validate/{id}', name: 'admin_comment_validate', methods: ["GET", "POST"])]
     public function validate(Request $request, CommentsRepository $CommentsRepository ): JsonResponse
     {
 
@@ -191,9 +179,7 @@ class CommentsController extends ApiController
 
     }
 
-    /**
-     * @Route("/verify_email", name="verify", methods={"POST"})
-     */
+    #[Route('/verify_email', name: 'verify', methods: ['POST'])]
     public function verifyEmail(Request $request, HttpClientInterface $httpClient, EntityManagerInterface $entityManager): JsonResponse
     {
     $email = JSON_decode($request->getContent(), true)['email'];
