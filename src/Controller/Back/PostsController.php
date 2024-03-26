@@ -211,7 +211,7 @@ class PostsController extends AbstractController
             ], Response::HTTP_SEE_OTHER);
 
         }
-        return $this->renderForm('back/posts/new.html.twig', [
+        return $this->render('back/posts/new.html.twig', [
             'post' => $post,
             'form' => $form,
         ]);
@@ -367,7 +367,7 @@ class PostsController extends AbstractController
             ], Response::HTTP_SEE_OTHER);
         }
     
-        return $this->renderForm('back/posts/edit.html.twig', [
+        return $this->render('back/posts/edit.html.twig', [
             'post' => $post,
             'form' => $form,
             'articles' => $articles,
