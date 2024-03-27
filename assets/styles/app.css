@@ -17,10 +17,7 @@ h1 {
 h1{
     text-align: center;
 }
-form{
-    width: 50%;
-    margin: auto;
-}
+
 form button.button, 
 a.button{
     width: 50%;
@@ -59,4 +56,10 @@ label{
 
 .none{
     display: none !important;
+}
+
+label,
+input[type='text'],
+textarea {
+    width: 100%;
 }
