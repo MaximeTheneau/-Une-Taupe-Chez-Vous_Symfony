@@ -52,7 +52,7 @@ class PostsController extends AbstractController
     private $markdownProcessor;
     private $messageBus;
     private $urlGeneratorService;
-    private $triggerNextJsBuil;
+    private $triggerNextJsBuild;
 
     public function __construct(
         ContainerBagInterface $params,
@@ -72,7 +72,6 @@ class PostsController extends AbstractController
         $this->projectDir =  $this->params->get('app.projectDir');
         $this->photoDir =  $this->params->get('app.imgDir');
         $this->markdown = new MarkdownExtra();
-        $this->domainFront = $this->params->get('app.domain');
         $this->markdownProcessor = $markdownProcessor;
         $this->messageBus = $messageBus;
         $this->urlGeneratorService = $urlGeneratorService;
@@ -135,6 +134,8 @@ class PostsController extends AbstractController
             if (empty($brochureFile)) {
                 $post->setImgPost('Accueil');
                 $post->setAltImg('Une Taupe Chez Vous ! image de présentation');
+                $post->setImgWidth('1000');
+                $post->setImgHeight('563');
             } else {
                 $post->setImgPost($slug);
                 $this->imageOptimizer->setPicture($brochureFile, $slug, $post );
