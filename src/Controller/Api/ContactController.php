@@ -253,6 +253,7 @@ class ContactController extends ApiController
             'websiteContact' => $data['siteWeb'],
             'serviceContact' => $data['service'],
             'directoryContact' => $data['directory'],
+            'directoryOtherContact' => $data['directoryOther'] && null,
 
         ])
         ->replyTo($data['email']);

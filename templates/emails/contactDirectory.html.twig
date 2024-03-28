@@ -8,3 +8,6 @@
 <p>Site Web : {{ websiteContact }}</p>
 <p>Service : {{ serviceContact }}</p>
 <p>Annuaire : {{ directoryContact }}</p>
+{% if directoryOtherContact is not empty %}
+    <p>Autre : {{ directoryOtherContact }}</p>
+{% endif %}
