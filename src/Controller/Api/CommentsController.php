@@ -56,24 +56,22 @@ class CommentsController extends ApiController
         $content = $request->getContent();
 
         $cookie = $request->cookies->get('jwt');
+        $token = new JWTUserToken();
+        $token->setRawToken($cookie);
+        $tokenData = $this->jwtManager->decode($token);
 
+        $user = $tokenData['username'];
+        $user = $this->entityManager->getRepository(User::class)->findOneBy(['email' => $user]);
 
-        if (!$cookie) {
-            return new JsonResponse(['message' => $request->cookies], 400);
+        if (!$cookie && !$user) {
+            return new JsonResponse(['message' => 'Une erreur est survenue lors du traitement de votre demande. Veuillez réessayer ultérieurement.'], 400);
         }
         
-    //   $token = new JWTUserToken();
-    //   $token->setRawToken($cookie);
 
 
 
-    //         $tokenData = $this->jwtManager->decode($token);
 
-            // $user = $tokenData['username'];
-            // $user = $this->entityManager->getRepository(User::class)->findOneBy(['email' => $user]);
-            // if (!$user) {
-            //     return new JsonResponse('Utilisateur non trouvé', 400);
-            // }
+
 
             $data = json_decode($content, true);
 
