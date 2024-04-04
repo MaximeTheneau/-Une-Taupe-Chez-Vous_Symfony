@@ -3,11 +3,24 @@
 {% block title %}Posts index{% endblock %}
 
 {% block body %}
-{% if error is defined %}
-    <div class="alert alert-danger">
+
+<div id="contenu"></div>
+
+<div id="content-container">
+    {% set error = app.request.query.get('error') %}
+
+    {% if error is defined %}
+    {% if error == "Build" %}
+        <p id="loading-message">Chargement en cours...</p>
         {{ error }}
-    </div>
+    {% else %}
+        <p>{{ error }}</p> {# Affiche l'erreur #}
+    {% endif %}
 {% endif %}
+{% if updated_message_content is defined %}
+    {{ updated_message_content }}
+{% endif %}
+</div>
 
         <table class="w-9/12 text-left text-sm font-light m-auto">
             <thead>
@@ -43,4 +56,18 @@
         </table>
 
     <a href="{{ path('app_back_posts_new') }}" class="button is-primary items-center">Nouvelle post</a>
+
+
+    <!-- <script>
+        // Effectuez une requête asynchrone
+        fetch('/votre/url')
+            .then(response => response.text())
+            .then(content => {
+                // Stockez le contenu dans une variable JavaScript
+                var contenu = content;
+                // Mettez à jour le contenu de la div dans votre template Twig
+                document.getElementById('contenu').innerHTML = contenu;
+            })
+            .catch(error => console.error('Erreur lors de la requête:', error));
+    </script> -->
 {% endblock %}

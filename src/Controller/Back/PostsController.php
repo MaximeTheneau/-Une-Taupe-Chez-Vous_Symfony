@@ -35,8 +35,7 @@ use Michelf\MarkdownExtra;
 use \IntlDateFormatter;
 use App\Service\MarkdownProcessor;
 use App\Service\UrlGeneratorService;
-use App\Service\TriggerNextJsBuild;
-use App\Message\UpdateNextAppMessage;
+use App\Message\TriggerNextJsBuild;
 use Symfony\Component\String\UnicodeString;
 
 #[Route('/posts')]
@@ -52,7 +51,7 @@ class PostsController extends AbstractController
     private $markdownProcessor;
     private $messageBus;
     private $urlGeneratorService;
-    private $triggerNextJsBuild;
+
 
     public function __construct(
         ContainerBagInterface $params,
@@ -62,7 +61,6 @@ class PostsController extends AbstractController
         MarkdownProcessor $markdownProcessor,
         MessageBusInterface $messageBus,
         UrlGeneratorService $urlGeneratorService,
-        TriggerNextJsBuild $triggerNextJsBuild,
     )
     {
         $this->params = $params;
@@ -75,16 +73,14 @@ class PostsController extends AbstractController
         $this->markdownProcessor = $markdownProcessor;
         $this->messageBus = $messageBus;
         $this->urlGeneratorService = $urlGeneratorService;
-        $this->triggerNextJsBuild = $triggerNextJsBuild;
     }
     
     #[Route('/', name: 'app_back_posts_index', methods: ['GET'])]
-    public function index(PostsRepository $postsRepository, Request $request ): Response
+    public function index(PostsRepository $postsRepository, Request $request): Response
     {
-        $error = $request->query->get('error');
         return $this->render('back/posts/index.html.twig', [
             'posts' => $postsRepository->findAll(),
-            'error' => $error,
+            'error' => null,
         ]);
     }
 
@@ -99,7 +95,7 @@ class PostsController extends AbstractController
     }
 
     #[Route('/new', name: 'app_back_posts_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, PostsRepository $postsRepository): Response
+    public function new(Request $request, PostsRepository $postsRepository, MessageBusInterface $messageBus): Response
     {
         $this->denyAccessUnlessGranted('ROLE_USER');
 
@@ -205,7 +201,7 @@ class PostsController extends AbstractController
                  }          
             } 
 
-            // $result = $this->triggerNextJsBuild->triggerBuild();
+            $messageBus->dispatch(new TriggerNextJsBuildMessage());
 
             $postsRepository->save($post, true);
             return $this->redirectToRoute('app_back_posts_index', [
@@ -227,8 +223,9 @@ class PostsController extends AbstractController
         ]);
     }
 
+
     #[Route('/{id}/edit', name: 'app_back_posts_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Posts $post, $id, ParagraphPostsRepository $paragraphPostsRepository, PostsRepository $postsRepository): Response
+    public function edit(Request $request, Posts $post, $id, ParagraphPostsRepository $paragraphPostsRepository, PostsRepository $postsRepository, MessageBusInterface $messageBus): Response
     {
         $imgPost = $post->getImgPost();
         
@@ -360,11 +357,11 @@ class PostsController extends AbstractController
             $post->setFormattedDate('Publié le ' . $createdAt . '. Mise à jour le ' . $updatedDate);
             
             $postsRepository->save($post, true);
-            
-            $response = $this->triggerNextJsBuild->triggerBuild();
+            $messageBus->dispatch(new TriggerNextJsBuild('Build'));
+            $messageBuild = $messageBus->dispatch(new TriggerNextJsBuild('Build'))->getMessage()->getContent();
 
             return $this->redirectToRoute('app_back_posts_index', [
-                'error' => $response->getContent(),
+                'error' => $messageBuild,
             ], Response::HTTP_SEE_OTHER);
         }
     
@@ -374,6 +371,7 @@ class PostsController extends AbstractController
             'articles' => $articles,
         ]);
     }
+
 
     #[Route('/{id}', name: 'app_back_posts_delete', methods: ['POST'])]
     public function delete(Request $request, Posts $post, PostsRepository $postsRepository): Response
@@ -405,4 +403,5 @@ class PostsController extends AbstractController
         
         return $this->redirectToRoute('app_back_posts_edit', ['id' => $postId], Response::HTTP_SEE_OTHER);
     }
+
 }
