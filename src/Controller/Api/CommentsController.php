@@ -25,6 +25,7 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Lexik\Bundle\JWTAuthenticationBundle\Security\Authentication\Token\JWTUserToken;
+use DateTime;
 
 #[Route('/api/comments')]
 class CommentsController extends ApiController
@@ -57,10 +58,9 @@ class CommentsController extends ApiController
         $cookie = $request->cookies->get('jwt');
 
 
-
-        // if (!$cookie) {
-        //     return new JsonResponse(['message' => 'Une erreur est survenue, veuillez réessayer plus tard !'], 400);
-    //     // }
+        if (!$cookie) {
+            return new JsonResponse(['message' => $request->cookies], 400);
+        }
         
     //   $token = new JWTUserToken();
     //   $token->setRawToken($cookie);
@@ -184,87 +184,82 @@ class CommentsController extends ApiController
     {
     $email = JSON_decode($request->getContent(), true)['email'];
 
+    try {
+        $urlAPI = 'https://api.mailcheck.ai/email/' . $email;
+    
+        $reponse = $httpClient->request('GET', $urlAPI);
+        $donnees = $reponse->toArray();
+        
+        $existingUser = $entityManager->getRepository(User::class)->findOneBy(['email' => $email]);
+                
+        if ($existingUser) {
+    
+            $token = $this->jwtManager->create($existingUser);
+            $date = time() + (3600 * 24 * 365); 
 
-    $urlAPI = 'https://api.mailcheck.ai/email/' . $email;
+            $cookie = new Cookie(
+                'jwt',
+                $token,
+                $date,
+
+                // '/',        // Le chemin du cookie (par exemple, '/')
+                // '',        // Le domaine du cookie (null pour le domaine actuel)
+                // true,  // Désactivez l'option Secure pour permettre les connexions HTTP
+                // false,  // Désactivez l'option HttpOnly pour permettre l'accès via JavaScript
+                // 'lax',
+            );
     
-    $reponse = $httpClient->request('GET', $urlAPI);
-    $donnees = $reponse->toArray();
-    
-    $existingUser = $entityManager->getRepository(User::class)->findOneBy(['email' => $email]);
+            $response = new JsonResponse(['message' => true]);
+            $response->headers->set('Content-Type', 'application/json');
             
-    if ($existingUser) {
-
-        $token = $this->jwtManager->create($existingUser);
-
-        // Créez un cookie
-        $cookie = new Cookie(
-            'jwt',
-            $token,
-            strtotime('+1 day'),
-            '/',        // Le chemin du cookie (par exemple, '/')
-            '',        // Le domaine du cookie (null pour le domaine actuel)
-            true,  // Désactivez l'option Secure pour permettre les connexions HTTP
-            false,  // Désactivez l'option HttpOnly pour permettre l'accès via JavaScript
-            'lax',
-        );
-
-    $response = new JsonResponse(['message' => true]);
+            $response->headers->setCookie($cookie);
+            
+            return $response;
     
-    // Ajoutez le cookie à la réponse
-    $response->headers->setCookie($cookie);
-    
-    // Renvoyez la réponse
-    return $response;
+        }
 
-    }
+        if ($donnees['disposable']) {
+            return new JsonResponse(['message' => 'L\'e-mail est jetable et n\'est pas accepté.'], 400);
+        } 
 
-    if ($donnees['disposable']) {
-        return new JsonResponse(['message' => 'L\'e-mail est jetable et n\'est pas accepté.'], 400);
-    } 
-    if (!$donnees['mx']) {
-        return new JsonResponse(['message' => 'L\'e-mail est invalide.'], 400);
-    } 
-    if (!$existingUser) {
+        if (!$donnees['mx'] ) {
+            return new JsonResponse(['message' => 'L\'e-mail est invalide.'], 400);
+        } 
+        if (!$existingUser) {
 
-        $currentDate = new \DateTimeImmutable();
-        $password = $currentDate->format('Ymd');
-        $password .= random_int(1000, 9999);
+            $currentDate = new \DateTimeImmutable();
+            $password = $currentDate->format('Ymd');
+            $password .= random_int(1000, 9999);
 
-        $user = new User();
-        $user->setEmail($email);
-        $user->setRoles(['ROLE_COMMENT']);
-        $user->setPassword($this->passwordHasher->hashPassword($user, $password ));
+            $user = new User();
+            $user->setEmail($email);
+            $user->setRoles(['ROLE_COMMENT']);
+            $user->setPassword($this->passwordHasher->hashPassword($user, $password ));
 
-        $entityManager->persist($user);
-        $entityManager->flush();
+            $entityManager->persist($user);
+            $entityManager->flush();
 
-        $token = $this->jwtManager->create($user);
+            $token = $this->jwtManager->create($user);
 
 
-        $cookie = new Cookie(
-            'jwt',
-            $token,
-            strtotime('+1 day'),
-            '/',
-            'unetaupechezvous.fr',
-            false,  // Désactivez l'option Secure pour permettre les connexions HTTP
-            true,  // Désactivez l'option HttpOnly pour permettre l'accès via JavaScript
-            'Lax'         // Contrôle SameSite (ajustez selon vos besoins)
-        );
+            $cookie = new Cookie(
+                'jwt',
+                $token,
+
+            );
 
 
-        $response = new JsonResponse(['message' => true]);
-    
-        // Ajoutez le cookie à la réponse
-        $response->headers->setCookie($cookie);
+            $response = new JsonResponse(['message' => true]);
         
-        // Renvoyez la réponse
-        return $response;
-        
+            $response->headers->setCookie($cookie);
+            
+            return $response;
+            
+        }
+    
+    } catch (\Exception $e) {
+        return new JsonResponse(['message' => 'Veuillez vérifier l\'adresse e-mail fournie.'], 400);
     }
-
-
-    return new JsonResponse(['message' => 'L\'e-mail n\'est pas présent ou n\'est pas valide.'], 400);
 
     }
 }
