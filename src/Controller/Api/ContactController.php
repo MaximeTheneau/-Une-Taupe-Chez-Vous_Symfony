@@ -141,6 +141,7 @@ class ContactController extends ApiController
                 'surfaceContact' => $data['surface'] ?? null ,
                 'interventionContact' => $data['intervention'] ?? null,
                 'interventionOtherContact' => $data['interventionOther'] ?? null,
+                
             ])
             ->replyTo($data['email']);
         
@@ -238,7 +239,6 @@ class ContactController extends ApiController
             Response::HTTP_BAD_REQUEST, // 400
         );
     }
-
     $email = (new TemplatedEmail())
         ->to($emailTo)
         ->from($_ENV['MAILER_TO'])
@@ -253,7 +253,7 @@ class ContactController extends ApiController
             'websiteContact' => $data['siteWeb'],
             'serviceContact' => $data['service'],
             'directoryContact' => $data['directory'],
-            'directoryOtherContact' => $data['directoryOther'] && null,
+            'directoryOtherContact' => $data['directoryOther'] ?? null,
 
         ])
         ->replyTo($data['email']);
