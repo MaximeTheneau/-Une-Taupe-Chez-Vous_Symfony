@@ -16,6 +16,8 @@ use Symfony\Component\Serializer\SerializerInterface;
 use Cloudinary\Configuration\Configuration;
 use Cloudinary\Api\Upload\UploadApi;
 use Symfony\Component\HttpClient\HttpClient;
+use Aws\S3\S3Client;
+use Aws\Exception\AwsException;
 
 class ImageOptimizer
 {
@@ -39,89 +41,83 @@ class ImageOptimizer
             $this->serializer = $serializer;
             $this->photoDir =  $this->params->get('app.imgDir');
             $this->projectDir =  $this->params->get('app.projectDir');
+            $this->s3Key = $this->params->get('amazon.s3.key');
+            $this->s3Secret = $this->params->get('amazon.s3.secret');
+            $this->s3Region = $this->params->get('amazon.s3.region');
+            $this->s3Bucket = $this->params->get('amazon.s3.bucket');
+            $this->s3Version = $this->params->get('amazon.s3.version');
+            $this->domainImg = $this->params->get('app.domain.img');
+            $this->s3Client = new S3Client([
+                'version' => $this->s3Version,
+                'region' => $this->s3Region,
+                'credentials' => [
+                    'key' => $this->s3Key,
+                    'secret' => $this->s3Secret,
+                ],
+            ]);
             $this->imagine = new Imagine();
-            $this->uploadApi = Configuration::instance();
-            $this->uploadApi->cloud->cloudName = $_ENV['CLOUD_NAME'];
-            $this->uploadApi->cloud->apiKey = $_ENV['CLOUD_API_KEY'];
-            $this->uploadApi->cloud->apiSecret = $_ENV['CLOUD_API_SECRET'];
-            $this->uploadApi->url->secure = true;
-            $this->uploadApi = new UploadApi();
+
+            // $this->uploadApi = Configuration::instance();
+            // $this->uploadApi->cloud->cloudName = $_ENV['CLOUD_NAME'];
+            // $this->uploadApi->cloud->apiKey = $_ENV['CLOUD_API_KEY'];
+            // $this->uploadApi->cloud->apiSecret = $_ENV['CLOUD_API_SECRET'];
+            // $this->uploadApi->url->secure = true;
+            // $this->uploadApi = new UploadApi();
     }
 
     public function setPicture( $brochureFile, $post, $slug ): void
     {   
+        $localImagePath = $this->photoDir . $slug . '.webp'; // Path Local Image
 
-        // Save Local File
-        $img = $this->imagine->open($brochureFile)
+        
+        $img = $this->imagine->open($brochureFile) 
         ->strip()
-        ->thumbnail(new Box(2560, 1200))
-        ->save($this->photoDir.$slug.'.webp', ['webp_quality' => 80]);
+        ->save($localImagePath, ['webp_quality' => 80]); // Save Local File
 
+        // Srcset Image
         $srcset = '';
-
+        $imgUrl = $this->domainImg . $slug . '.webp';
         foreach (self::IMAGE_SIZES as $size) {
             if($size <= $img->getSize()->getWidth()) {
-                $imgUrl = 'https://res.cloudinary.com/dsn2zwbis/image/upload/c_limit,w_' 
-                . $size . ',q_auto/unetaupechezvous/'
-                . $slug . '.webp';
-                
-                if (!empty($srcset)) {
-                    $srcset .= ', ';
-                }
-                $srcset .= $imgUrl . ' ' . $size . 'w';
+                $srcset .= $imgUrl . '?width=' . $size . ' ' . $size . 'w,';
             }
         }
 
-        $lastImgUrl = 'https://res.cloudinary.com/dsn2zwbis/image/upload/c_limit,w_' 
-        . $img->getSize()->getWidth() . ',q_auto/unetaupechezvous/'
-        . $slug;
+        $srcset .= $imgUrl . ' ' . $img->getSize()->getWidth() . 'w';
+        
+        try {
 
-        if (!empty($srcset)) {
-            $srcset .= ', ';
+        // Put Image on S3
+        $this->s3Client->putObject([
+            'Bucket' => $this->s3Bucket,
+            'Key'    => $slug . '.webp',
+            'Body'   => fopen($this->photoDir.$slug.'.webp', 'r'),
+        ]);
+
+        $post->setImgPost($imgUrl); // Url Image
+        $post->setSrcset($srcset); // Srcset Image
+        $post->setImgWidth($img->getSize()->getWidth()); // Width Image
+        $post->setImgHeight($img->getSize()->getHeight()); // Height Image
+        
+        } catch (AwsException $e) {
+            echo $e->getMessage();
+        } finally {
+            unlink($localImagePath);
         }
-        $srcset .= $lastImgUrl . ' ' . $img->getSize()->getWidth() . 'w';
-        
-        $post->setImgPost($lastImgUrl);
-
-        $post->setSrcset($srcset);
-
-        // Size Image
-        $post->setImgWidth($img->getSize()->getWidth());
-        $post->setImgHeight($img->getSize()->getHeight());
-
-        // Delete File if exists
-        $httpClient = HttpClient::create();
-        $response = $httpClient->request('GET',  'https://res.cloudinary.com/dsn2zwbis/image/upload/fl_getinfo/unetaupechezvous/' . $slug . '.webp');
-        if ($response->getStatusCode() === 200) {
-            $this->uploadApi->destroy($slug);
-        }
-        
-        // Save Cloudinary File
-        $this->uploadApi->upload($this->photoDir.$slug.'.webp', array(
-            "public_id" => $slug,
-            "folder" => "unetaupechezvous",
-            "overwrite" => true,
-            "resource_type" => "auto",
-            "quality" => "auto",
-            "fetch_format" => "webp",
-            "width" => 1000,
-            "height" => 1000,
-            "crop" => "limit",
-            "secure" => true));
-        
-        // Delete Local File
-        unlink($this->photoDir . $slug . '.webp');
 
     }
 
     public function deletedPicture($slug): void
     {
-        $httpClient = HttpClient::create();
-        $response = $httpClient->request('GET',  'https://res.cloudinary.com/dsn2zwbis/image/upload/fl_getinfo/unetaupechezvous/' . $slug . '.webp');
-
-        if ($response->getStatusCode() === 200) {
-            $this->uploadApi->destroy($slug);
+        try {
+            $this->s3Client->deleteObject([
+                'Bucket' => $this->s3Bucket,
+                'Key'    => $slug . '.webp',
+            ]);
+        } catch (AwsException $e) {
+            echo $e->getMessage();
         }
+      
     }
 
 }

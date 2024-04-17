@@ -368,7 +368,9 @@ class PostsController extends AbstractController
     public function delete(Request $request, Posts $post, PostsRepository $postsRepository): Response
     {
         if ($this->isCsrfTokenValid('delete'.$post->getId(), $request->request->get('_token'))) {
+            $this->imageOptimizer->deletedPicture($post->getSlug());
             $postsRepository->remove($post, true);
+
         }
 
         return $this->redirectToRoute('app_back_posts_index', [], Response::HTTP_SEE_OTHER);
