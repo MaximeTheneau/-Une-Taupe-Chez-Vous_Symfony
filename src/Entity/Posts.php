@@ -116,7 +116,7 @@ class Posts
     #[Groups(['api_posts_read', 'api_posts_home'])]
     private ?int $imgHeight = null;
 
-    #[ORM\Column(length: 2000, nullable: true)]
+    #[ORM\Column(type: 'text', nullable: true)]
     #[Groups(['api_posts_read', 'api_posts_home'])]
     private ?string $srcset = null;
 

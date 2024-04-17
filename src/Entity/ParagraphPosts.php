@@ -64,8 +64,12 @@ class ParagraphPosts
     private ?int $imgHeight = null;
 
     #[ORM\Column(length: 500, nullable: true)]
+    #[Groups(['api_posts_read'])]
     private ?string $imgPost = null;
 
+    #[ORM\Column(type: 'text', nullable: true)]
+    #[Groups(['api_posts_read'])]
+    private ?string $srcset = null;
     
     public function getId(): ?int
     {
@@ -224,6 +228,18 @@ class ParagraphPosts
     public function setImgPost(?string $imgPost): static
     {
         $this->imgPost = $imgPost;
+
+        return $this;
+    }
+
+    public function getSrcset(): ?string
+    {
+        return $this->srcset;
+    }
+
+    public function setSrcset(?string $srcset): static
+    {
+        $this->srcset = $srcset;
 
         return $this;
     }
