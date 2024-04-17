@@ -252,16 +252,9 @@ class PostsController extends AbstractController
             
             // IMAGE Principal
             $brochureFile = $form->get('imgPost')->getData();
-
             if (!empty($brochureFile)) {
-                
-                $post->setImgPost($slug);
-                $this->imageOptimizer->setPicture($brochureFile, $post->getImgPost(), $post );
-                
-            } else {
-                $post->setImgPost($imgPost);
-            }
-
+                $this->imageOptimizer->setPicture($brochureFile, $post, $slug);
+            } 
 
             // PARAGRAPH
             $paragraphPosts = $form->get('paragraphPosts')->getData();
