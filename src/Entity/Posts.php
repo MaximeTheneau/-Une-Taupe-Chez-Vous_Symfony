@@ -23,23 +23,23 @@ class Posts
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['api_posts_browse', 'api_posts_read', 'api_posts_desc', 'api_posts_category', 'api_posts_keyword' ])]
+    #[Groups(['api_posts_read', 'api_posts_desc', 'api_posts_category', 'api_posts_keyword', 'api_posts_home' ])]
     private ?int $id = null;
 
     #[ORM\Column(length: 70)]
-    #[Groups(['api_posts_read'])]
+    #[Groups(['api_posts_read', 'api_posts_home'])]
     private ?string $heading = null;
     
     #[ORM\Column(length: 70, unique: true, type: Types::STRING)]
-    #[Groups(['api_posts_browse', 'api_posts_read', 'api_posts_desc', 'api_posts_category', 'api_posts_subcategory', 'api_posts_articles_desc', 'api_posts_all', 'api_posts_keyword' ])]
+    #[Groups(['api_posts_home', 'api_posts_read', 'api_posts_desc', 'api_posts_category', 'api_posts_subcategory', 'api_posts_articles_desc', 'api_posts_all', 'api_posts_keyword' ])]
     private ?string $title = null;
 
     #[ORM\Column(length: 1000)]
-    #[Groups(['api_posts_read'])]
+    #[Groups(['api_posts_read', 'api_posts_home'])]
     private ?string $metaDescription = null;
     
     #[ORM\Column(length: 70, unique: true, type: Types::STRING)]
-    #[Groups(['api_posts_browse', 'api_posts_read', 'api_posts_desc', 'api_posts_category', 'api_posts_subcategory', 'api_posts_all', 'api_posts_keyword', 'api_posts_sitemap' ])]
+    #[Groups(['api_posts_home', 'api_posts_read', 'api_posts_desc', 'api_posts_category', 'api_posts_subcategory', 'api_posts_all', 'api_posts_keyword', 'api_posts_sitemap' ])]
     private ?string $slug = null;
     
     #[ORM\Column(length: 5000, nullable: true, type: Types::STRING)]
@@ -60,14 +60,14 @@ class Posts
     private ?string $formattedDate = null;
     
     #[ORM\OneToMany(mappedBy: 'posts', targetEntity: ListPosts::class, cascade: ['persist', 'remove'], orphanRemoval: true)]
-    #[Groups(['api_posts_read'])]
+    #[Groups(['api_posts_read', 'api_posts_home' ])]
     private Collection $listPosts;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $links = null;
 
     #[ORM\OneToMany(mappedBy: 'posts', targetEntity: ParagraphPosts::class, cascade: ['persist', 'remove'], orphanRemoval: true)]
-    #[Groups(['api_posts_read', 'api_posts_sitemap' ])]
+    #[Groups(['api_posts_read', 'api_posts_sitemap', 'api_posts_home' ])]
     private Collection $paragraphPosts;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -78,7 +78,7 @@ class Posts
     private ?Category $category = null;
 
     #[ORM\Column(length: 125, nullable: true)]
-    #[Groups(['api_posts_category', 'api_posts_read',  'api_posts_desc', 'api_posts_keyword', 'api_posts_all', 'api_posts_category', 'api_posts_subcategory'])]
+    #[Groups(['api_posts_category', 'api_posts_home', 'api_posts_read',  'api_posts_desc', 'api_posts_keyword', 'api_posts_all', 'api_posts_category', 'api_posts_subcategory'])]
     private ?string $altImg = null;
 
     #[ORM\Column(length: 500, nullable: true)]
@@ -86,7 +86,7 @@ class Posts
     private ?string $imgPost = null;
 
     #[ORM\ManyToOne(inversedBy: 'posts')]
-    #[Groups(['api_posts_all', 'api_posts_browse', 'api_posts_category', 'api_posts_desc', 'api_posts_subcategory', 'api_posts_read', 'api_posts_keyword'])]
+    #[Groups(['api_posts_all', 'api_posts_category', 'api_posts_desc', 'api_posts_subcategory', 'api_posts_read', 'api_posts_keyword'])]
     private ?Subcategory $subcategory = null;
 
     #[ORM\OneToMany(mappedBy: 'posts', targetEntity: Comments::class, cascade: ['persist', 'remove'], orphanRemoval: true)]
@@ -98,23 +98,27 @@ class Posts
     private Collection $keywords;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['api_posts_all', 'api_posts_category', 'api_posts_desc', 'api_posts_subcategory', 'api_posts_browse', 'api_posts_read', 'api_posts_keyword', 'api_posts_sitemap'  ])]
+    #[Groups(['api_posts_all', 'api_posts_category', 'api_posts_desc', 'api_posts_subcategory', 'api_posts_read', 'api_posts_keyword', 'api_posts_sitemap'  ])]
     private ?string $url = null;
 
     #[ORM\Column(length: 5000)]
-    #[Groups(['api_posts_read'])]
+    #[Groups(['api_posts_read', 'api_posts_home'])]
     private ?string $contentsHTML = null;
 
     #[ORM\Column(nullable: true)]
     private ?bool $draft = null;
 
     #[ORM\Column( nullable: true)]
-    #[Groups(['api_posts_read'])]
+    #[Groups(['api_posts_read', 'api_posts_home'])]
     private ?int $imgWidth = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['api_posts_read'])]
+    #[Groups(['api_posts_read', 'api_posts_home'])]
     private ?int $imgHeight = null;
+
+    #[ORM\Column(length: 2000, nullable: true)]
+    #[Groups(['api_posts_read', 'api_posts_home'])]
+    private ?string $srcset = null;
 
     public function __construct()
     {
@@ -479,6 +483,18 @@ class Posts
     public function setImgHeight(?int $imgHeight): static
     {
         $this->imgHeight = $imgHeight;
+
+        return $this;
+    }
+
+    public function getSrcset(): ?string
+    {
+        return $this->srcset;
+    }
+
+    public function setSrcset(?string $srcset): static
+    {
+        $this->srcset = $srcset;
 
         return $this;
     }

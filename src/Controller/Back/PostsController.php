@@ -133,8 +133,7 @@ class PostsController extends AbstractController
                 $post->setImgWidth('1000');
                 $post->setImgHeight('563');
             } else {
-                $post->setImgPost($slug);
-                $this->imageOptimizer->setPicture($brochureFile, $slug, $post );
+                $this->imageOptimizer->setPicture($brochureFile, $post, $slug);
                 
             }
 
@@ -168,29 +167,23 @@ class PostsController extends AbstractController
             // PARAGRAPH
             $paragraphPosts = $form->get('paragraphPosts')->getData();
             foreach ($paragraphPosts as $paragraph) {
-                if (!empty($paragraph->getSubtitle())) {
-                    // SLUG
-                    $slugPara = $this->slugger->slug($paragraph->getSubtitle());
-                    $slugPara = substr($slugPara, 0, 30); 
-                    $paragraph->setSlug($slugPara);
+                // SLUG
+                $slugPara = $this->slugger->slug($paragraph->getSubtitle());
+                $slugPara = substr($slugPara, 0, 30);
 
+                if (!empty($paragraph->getSubtitle())) {
+                    $paragraph->setSlug($slugPara);
                 } else {
                     $this->entityManager->remove($paragraph);
                     $this->entityManager->flush();
                     }
 
                  // IMAGE PARAGRAPH
-
                  $imgPostParaghFile = $paragraph->getImgPostParaghFile();
 
-                 if ($imgPostParaghFile !== null ) {
-                     $brochureFileParagraph = $paragraph->getImgPostParagh();
-                     // SLUG
-                     $slugPara = $this->slugger->slug($paragraph->getSubtitle()); // slugify
-                     $slugPara = substr($slugPara, 0, 30); // 30 max
-                     $paragraph->setImgPostParagh($slugPara);// set slug to image paragraph
+                 if (!empty($imgPostParaghFile)) {
                      // Cloudinary
-                     $this->imageOptimizer->setPicture($brochureFileParagraph, $slugPara, $paragraph ); // set image paragraph
+                     $this->imageOptimizer->setPicture($imgPostParaghFile,  $paragraph, $slugPara); 
                  } 
  
                  // ALT IMG PARAGRAPH
@@ -200,8 +193,6 @@ class PostsController extends AbstractController
                      $paragraph->setAltImg($paragraph->getAltImg());
                  }          
             } 
-
-            $messageBus->dispatch(new TriggerNextJsBuildMessage());
 
             $postsRepository->save($post, true);
             return $this->redirectToRoute('app_back_posts_index', [

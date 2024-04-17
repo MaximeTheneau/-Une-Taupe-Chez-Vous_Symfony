@@ -23,7 +23,7 @@ class ParagraphPosts
     private ?string $subtitle = null;
 
     #[ORM\Column(length: 5000, nullable: true)]
-    #[Groups(['api_posts_read'])]
+    #[Groups(['api_posts_read', 'api_posts_home'])]
     private ?string $paragraph = null;
 
     #[ORM\ManyToOne(inversedBy: 'paragraphPosts', targetEntity: Posts::class)]
@@ -46,7 +46,7 @@ class ParagraphPosts
     private ?string $link = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['api_posts_read'])]
+    #[Groups(['api_posts_read', 'api_posts_home'])]
     private ?string $linkSubtitle = null;
 
     #[ORM\ManyTone(targetEntity: Posts::class)]
@@ -62,6 +62,9 @@ class ParagraphPosts
     #[ORM\Column(nullable: true)]
     #[Groups(['api_posts_read'])]
     private ?int $imgHeight = null;
+
+    #[ORM\Column(length: 500, nullable: true)]
+    private ?string $imgPost = null;
 
     
     public function getId(): ?int
@@ -209,6 +212,18 @@ class ParagraphPosts
     public function setImgHeight(?int $imgHeight): static
     {
         $this->imgHeight = $imgHeight;
+
+        return $this;
+    }
+
+    public function getImgPost(): ?string
+    {
+        return $this->imgPost;
+    }
+
+    public function setImgPost(?string $imgPost): static
+    {
+        $this->imgPost = $imgPost;
 
         return $this;
     }

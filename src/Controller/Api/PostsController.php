@@ -8,6 +8,7 @@ use App\Entity\Subcategory;
 use App\Repository\CommentsRepository;
 use App\Repository\PostsRepository;
 use App\Repository\SubcategoryRepository;
+use App\Repository\CategoryRepository;
 use App\Repository\KeywordRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -28,20 +29,24 @@ use Doctrine\Common\Collections\Collection;
 class PostsController extends ApiController
 {
 
-    #[Route('/home', name: 'browse', methods: ['GET'])]
-    public function browse(PostsRepository $postsRepository ): JsonResponse
+    #[Route('/home', name: 'home', methods: ['GET'])]
+    public function home(PostsRepository $postsRepository, CategoryRepository $categoryRepository ): JsonResponse
     {
     
-        $allPosts = $postsRepository->findLastPosts();
+        $home = $postsRepository->findBy(['slug' => 'Accueil']);
+        $interventions = $postsRepository->findByCategorySlug('Interventions', 3);
 
         return $this->json(
-            $allPosts,
+            [
+                // 'home' =>  $home[0],
+                'interventions' => $interventions,
+            ],
             Response::HTTP_OK,
             [],
             [
                 "groups" => 
                 [
-                    "api_posts__browse"
+                    "api_posts_home"
                 ]
             ]
         );

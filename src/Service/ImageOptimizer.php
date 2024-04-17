@@ -26,7 +26,7 @@ class ImageOptimizer
     private $projectDir;
     private $imagine;
     private $uploadApi;
-
+    private const IMAGE_SIZES = [320, 640, 750, 828, 1080, 1200, 1920, 2048, 3840];
 
     public function __construct(
         SluggerInterface $slugger,
@@ -48,14 +48,42 @@ class ImageOptimizer
             $this->uploadApi = new UploadApi();
     }
 
-    public function setPicture( $brochureFile, $slug, $post ): void
+    public function setPicture( $brochureFile, $post, $slug ): void
     {   
-        // Save Local File
 
+        // Save Local File
         $img = $this->imagine->open($brochureFile)
-            ->strip()
-            ->thumbnail(new Box(2560, 1200))
-            ->save($this->photoDir.$slug.'.webp', ['webp_quality' => 80]);
+        ->strip()
+        ->thumbnail(new Box(2560, 1200))
+        ->save($this->photoDir.$slug.'.webp', ['webp_quality' => 80]);
+
+        $srcset = '';
+
+        foreach (self::IMAGE_SIZES as $size) {
+            if($size <= $img->getSize()->getWidth()) {
+                $imgUrl = 'https://res.cloudinary.com/dsn2zwbis/image/upload/c_limit,w_' 
+                . $size . ',q_auto/unetaupechezvous/'
+                . $slug . '.webp';
+                
+                if (!empty($srcset)) {
+                    $srcset .= ', ';
+                }
+                $srcset .= $imgUrl . ' ' . $size . 'w';
+            }
+        }
+
+        $lastImgUrl = 'https://res.cloudinary.com/dsn2zwbis/image/upload/c_limit,w_' 
+        . $img->getSize()->getWidth() . ',q_auto/unetaupechezvous/'
+        . $slug;
+
+        if (!empty($srcset)) {
+            $srcset .= ', ';
+        }
+        $srcset .= $lastImgUrl . ' ' . $img->getSize()->getWidth() . 'w';
+        
+        $post->setImgPost($lastImgUrl);
+
+        $post->setSrcset($srcset);
 
         // Size Image
         $post->setImgWidth($img->getSize()->getWidth());
@@ -64,13 +92,11 @@ class ImageOptimizer
         // Delete File if exists
         $httpClient = HttpClient::create();
         $response = $httpClient->request('GET',  'https://res.cloudinary.com/dsn2zwbis/image/upload/fl_getinfo/unetaupechezvous/' . $slug . '.webp');
-
         if ($response->getStatusCode() === 200) {
             $this->uploadApi->destroy($slug);
         }
         
         // Save Cloudinary File
-
         $this->uploadApi->upload($this->photoDir.$slug.'.webp', array(
             "public_id" => $slug,
             "folder" => "unetaupechezvous",
@@ -84,7 +110,6 @@ class ImageOptimizer
             "secure" => true));
         
         // Delete Local File
-
         unlink($this->photoDir . $slug . '.webp');
 
     }

@@ -17,14 +17,14 @@ class ListPosts
     private ?int $id = null;
 
     #[ORM\Column(length: 170, nullable: true)]
-    #[Groups(['api_posts_read'])]
+    #[Groups(['api_posts_read', 'api_posts_home'])]
     private ?string $title = null;
 
     #[ORM\ManyToOne(inversedBy: 'ListPosts')]
     private ?Posts $posts = null;
 
     #[ORM\Column(length: 5000, nullable: true)]
-    #[Groups(['api_posts_read'])]
+    #[Groups(['api_posts_read', 'api_posts_home'])]
     private ?string $description = null;
 
     #[ORM\Column(length: 500, nullable: true)]
