@@ -1,4 +1,4 @@
-import CryptoJS from 'crypto-js';
+const CryptoJS = require('crypto.js');
 
 const triggerNextJsBuild = async () => {
     const url = `https://unetaupechezvous.fr/api/webhook`;
@@ -8,7 +8,7 @@ const triggerNextJsBuild = async () => {
         force: true,
     };
 
-    const calculatedSignature = CryptoJS.HmacSHA256(JSON.stringify(data), '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');
+    const calculatedSignature = CryptoJS.HmacSHA256(JSON.stringify(data), 'secret');
     const headers = {
         'Content-Type': 'application/json',
         'x-hub-signature-256': `sha256=${calculatedSignature}`,
