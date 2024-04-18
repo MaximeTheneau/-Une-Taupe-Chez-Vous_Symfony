@@ -80,7 +80,7 @@ class PostsController extends AbstractController
     {
         return $this->render('back/posts/index.html.twig', [
             'posts' => $postsRepository->findAll(),
-            'error' => null,
+            'build' => $request->query->get('build') ,
         ]);
     }
 
@@ -314,7 +314,7 @@ class PostsController extends AbstractController
                     $slugPara = $this->slugger->slug($paragraph->getSubtitle());
                     $slugPara = substr($slugPara, 0, 30);
                     $paragraph->setImgPostParagh($slugPara);
-                    $this->imageOptimizer->setPicture($brochureFileParagraph, $slugPara, $paragraph);
+                    $this->imageOptimizer->setPicture($brochureFileParagraph, $paragraph, $slugPara);
                     
                     // ALT IMG PARAGRAPH
                     if (empty($paragraph->getAltImg())) {
@@ -341,11 +341,9 @@ class PostsController extends AbstractController
             $post->setFormattedDate('Publié le ' . $createdAt . '. Mise à jour le ' . $updatedDate);
             
             $postsRepository->save($post, true);
-            $messageBus->dispatch(new TriggerNextJsBuild('Build'));
-            $messageBuild = $messageBus->dispatch(new TriggerNextJsBuild('Build'))->getMessage()->getContent();
 
             return $this->redirectToRoute('app_back_posts_index', [
-                'error' => $messageBuild,
+                'build' => 'Build',
             ], Response::HTTP_SEE_OTHER);
         }
     

@@ -30,5 +30,11 @@
     "build": "encore production --progress",
     "build-next": "cd /var/www/html/Une-Taupe-Chez-Vous_Next.js && npm run build",
     "clean": "sudo rm -rf public/build node_modules pnpm-lock.yaml"
+  },
+  "dependencies": {
+    "core-js": "^3.37.0",
+    "crypto-js": "^4.2.0",
+    "dotenv": "^16.4.5",
+    "dotenv-webpack": "^8.1.0"
   }
 }

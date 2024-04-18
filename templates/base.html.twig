@@ -14,9 +14,15 @@
         {% endblock %}
 
         {% block javascripts %}
-            {% block importmap %}{{ importmap('app') }}{% endblock %}
+            {% block importmaps %}
+                {% block importmap_app %}{{ importmap('app') }}{% endblock %}
+            {% endblock %}
             {{ encore_entry_script_tags('app') }}
-        {% endblock %}
+            <script src={{asset('js/build.js')}}></script>
+
+            {% endblock %}
+            
+
 
     </head>
     <body>

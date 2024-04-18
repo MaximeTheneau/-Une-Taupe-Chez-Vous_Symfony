@@ -4,23 +4,18 @@
 
 {% block body %}
 
-<div id="contenu"></div>
-
-<div id="content-container">
-    {% set error = app.request.query.get('error') %}
-
-    {% if error is defined %}
-    {% if error == "Build" %}
-        <p id="loading-message">Chargement en cours...</p>
-        {{ error }}
-    {% else %}
-        <p>{{ error }}</p> {# Affiche l'erreur #}
+<div id="modal-build">
+    {% if build is defined %}
+        <div id="build">{{ build }}</div>
+        <dialog closed>
+            <div class="flex justify-between items-center p-4">
+                <h2 class="text-lg font" id="response">
+                </h2>
+                </div>
+        </dialog>
     {% endif %}
-{% endif %}
-{% if updated_message_content is defined %}
-    {{ updated_message_content }}
-{% endif %}
 </div>
+
 
         <table class="w-9/12 text-left text-sm font-light m-auto">
             <thead>
