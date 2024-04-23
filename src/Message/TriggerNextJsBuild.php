@@ -2,16 +2,7 @@
 
 namespace App\Message;
 
-use App\MessageHandler\TriggerNextJsBuildHandler;
-use Symfony\Component\HttpClient\HttpClient;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\String\UnicodeString;
-use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Messenger\MessageInterface;
-
-
-class TriggerNextJsBuild
+final class TriggerNextJsBuild
 {
     private $content;
 
@@ -31,5 +22,4 @@ class TriggerNextJsBuild
 
         return $this;
     }
-
 }

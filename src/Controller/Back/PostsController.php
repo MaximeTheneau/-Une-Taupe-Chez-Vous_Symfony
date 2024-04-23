@@ -9,6 +9,7 @@ use App\Entity\ParagraphPosts;
 use App\Entity\Keyword;
 use App\Form\PostsType;
 use App\Form\ParagraphPostsType;
+use App\Message\TriggerNextJsBuild;
 use App\Repository\PostsRepository;
 use App\Repository\CategoryRepository;
 use App\Repository\ParagraphPostsRepository;
@@ -35,8 +36,9 @@ use Michelf\MarkdownExtra;
 use \IntlDateFormatter;
 use App\Service\MarkdownProcessor;
 use App\Service\UrlGeneratorService;
-use App\Message\TriggerNextJsBuild;
 use Symfony\Component\String\UnicodeString;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+
 
 #[Route('/posts')]
 class PostsController extends AbstractController
@@ -49,9 +51,7 @@ class PostsController extends AbstractController
     private $entityManager;
     private $markdown;
     private $markdownProcessor;
-    private $messageBus;
     private $urlGeneratorService;
-
 
     public function __construct(
         ContainerBagInterface $params,
@@ -59,7 +59,6 @@ class PostsController extends AbstractController
         SluggerInterface $slugger,
         EntityManagerInterface $entityManager,
         MarkdownProcessor $markdownProcessor,
-        MessageBusInterface $messageBus,
         UrlGeneratorService $urlGeneratorService,
     )
     {
@@ -71,16 +70,14 @@ class PostsController extends AbstractController
         $this->photoDir =  $this->params->get('app.imgDir');
         $this->markdown = new MarkdownExtra();
         $this->markdownProcessor = $markdownProcessor;
-        $this->messageBus = $messageBus;
         $this->urlGeneratorService = $urlGeneratorService;
     }
     
     #[Route('/', name: 'app_back_posts_index', methods: ['GET'])]
-    public function index(PostsRepository $postsRepository, Request $request): Response
+    public function index(PostsRepository $postsRepository, Request $request, MessageBusInterface $messageBus,): Response
     {
         return $this->render('back/posts/index.html.twig', [
             'posts' => $postsRepository->findAll(),
-            'build' => $request->query->get('build') ,
         ]);
     }
 
@@ -194,6 +191,9 @@ class PostsController extends AbstractController
                  }          
             } 
 
+            $message = new TriggerNextJsBuild('Build');
+            $messageBus->dispatch($message);
+            
             $postsRepository->save($post, true);
             return $this->redirectToRoute('app_back_posts_index', [
             ], Response::HTTP_SEE_OTHER);
@@ -342,8 +342,10 @@ class PostsController extends AbstractController
             
             $postsRepository->save($post, true);
 
+            $message = new TriggerNextJsBuild('Build');
+            $messageBus->dispatch($message);
+
             return $this->redirectToRoute('app_back_posts_index', [
-                'build' => 'Build',
             ], Response::HTTP_SEE_OTHER);
         }
     

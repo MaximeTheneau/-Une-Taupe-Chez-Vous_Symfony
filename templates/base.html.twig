@@ -18,15 +18,19 @@
                 {% block importmap_app %}{{ importmap('app') }}{% endblock %}
             {% endblock %}
             {{ encore_entry_script_tags('app') }}
-            <script src={{asset('js/build.js')}}></script>
-
             {% endblock %}
             
 
 
     </head>
     <body>
+
       {% if is_granted('ROLE_USER') %}
+      {% for message in app.flashes('notification') %}
+      <div class="bg-blue-100 border-t border-b border-blue-500 text-blue-700 px-4 py-3 rounded relative mb-4" role="alert">
+          <p>{{ message }}</p>
+      </div>
+  {% endfor %}
       <nav class="contents__nav md:w-1/4 bg-zinc-900 text-white max-h-full h-full md:fixed top-0 flex flex-col  justify-between ">  
         <ul>
           <li class="flex text-lg p-2 border-gray-600 border-t navbar__menu">
