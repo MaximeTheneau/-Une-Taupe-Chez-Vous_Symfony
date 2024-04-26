@@ -45,6 +45,7 @@ class ImageOptimizer
             $this->s3Secret = $this->params->get('amazon.s3.secret');
             $this->s3Region = $this->params->get('amazon.s3.region');
             $this->s3Bucket = $this->params->get('amazon.s3.bucket');
+            $this->s3BucketFront = $this->params->get('amazon.s3.bucket.front');
             $this->s3Version = $this->params->get('amazon.s3.version');
             $this->domainImg = $this->params->get('app.domain.img');
             $this->s3Client = new S3Client([
@@ -69,36 +70,62 @@ class ImageOptimizer
     {   
         $localImagePath = $this->photoDir . $slug . '.webp'; // Path Local Image
 
-        
+        $imageS3Path = $this->s3Bucket . '/' . $slug . '.webp'; // Path S3 Image
+
         $img = $this->imagine->open($brochureFile) 
         ->strip()
         ->save($localImagePath, ['webp_quality' => 80]); // Save Local File
 
+        if ($post->getImgPost() !== null) {
+            
+            $bucketDomain = $_ENV['DOMAIN_IMG']; 
+            $key = str_replace($bucketDomain, "", $post->getImgPost());
+
+            $this->s3Client->deleteObject([
+                'Bucket' => $this->s3Bucket,
+                'Key'    => $key,
+            ]);
+
+            $this->s3Client->deleteMatchingObjects($this->s3BucketFront, $slug . '.webp');
+
+            $this->s3Client->deleteObject([
+                'Bucket' => $this->s3BucketFront,
+                'Key'    => $post->getImgPost(),
+            ]);
+
+            $slug = $slug . '-' . rand(0, 10);
+
+            $this->s3Client->putObject([
+                'Bucket' => $this->s3Bucket,
+                'Key'    => $slug . '.webp',
+                'Body'   => $img,
+            ]);
+        }
+        
         // Srcset Image
         $srcset = '';
+        
         $imgUrl = $this->domainImg . $slug . '.webp';
         foreach (self::IMAGE_SIZES as $size) {
             if($size <= $img->getSize()->getWidth()) {
                 $srcset .= $imgUrl . '?width=' . $size . ' ' . $size . 'w,';
             }
         }
-
+        
         $srcset .= $imgUrl . ' ' . $img->getSize()->getWidth() . 'w';
         
         try {
+            $this->s3Client->putObject([
+                'Bucket' => $this->s3Bucket,
+                'Key'    => $slug . '.webp',
+                'Body'   => $img,
+            ]);
+            
+            $post->setImgPost($imgUrl); // Url Image
+            $post->setSrcset($srcset); // Srcset Image
+            $post->setImgWidth($img->getSize()->getWidth()); // Width Image
+            $post->setImgHeight($img->getSize()->getHeight()); // Height Image
 
-        // Put Image on S3
-        $this->s3Client->putObject([
-            'Bucket' => $this->s3Bucket,
-            'Key'    => $slug . '.webp',
-            'Body'   => fopen($this->photoDir.$slug.'.webp', 'r'),
-        ]);
-
-        $post->setImgPost($imgUrl); // Url Image
-        $post->setSrcset($srcset); // Srcset Image
-        $post->setImgWidth($img->getSize()->getWidth()); // Width Image
-        $post->setImgHeight($img->getSize()->getHeight()); // Height Image
-        
         } catch (AwsException $e) {
             echo $e->getMessage();
         } finally {
@@ -112,6 +139,13 @@ class ImageOptimizer
         try {
             $this->s3Client->deleteObject([
                 'Bucket' => $this->s3Bucket,
+                'Key'    => $slug . '.webp',
+            ]);
+
+            $this->s3Client->deleteMatchingObjects($this->s3BucketFront, $slug . '.webp');
+
+            $this->s3Client->deleteObject([
+                'Bucket' => $this->s3BucketFront,
                 'Key'    => $slug . '.webp',
             ]);
         } catch (AwsException $e) {

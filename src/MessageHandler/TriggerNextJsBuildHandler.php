@@ -27,7 +27,7 @@ final class TriggerNextJsBuildHandler
     {
 
         try {
-            $url = 'http://' . $_ENV['NGINX_DOMAIN'] . '/api/webhook';
+            $url = 'https://' . $_ENV['NGINX_DOMAIN'] . '/api/webhook';
             $data = [
                 'name' => 'NextJsBuild',
                 'project' => $_ENV['NGINX_DOMAIN'],

@@ -47,7 +47,7 @@ class ParagraphPostsType extends AbstractType
                         ]
                     ])
 
-            ->add('imgPostParaghFile', FileType::class, [
+                    ->add('imgPostParaghFile', FileType::class, [
                         'label' => 'Image du paragraphe',
                         'required' => false,
                         'data_class' => null,

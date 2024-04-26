@@ -64,7 +64,7 @@
                     {% if paragraph.vars.value.getImgPost() is not empty %}
                     <img src="{{ paragraph.vars.value.getImgPost() }}" alt="imgHeader">
                     {% endif %}
-                    {{ form_widget(paragraph.imgPostParaghFile) }}
+                    {{ form_row(paragraph.imgPostParaghFile) }}
                     {{ form_widget(paragraph.altImg) }}
                     <div>
                         {% if paragraph.vars.value.getLinkSubtitle() is empty %}
@@ -180,12 +180,8 @@ addParagraphButton.addEventListener('click', function() {
     addListButton.addEventListener('click', function() {
         let collectionHolder = document.querySelector('.list');
         let index = collectionHolder.dataset.index;
-        
-
         let newList = collectionHolder.dataset.prototype;
-
         newList = newList.replace(/__name__/g, index);
-
         let newListLi = document.createElement('li');
         newListLi.innerHTML = newList;
 
@@ -193,8 +189,5 @@ addParagraphButton.addEventListener('click', function() {
 
         collectionHolder.dataset.index = parseInt(index) + 1;
     });
-   
     </script>
-
-
 {% endblock %}

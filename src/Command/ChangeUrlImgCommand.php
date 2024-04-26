@@ -50,7 +50,7 @@ class ChangeUrlImgCommand extends Command
         }
         $posts = $this->entityManager->getRepository(Posts::class)->findAll();
         foreach ($posts as $post) {
-        $urlImg = 'https://picture.unetaupechezvous.fr/' . $post->getSlug() . '.webp';
+        $urlImg = $_ENV['DOMAIN_IMG'] . $post->getSlug() . '.webp';
         $post->setImgPost($urlImg);
 
         // Srcset Image
@@ -68,7 +68,7 @@ class ChangeUrlImgCommand extends Command
         $paragraphs = $this->entityManager->getRepository(ParagraphPosts::class)->findAll();
 
         foreach ($paragraphs as $paragraph) {
-            $urlImg = 'https://picture.unetaupechezvous.fr/' . $paragraph->getImgPostParagh() . '.webp';
+            $urlImg = $_ENV['DOMAIN_IMG'] . $paragraph->getImgPostParagh() . '.webp';
             if ($paragraph->getImgPostParagh() !== null) {
                 $paragraph->setImgPost($urlImg);
                 $srcset = '';

@@ -16,6 +16,10 @@ parameters:
     amazon.s3.bucket:  '%env(resolve:AWS_BUCKET)%'
     amazon.s3.version: '%env(resolve:AWS_VERSION)%'
 
+    #CloudFront
+    amazon.s3.bucket.front:  '%env(resolve:AWS_BUCKET_FRONT)%'
+
+
 
 
 services:

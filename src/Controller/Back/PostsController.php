@@ -131,7 +131,6 @@ class PostsController extends AbstractController
                 $post->setImgHeight('563');
             } else {
                 $this->imageOptimizer->setPicture($brochureFile, $post, $slug);
-                
             }
 
             // ALT IMG
@@ -176,11 +175,11 @@ class PostsController extends AbstractController
                     }
 
                  // IMAGE PARAGRAPH
-                 $imgPostParaghFile = $paragraph->getImgPostParaghFile();
+                 $brochureFileParagraph = $paragraph->getImgPost();
 
-                 if (!empty($imgPostParaghFile)) {
+                 if (!empty($brochureFileParagraph)) {
                      // Cloudinary
-                     $this->imageOptimizer->setPicture($imgPostParaghFile,  $paragraph, $slugPara); 
+                     $this->imageOptimizer->setPicture($paragraph,  $paragraph, $slugPara); 
                  } 
  
                  // ALT IMG PARAGRAPH
@@ -193,7 +192,7 @@ class PostsController extends AbstractController
 
             $message = new TriggerNextJsBuild('Build');
             $messageBus->dispatch($message);
-            
+
             $postsRepository->save($post, true);
             return $this->redirectToRoute('app_back_posts_index', [
             ], Response::HTTP_SEE_OTHER);
@@ -252,9 +251,12 @@ class PostsController extends AbstractController
             
             // IMAGE Principal
             $brochureFile = $form->get('imgPost')->getData();
+            
             if (!empty($brochureFile)) {
                 $this->imageOptimizer->setPicture($brochureFile, $post, $slug);
-            } 
+            } else {
+                $post->setImgPost($imgPost);
+            }
 
             // PARAGRAPH
             $paragraphPosts = $form->get('paragraphPosts')->getData();
