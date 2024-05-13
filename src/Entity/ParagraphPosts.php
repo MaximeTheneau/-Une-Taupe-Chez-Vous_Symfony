@@ -30,7 +30,7 @@ class ParagraphPosts
     private $posts;
 
     #[ORM\Column(length: 500, nullable: true)]
-    #[Groups(['api_posts_read', 'api_posts_sitemap'])]
+    #[Groups(['api_posts_read'])]
     private ?string $imgPostParagh = null;
 
     #[ORM\Column(length: 170, nullable: true)]
@@ -64,7 +64,7 @@ class ParagraphPosts
     private ?int $imgHeight = null;
 
     #[ORM\Column(length: 500, nullable: true)]
-    #[Groups(['api_posts_read'])]
+    #[Groups(['api_posts_read', 'api_posts_sitemap'])]
     private ?string $imgPost = null;
 
     #[ORM\Column(type: 'text', nullable: true)]
