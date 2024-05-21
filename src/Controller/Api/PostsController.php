@@ -35,11 +35,13 @@ class PostsController extends ApiController
     
         $home = $postsRepository->findBy(['slug' => 'Accueil']);
         $interventions = $postsRepository->findByCategorySlug('Interventions', 3);
+        $testimonials = $postsRepository->findBy(['slug' => 'Temoignages']);
 
         return $this->json(
             [
-                // 'home' =>  $home[0],
+                'home' =>  $home[0],
                 'interventions' => $interventions,
+                'testimonials' => $testimonials[0],
             ],
             Response::HTTP_OK,
             [],

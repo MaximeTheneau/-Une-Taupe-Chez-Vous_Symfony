@@ -15,11 +15,11 @@ class ParagraphPosts
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['api_posts_read'])]
+    #[Groups(['api_posts_read', 'api_posts_home'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 170, nullable: true)]
-    #[Groups(['api_posts_read'])]
+    #[Groups(['api_posts_read', 'api_posts_home'])]
     private ?string $subtitle = null;
 
     #[ORM\Column(length: 5000, nullable: true)]

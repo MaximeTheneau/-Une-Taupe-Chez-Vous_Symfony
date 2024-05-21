@@ -350,12 +350,13 @@ class PostsController extends AbstractController
             return $this->redirectToRoute('app_back_posts_index', [
             ], Response::HTTP_SEE_OTHER);
         }
-    
+        $keyChatGpt = $_ENV['CHATGPT_API_KEY'];
         return $this->render('back/posts/edit.html.twig', [
             'post' => $post,
             'form' => $form,
             'articles' => $articles,
-        ]);
+            'keyChatGpt' => $keyChatGpt,
+         ]);
     }
 
 
@@ -392,4 +393,5 @@ class PostsController extends AbstractController
         return $this->redirectToRoute('app_back_posts_edit', ['id' => $postId], Response::HTTP_SEE_OTHER);
     }
 
+   
 }

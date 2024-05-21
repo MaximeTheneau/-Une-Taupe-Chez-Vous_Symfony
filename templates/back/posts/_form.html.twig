@@ -58,8 +58,10 @@
                     data-prototype="{{ form_widget(form.paragraphPosts.vars.prototype)|e('html_attr') }}"
                 >   
                 {% for paragraph in form.paragraphPosts %}
+                
                 <li class="h-auto mb-8 border border-gray-200">
                     {{ form_row(paragraph.subtitle) }}
+                    <button type="button" class="button__chatGpt" onclick="submitChatGptForm('{{ keyChatGpt }}', '{{ paragraph.subtitle.vars.value }}')">Remplir le paragraphe avec ChatGPT</button>
                     {{ form_row(paragraph.paragraph) }}
                     {% if paragraph.vars.value.getImgPost() is not empty %}
                     <img src="{{ paragraph.vars.value.getImgPost() }}" alt="imgHeader">
@@ -136,8 +138,7 @@
     <script src={{asset('js/posts.js')}}></script>
     <script type="text/javascript">
 
-
-
+ 
 const textareaContents = document.querySelector('#posts_contents');
 
 textareaContents.addEventListener('input', (e) => {
@@ -189,5 +190,36 @@ addParagraphButton.addEventListener('click', function() {
 
         collectionHolder.dataset.index = parseInt(index) + 1;
     });
+
+    function submitChatGptForm(keyChatGpt, subtitle,) {
+        event.preventDefault();
+        console.log(keyChatGpt);
+        const prompt = subtitle + '\n'
+        'ameliore le seo et ajoute "testIci" à la fin du paragraphe';
+        fetch('https://api.openai.com/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + keyChatGpt,
+            },
+            body: JSON.stringify({ 
+                model: 'gpt-3.5-turbo',
+                messages: [
+                    {
+                        role: 'user',
+                        content:  "You are a helpful assistant.",
+                    },
+                ],
+            }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log(data);
+            document.getElementById('paragraph').innerText = data.generated_text;
+        })
+        .catch(error => {
+            console.error('Erreur lors de la récupération de la réponse de GPT:', error);
+        });
+    }
     </script>
 {% endblock %}

@@ -82,7 +82,7 @@ class Posts
     private ?string $altImg = null;
 
     #[ORM\Column(length: 500, nullable: true)]
-    #[Groups(['api_posts_read', 'api_posts_all',  'api_posts_desc', 'api_posts_subcategory', 'api_posts_category', 'api_posts_keyword', 'api_posts_sitemap' ])]
+    #[Groups(['api_posts_read', 'api_posts_all',  'api_posts_desc', 'api_posts_subcategory', 'api_posts_category', 'api_posts_keyword', 'api_posts_sitemap', 'api_posts_home' ])]
     private ?string $imgPost = null;
 
     #[ORM\ManyToOne(inversedBy: 'posts')]
@@ -98,7 +98,7 @@ class Posts
     private Collection $keywords;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['api_posts_all', 'api_posts_category', 'api_posts_desc', 'api_posts_subcategory', 'api_posts_read', 'api_posts_keyword', 'api_posts_sitemap'  ])]
+    #[Groups(['api_posts_all', 'api_posts_category', 'api_posts_desc', 'api_posts_subcategory', 'api_posts_read', 'api_posts_keyword', 'api_posts_sitemap', 'api_posts_home'  ])]
     private ?string $url = null;
 
     #[ORM\Column(length: 5000)]
