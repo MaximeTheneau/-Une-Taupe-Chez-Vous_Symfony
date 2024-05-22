@@ -72,9 +72,9 @@ class ImageOptimizer
 
         $imageS3Path = $this->s3Bucket . '/' . $slug . '.webp'; // Path S3 Image
 
-        $img = $this->imagine->open($brochureFile) 
-        ->strip()
-        ->save($localImagePath, ['webp_quality' => 80]); // Save Local File
+        $img = $this->imagine->open($brochureFile);
+
+        $img->strip()->save($localImagePath, ['webp_quality' => 80]);
 
         if ($post->getImgPost() !== null) {
             
@@ -98,7 +98,7 @@ class ImageOptimizer
             $this->s3Client->putObject([
                 'Bucket' => $this->s3Bucket,
                 'Key'    => $slug . '.webp',
-                'Body'   => $img,
+                'Body'   => fopen($localImagePath, 'rb'),
             ]);
         }
         
@@ -118,7 +118,7 @@ class ImageOptimizer
             $this->s3Client->putObject([
                 'Bucket' => $this->s3Bucket,
                 'Key'    => $slug . '.webp',
-                'Body'   => $img,
+                'Body'   => fopen($localImagePath, 'rb'),
             ]);
             
             $post->setImgPost($imgUrl); // Url Image
