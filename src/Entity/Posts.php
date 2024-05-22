@@ -44,7 +44,7 @@ class Posts
     
     #[ORM\Column(length: 5000, nullable: true, type: Types::STRING)]
     #[Type(type: Types::string)]
-    #[Groups(['api_posts_read'])]
+    #[Groups(['api_posts_read', 'api_posts_home'])]
     private ?string $contents = null;
 
     #[ORM\Column]
