@@ -74,7 +74,7 @@ class PostsController extends AbstractController
     }
     
     #[Route('/', name: 'app_back_posts_index', methods: ['GET'])]
-    public function index(PostsRepository $postsRepository, Request $request, MessageBusInterface $messageBus,): Response
+    public function index(PostsRepository $postsRepository, Request $request): Response
     {
         return $this->render('back/posts/index.html.twig', [
             'posts' => $postsRepository->findAll(),
@@ -192,10 +192,11 @@ class PostsController extends AbstractController
 
             $message = new TriggerNextJsBuild('Build');
             $messageBus->dispatch($message);
-
+            $buildResponse = $message->getContent();
             $postsRepository->save($post, true);
-            return $this->redirectToRoute('app_back_posts_index', [
-            ], Response::HTTP_SEE_OTHER);
+            return $this->render('some_template.html.twig', [
+                'buildResponse' => $result,
+            ]);
 
         }
         return $this->render('back/posts/new.html.twig', [
@@ -215,7 +216,7 @@ class PostsController extends AbstractController
 
 
     #[Route('/{id}/edit', name: 'app_back_posts_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Posts $post, $id, ParagraphPostsRepository $paragraphPostsRepository, PostsRepository $postsRepository, MessageBusInterface $messageBus): Response
+    public function edit(Request $request, Posts $post, $id, ParagraphPostsRepository $paragraphPostsRepository, PostsRepository $postsRepository, MessageBusInterface $messageBus, Category $category): Response
     {
         $imgPost = $post->getImgPost();
         
@@ -346,8 +347,10 @@ class PostsController extends AbstractController
 
             $message = new TriggerNextJsBuild('Build');
             $messageBus->dispatch($message);
-
+    
+            $result = $message->getContent();
             return $this->redirectToRoute('app_back_posts_index', [
+                'buildResponse' => $result
             ], Response::HTTP_SEE_OTHER);
         }
         $keyChatGpt = $_ENV['CHATGPT_API_KEY'];
