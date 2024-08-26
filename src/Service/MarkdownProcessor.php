@@ -17,11 +17,8 @@ class MarkdownProcessor
 
     public function processMarkdown($markdownText)
     {
-        $unicodeHtml = json_encode($markdownText, JSON_UNESCAPED_UNICODE);
 
-        $html = $this->markdown->transform($unicodeHtml);
-
-        return $html;
+        return $this->markdown->transform($unicodeHtml);
     }
 
 }
