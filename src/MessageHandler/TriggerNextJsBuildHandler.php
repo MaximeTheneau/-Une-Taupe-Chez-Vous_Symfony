@@ -22,7 +22,7 @@ final class TriggerNextJsBuildHandler
     {
 
         try {
-            $url = 'https://' . $_ENV['NGINX_DOMAIN'] . '/api/webhook';
+            $url = 'http://localhost:3001/api/webhook';
             $data = [
                 'name' => 'NextJsBuild',
                 'project' => $_ENV['NGINX_DOMAIN'],
@@ -46,11 +46,6 @@ final class TriggerNextJsBuildHandler
             $statusCode = $response->getStatusCode();
             $content = $response->getContent();
             $message->setContent($content);
-
-            $this->cache->get('build_result_' . $message->getId(), function() use ($content) {
-                return $content;
-            });
-            
         } catch (\Exception $e) {
             return 'Une erreur est survenue lors de la requête.' . $e->getCode();
         }

@@ -353,7 +353,6 @@ class PostsController extends AbstractController
 
             $message = new TriggerNextJsBuild('Build');
             $messageBus->dispatch($message);
-    
             $result = $message->getContent();
             return $this->redirectToRoute('app_back_posts_index', [
                 'buildResponse' => $result
