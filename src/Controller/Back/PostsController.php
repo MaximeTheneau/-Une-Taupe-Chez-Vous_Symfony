@@ -325,16 +325,22 @@ class PostsController extends AbstractController
                     } 
                 }
             } 
+            
             $listPosts = $post->getListPosts();
             if ($listPosts !== null) {
                 foreach ($listPosts as $listPost) {
                     if ($listPost->getLinkPostSelect() !== null){
-
+                        
                         $listPost->setLinkSubtitle($listPost->getLinkPostSelect()->getTitle());
                         $listPost->setLink($listPost->getLinkPostSelect()->getUrl());
                     }
+                    if (empty($listPost->getTitle())) {
+                        $this->entityManager->remove($listPost);
+                        $this->entityManager->flush();
+                    }
                 }
             }
+            
             // DATE
             $formatter = new IntlDateFormatter('fr_FR', IntlDateFormatter::FULL, IntlDateFormatter::NONE, null, null, 'dd MMMM yyyy');
             $post->setUpdatedAt(new DateTime());

@@ -3,32 +3,25 @@
 namespace App\Service;
 
 use Michelf\MarkdownExtra;
-// use voku\helper\HtmlMin;
 
 class MarkdownProcessor
 {
     private $markdown;
-    // private $minifier;
 
     public function __construct()
     {
         $this->markdown = new MarkdownExtra();
-        // $this->minifier = new HtmlMin();
+
+
     }
 
     public function processMarkdown($markdownText)
     {
-        $containsTable = preg_match('/\|.*\|/', $markdownText);
-        $containsMarkdownElements = preg_match('/(\*\*|###)/', $markdownText);
-        $containsNumberedList = preg_match('/^\d+\./m', $markdownText);
-        $containsBulletedList = preg_match('/^\*/m', $markdownText);
+        $unicodeHtml = json_encode($markdownText, JSON_UNESCAPED_UNICODE);
 
-        if ($containsTable === 1 || $containsMarkdownElements === 1 || $containsNumberedList === 1 || $containsBulletedList === 1) {
-            return $this->markdown->transform($markdownText);
-        }
-        
-        // $minifiedHtml = $this->minifier->minify();
+        $html = $this->markdown->transform($unicodeHtml);
 
-        return $markdownText;
+        return $html;
     }
+
 }

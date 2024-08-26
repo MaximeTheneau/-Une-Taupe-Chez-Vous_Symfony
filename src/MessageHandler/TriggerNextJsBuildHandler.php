@@ -47,8 +47,10 @@ final class TriggerNextJsBuildHandler
             $content = $response->getContent();
             $message->setContent($content);
 
+            $this->cache->get('build_result_' . $message->getId(), function() use ($content) {
+                return $content;
+            });
             
-            return 'eee';
         } catch (\Exception $e) {
             return 'Une erreur est survenue lors de la requête.' . $e->getCode();
         }
