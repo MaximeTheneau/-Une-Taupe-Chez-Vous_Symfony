@@ -18,7 +18,7 @@ class MarkdownProcessor
     public function processMarkdown($markdownText)
     {
 
-        return $this->markdown->transform($unicodeHtml);
+        return $this->markdown->transform($markdownText);
     }
 
 }
