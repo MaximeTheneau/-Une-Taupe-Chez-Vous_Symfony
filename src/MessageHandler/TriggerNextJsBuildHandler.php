@@ -33,7 +33,7 @@ final class TriggerNextJsBuildHandler
             $headers = [
                 'Content-Type: application/json',
                 'x-hub-signature-256: ' .'sha256=' . $calculatedSignature,
-                'x-github-event: ' . 'build',
+                'x-github-event: ' . 'Build',
             ];
     
             $client = HttpClient::create();
