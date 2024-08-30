@@ -355,7 +355,6 @@ class PostsController extends AbstractController
             $messageBus->dispatch($message);
             $result = $message->getContent();
             return $this->redirectToRoute('app_back_posts_index', [
-                'buildResponse' => $result
             ], Response::HTTP_SEE_OTHER);
         }
         $keyChatGpt = $_ENV['CHATGPT_API_KEY'];
