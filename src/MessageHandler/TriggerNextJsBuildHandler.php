@@ -22,18 +22,16 @@ final class TriggerNextJsBuildHandler
     {
 
         try {
-            $url = 'https://' . $_ENV['NGINX_DOMAIN'] . '/api/webhook';
-            $data = [
-                'name' => 'NextJsBuild',
-                'project' => $_ENV['NGINX_DOMAIN'],
-                'force' => true,
-            ];
+            $url = 'https://api.github.com/repos/MaximeTheneau/Une-Taupe-Chez-Vous_Next.js/dispatches';
             
-            $calculatedSignature =  hash_hmac('sha256', json_encode($data), $_ENV['APP_AUTHTOKEN']);
+            $data = [
+                'event_type' => 'trigger-nextjs-build',
+            ];
+
             $headers = [
                 'Content-Type: application/json',
-                'x-hub-signature-256: ' .'sha256=' . $calculatedSignature,
-                'x-github-event: ' . 'Build',
+                'Authorization: token ' . $_ENV['TARGET_REPO_PAT'],  
+                'Accept: application/vnd.github.everest-preview+json',  
             ];
     
             $client = HttpClient::create();
