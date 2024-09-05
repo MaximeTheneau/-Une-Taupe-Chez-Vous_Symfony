@@ -61,7 +61,7 @@
                 
                 <li class="h-auto mb-8 border border-gray-200">
                     {{ form_row(paragraph.subtitle) }}
-                    <button type="button" class="button__chatGpt" onclick="submitChatGptForm('{{ keyChatGpt }}', '{{ paragraph.subtitle.vars.value }}')">Remplir le paragraphe avec ChatGPT</button>
+                    <button type="button" class="button__chatGpt" onclick="submitChatGptForm('{{ keyChatGpt }}', '{{ paragraph.subtitle.vars.value }}', '{{ paragraph.vars.id }}')">Remplir le paragraphe avec ChatGPT</button>
                     {{ form_row(paragraph.paragraph) }}
                     {% if paragraph.vars.value.getImgPost() is not empty %}
                     <img src="{{ paragraph.vars.value.getImgPost() }}" alt="imgHeader">
@@ -191,11 +191,9 @@ addParagraphButton.addEventListener('click', function() {
         collectionHolder.dataset.index = parseInt(index) + 1;
     });
 
-    function submitChatGptForm(keyChatGpt, subtitle,) {
+    function submitChatGptForm(keyChatGpt, subtitle, id) {
         event.preventDefault();
-        console.log(keyChatGpt);
-        const prompt = subtitle + '\n'
-        'ameliore le seo et ajoute "testIci" à la fin du paragraphe';
+        const prompt = subtitle + "\n' Créez un paragraphe en markdown Pour le titre ci-dessous, qui sera introduit dans un articles. Le texte doit etre fluide à lire, ajoute des sauts de ligne. Si une phrase est intérésante mes la en gras (pas obligatoire). N'oubliez pas d'utiliser la syntaxe markdown appropriée pour formater votre texte de manière lisible et attrayante. ";
         fetch('https://api.openai.com/v1/chat/completions', {
             method: 'POST',
             headers: {
@@ -203,19 +201,20 @@ addParagraphButton.addEventListener('click', function() {
                 'Authorization': 'Bearer ' + keyChatGpt,
             },
             body: JSON.stringify({ 
-                model: 'gpt-3.5-turbo',
+                model: 'gpt-4o',
                 messages: [
                     {
                         role: 'user',
-                        content:  "You are a helpful assistant.",
+                        content:  prompt,
                     },
                 ],
             }),
         })
-        .then(response => response.json())
+        .then(response => response.json()) 
         .then(data => {
-            console.log(data);
-            document.getElementById('paragraph').innerText = data.generated_text;
+            const content = data.choices[0].message.content;
+            const formattedContent = content.replace(/\\n/g, '\n'); 
+            document.getElementById(id + '_paragraph').value = formattedContent;
         })
         .catch(error => {
             console.error('Erreur lors de la récupération de la réponse de GPT:', error);
