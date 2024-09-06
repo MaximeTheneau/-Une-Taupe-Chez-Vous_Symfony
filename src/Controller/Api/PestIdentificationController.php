@@ -101,14 +101,14 @@ class PestIdentificationController extends ApiController
                     'content' => [
                         [
                             'type' => 'text',
-                            'text' => "C'est quoi l'image?"
+                            'text' => "Décrit la photos de " . $data['type'] 
                         ],
-                        [
-                            'type' => 'image_url',
-                            'image_url' => [
-                                'url' => "data:image/jpeg;base64,{$base64Image}"
-                            ]
-                        ]
+                        // [
+                        //     'type' => 'image_url',
+                        //     'image_url' => [
+                        //         'url' => "data:image/jpeg;base64,{$base64Image}"
+                        //     ]
+                        // ]
                     ]
                 ]
             ],
@@ -121,9 +121,10 @@ class PestIdentificationController extends ApiController
 
         $content = $data['choices'][0]['message']['content'];
         
+        sleep(15);
 
         return $this->json([
-            'content' => $content
+            'message' => $content
         ]);
     }
 
