@@ -101,14 +101,14 @@ class PestIdentificationController extends ApiController
                     'content' => [
                         [
                             'type' => 'text',
-                            'text' => "Décrit la photos de " . $data['type'] 
+                            'text' => "Décrit la photos de " . $data['type'] . "si tu reconnais pas la photo dis simplement que tu ne reconnais pas la photo envoyé, veuillez recommencez. Utilise le vouvoiement pour répondre. Repond simplement et naturellement assez court, en texte simple toujours."
                         ],
-                        // [
-                        //     'type' => 'image_url',
-                        //     'image_url' => [
-                        //         'url' => "data:image/jpeg;base64,{$base64Image}"
-                        //     ]
-                        // ]
+                        [
+                            'type' => 'image_url',
+                            'image_url' => [
+                                'url' => "data:image/jpeg;base64,{$base64Image}"
+                            ]
+                        ]
                     ]
                 ]
             ],
