@@ -37,7 +37,7 @@ class PestIdentificationController extends ApiController
 
     }
 	
-    #[Route('', name: 'add_contact', methods: ['POST'])]
+    #[Route('', name: '', methods: ['POST'])]
     public function add(Request $request, MailerInterface $mailer): JsonResponse
     {
 
