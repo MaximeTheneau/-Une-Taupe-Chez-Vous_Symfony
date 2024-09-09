@@ -160,6 +160,8 @@ class CommentsController extends ApiController
 
             $comment = $CommentsRepository->find($request->get('id'));
             $comment->setAccepted(true);
+            $comment->isReplyToComment(true);
+
             $this->entityManager->persist($comment);
             $this->entityManager->flush();
         
