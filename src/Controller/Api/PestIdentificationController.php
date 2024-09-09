@@ -101,7 +101,7 @@ class PestIdentificationController extends ApiController
                     'content' => [
                         [
                             'type' => 'text',
-                            'text' => "Décrit la photos de " . $data['type'] . "si tu reconnais pas la photo dis simplement que tu ne reconnais pas la photo envoyé, veuillez recommencez. Utilise le vouvoiement pour répondre. Repond simplement et naturellement assez court, en texte simple toujours."
+                            'text' => "Veuillez identifier cette image en tant que " . $data['type'] ." Répondez simplement et naturellement, en utilisant un langage clair et courtois. Si vous ne reconnaissez pas l'image, veuillez l'indiquer poliment et suggérer de réessayer avec une autre image."
                         ],
                         [
                             'type' => 'image_url',
@@ -121,7 +121,7 @@ class PestIdentificationController extends ApiController
 
         $content = $data['choices'][0]['message']['content'];
         
-        sleep(15);
+        // sleep(15);
 
         return $this->json([
             'message' => $content
