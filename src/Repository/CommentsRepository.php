@@ -21,6 +21,15 @@ class CommentsRepository extends ServiceEntityRepository
         parent::__construct($registry, Comments::class);
     }
 
+    public function findNonReplyComments(int $postId)
+    {
+        return $this->createQueryBuilder('c')
+            ->where('c.replyToComment IS NULL')
+            ->andWhere('c.posts = :postId') 
+            ->setParameter('postId', $postId)
+            ->getQuery()
+            ->getResult();
+    }
 //    /**
 //     * @return Comments[] Returns an array of Comments objects
 //     */

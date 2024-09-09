@@ -47,6 +47,9 @@ class Comments
     #[Groups(['api_posts_read'])]
     private $replies;
 
+    #[ORM\Column(nullable: true)]
+    private ?bool $replyToComment = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -78,6 +81,7 @@ class Comments
 
     public function getComment(): ?string
     {
+
         return $this->comment;
     }
 
@@ -130,7 +134,7 @@ class Comments
      */
     public function getReplies()
     {
-        return $this->replies;
+        return $this->replies->toArray();
     }
 
     public function setReplies($replies): static
@@ -170,6 +174,18 @@ class Comments
                 $comment->setParent(null);
             }
         }
+
+        return $this;
+    }
+
+    public function isReplyToComment(): ?bool
+    {
+        return $this->replyToComment;
+    }
+
+    public function setReplyToComment(?bool $replyToComment): static
+    {
+        $this->replyToComment = $replyToComment;
 
         return $this;
     }

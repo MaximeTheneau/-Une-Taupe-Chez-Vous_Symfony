@@ -203,19 +203,14 @@ class PostsController extends ApiController
     }
 
     #[Route('/{slug}', name: 'read', methods: ['GET'])]
-    public function read(Posts $post)
-    {
-        $filteredComments = [];
+    public function read(Posts $post, CommentsRepository $commentRepository)
+    { 
+        $comments = $commentRepository->findNonReplyComments($post->getId());
 
-        foreach ($post->getComments() as $comment) {
-            if ($comment->isAccepted()) {
-                $filteredComments[] = $comment;
-            }
-        }
-        $filteredCommentsCollection = new ArrayCollection($filteredComments);
+        $commentsCollection = new ArrayCollection($comments);
 
-        $post->setComments($filteredCommentsCollection);
-    
+        $post->setComments($commentsCollection);
+
         return $this->json(
             $post,
             Response::HTTP_OK,
