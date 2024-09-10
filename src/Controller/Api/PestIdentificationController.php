@@ -40,7 +40,8 @@ class PestIdentificationController extends ApiController
     #[Route('', name: '', methods: ['POST'])]
     public function add(Request $request, MailerInterface $mailer): JsonResponse
     {
-
+        $clientIp = $request->getClientIp();
+        dd($clientIp);
     $content = $request->getContent();
     $data = $request->request->all();
     try {
@@ -136,7 +137,7 @@ class PestIdentificationController extends ApiController
 
         $content = $data['choices'][0]['message']['content'];
         
-        // sleep(15);
+        sleep(5);
 
         return $this->json([
             'message' => $content
