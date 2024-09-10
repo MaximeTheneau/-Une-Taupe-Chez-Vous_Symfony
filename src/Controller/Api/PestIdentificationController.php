@@ -67,7 +67,7 @@ class PestIdentificationController extends ApiController
         
         if ($uploadedFile ) {
             
-            $img = $this->imagine->open($filePath); 
+            $img = $this->imagine->open($uploadedFile); 
             
             $img->resize(new Box(750, 750));
             
@@ -75,8 +75,6 @@ class PestIdentificationController extends ApiController
             $filePath = $uploadDir . '/' . uniqid() . '.' . $uploadedFile->getClientOriginalExtension();
             
             $uploadedFile->move($uploadDir, $filePath);
-            
-        
             
             $img->save($filePath, ['webp_quality' => 80]);
             
