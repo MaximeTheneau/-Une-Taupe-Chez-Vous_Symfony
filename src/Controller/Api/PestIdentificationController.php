@@ -146,7 +146,6 @@ class PestIdentificationController extends ApiController
 
     }
     catch (\Exception $e) {
-    dd($e);
 
         $email = (new TemplatedEmail())
         ->to($_ENV['MAILER_TO_WEBMASTER'])
