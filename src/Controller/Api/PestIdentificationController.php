@@ -43,40 +43,55 @@ class PestIdentificationController extends ApiController
 
     $content = $request->getContent();
     $data = $request->request->all();
-    
     try {
-    $uploadedFile = $request->files->get('image');
-
-    $allowedExtensions = ['jpg', 'jpeg', 'png', 'webp', 'gif'];
-    $fileExtension = $uploadedFile->getClientOriginalExtension();
-
-    if (!in_array(strtolower($fileExtension), $allowedExtensions)) {
-        return $this->json(
-            [
-                "erreur" => "Formats acceptés : " . implode(', ', $allowedExtensions),
-                "code_error" => Response::HTTP_FORBIDDEN
-            ],
-            Response::HTTP_FORBIDDEN
-        );
-    }
-
-    if ($uploadedFile ) {
-        $img = $this->imagine->open($uploadedFile);
-        $img->resize(new Box(750, 750));
-
-        $img->save('img.webp', ['webp_quality' => 80]); // Sauvegarde l'image dans le flux
-
-        $base64Image = base64_encode($img);
-    } else {
-        return $this->json(
+        $uploadedFile = $request->files->get('image');
+        
+        $allowedExtensions = ['jpg', 'jpeg', 'png', 'webp'];
+        $fileExtension = $uploadedFile->getClientOriginalExtension();
+        
+        if (!in_array(strtolower($fileExtension), $allowedExtensions)) {
+            return $this->json(
+                [
+                    "erreur" => "Formats acceptés : " . implode(', ', $allowedExtensions),
+                    "code_error" => Response::HTTP_FORBIDDEN
+                ],
+                Response::HTTP_FORBIDDEN
+            );
+        }
+        if (!$uploadedFile) {
+            return $this->json([
+                "erreur" => "Aucun fichier n'a été téléchargé",
+                "code_error" => Response::HTTP_BAD_REQUEST
+            ], Response::HTTP_BAD_REQUEST);
+        }
+        
+        if ($uploadedFile ) {
+            $uploadDir = $this->getParameter('app.imgDir');
+            $filePath = $uploadDir . '/' . uniqid() . '.' . $uploadedFile->getClientOriginalExtension();
+            
+            $uploadedFile->move($uploadDir, $filePath);
+            
+            $img = $this->imagine->open($filePath); 
+        
+            $img->resize(new Box(750, 750));
+            
+            $img->save($filePath, ['webp_quality' => 80]);
+            
+            $imageData = file_get_contents($filePath);
+            $base64Image = base64_encode($imageData);
+            
+            unlink($filePath);
+            
+        } else {
+            return $this->json(
             [
                 "erreur" => "Erreur d'images, ressayer ulterieurement",
                 "code_error" => Response::HTTP_FORBIDDEN
             ],
             Response::HTTP_FORBIDDEN
         );
-     }
-
+    }
+    
     if (strlen($data['type']) <= 2) {
         return $this->json(
             [
@@ -131,6 +146,8 @@ class PestIdentificationController extends ApiController
 
     }
     catch (\Exception $e) {
+    dd($e);
+
         $email = (new TemplatedEmail())
         ->to($_ENV['MAILER_TO_WEBMASTER'])
         ->from($_ENV['MAILER_TO'])
