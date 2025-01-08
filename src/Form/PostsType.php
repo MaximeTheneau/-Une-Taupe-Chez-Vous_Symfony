@@ -161,6 +161,10 @@ class PostsType extends AbstractType
                         'maxlength' => '255',
                     ]
                     ])
+            ->add('isHomeImage', CheckboxType::class, [
+                        'required' => false,
+                        'label' => 'Définir comme image d\'accueil',
+                    ])
             ->add('paragraphPosts', CollectionType::class, [
                 'entry_type' => ParagraphPostsType::class,
                 'label' => false,
