@@ -120,6 +120,9 @@ class Posts
     #[Groups(['api_posts_read', 'api_posts_home'])]
     private ?string $srcset = null;
 
+    #[ORM\Column(nullable: true)]
+    private ?bool $isHomeImage = null;
+
     public function __construct()
     {
         $this->listPosts = new ArrayCollection();
@@ -495,6 +498,18 @@ class Posts
     public function setSrcset(?string $srcset): static
     {
         $this->srcset = $srcset;
+
+        return $this;
+    }
+
+    public function isIsHomeImage(): ?bool
+    {
+        return $this->isHomeImage;
+    }
+
+    public function setIsHomeImage(?bool $isHomeImage): static
+    {
+        $this->isHomeImage = $isHomeImage;
 
         return $this;
     }

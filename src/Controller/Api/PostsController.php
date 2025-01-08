@@ -8,40 +8,34 @@ use App\Entity\Subcategory;
 use App\Repository\CommentsRepository;
 use App\Repository\PostsRepository;
 use App\Repository\SubcategoryRepository;
-use App\Repository\CategoryRepository;
 use App\Repository\KeywordRepository;
-use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
-use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
-use Symfony\Component\Serializer\SerializerInterface;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
-use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
-use Lexik\Bundle\JWTAuthenticationBundle\Event\JWTCreatedEvent;
-use Symfony\Component\HttpFoundation\Cookie;
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\EntityManagerInterface;
 
 #[Route('/api/posts', name: 'api_posts_')]
 class PostsController extends ApiController
 {
 
     #[Route('/home', name: 'home', methods: ['GET'])]
-    public function home(PostsRepository $postsRepository, CategoryRepository $categoryRepository ): JsonResponse
+    public function home(PostsRepository $postsRepository, EntityManagerInterface $em ): JsonResponse
     {
     
         $home = $postsRepository->findBy(['slug' => 'Accueil']);
         $interventions = $postsRepository->findByCategorySlug('Interventions', 3);
         $testimonials = $postsRepository->findBy(['slug' => 'Temoignages']);
+        $category = $em->getRepository(Category::class)->findByName('Articles');
+        $blog = $em->getRepository(Posts::class)->findBy(['category' => $category, 'isHomeImage' => true], ['createdAt' => 'DESC'], 3);
 
         return $this->json(
             [
                 'home' =>  $home[0],
                 'interventions' => $interventions,
                 'testimonials' => $testimonials[0],
+                'blog'=> $blog,
+
             ],
             Response::HTTP_OK,
             [],
