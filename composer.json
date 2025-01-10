@@ -14,6 +14,7 @@
         "doctrine/doctrine-bundle": "^2.11",
         "doctrine/doctrine-migrations-bundle": "^3.3",
         "doctrine/orm": "^3.1",
+        "friendsofsymfony/ckeditor-bundle": "^2.5",
         "lexik/jwt-authentication-bundle": "*",
         "liip/imagine-bundle": "^2.11",
         "michelf/php-markdown": "^2.0",
@@ -90,7 +91,8 @@
             "cache:clear": "symfony-cmd",
             "assets:install %PUBLIC_DIR%": "symfony-cmd",
             "importmap:install": "symfony-cmd",
-            "requirements-checker": "script"
+            "requirements-checker": "script",
+            "ckeditor:install": "symfony-cmd"
         },
         "post-install-cmd": [
             "@auto-scripts"

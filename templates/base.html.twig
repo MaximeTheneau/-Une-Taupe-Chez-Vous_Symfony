@@ -16,9 +16,9 @@
         {% block javascripts %}
             {% block importmaps %}
                 {% block importmap_app %}{{ importmap('app') }}{% endblock %}
+                {% endblock %}
+                {{ encore_entry_script_tags('app') }}
             {% endblock %}
-            {% endblock %}
-            {{ encore_entry_script_tags('app') }}
             
 
 
