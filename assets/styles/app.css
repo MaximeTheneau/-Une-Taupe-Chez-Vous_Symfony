@@ -63,3 +63,12 @@ input[type='text'],
 textarea {
     width: 100%;
 }
+
+.ck-editor__editable {
+    min-height: 250px;
+    height: auto;
+}
+ol,
+ul{
+  margin-left: 1rem ;
+}

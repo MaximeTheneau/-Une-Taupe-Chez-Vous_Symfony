@@ -44,6 +44,7 @@ import {
 import translations from './translations/fr.js';
 
 const postId = document.querySelector('#postId')?.value;
+const paragraph = document.querySelector('.paragraph');
 
 const editorConfig = {
 

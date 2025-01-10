@@ -1,4 +1,5 @@
 {{ form_start(form) }}
+    <input type="hidden" id="postId" value="{{ post.id }}">
 
     {% if post.imgPost is empty %}
             <img src={{'https://res.cloudinary.com/dsn2zwbis/image/upload/unetaupechezvous/Accueil.webp'}} alt="imgHeader" > 
