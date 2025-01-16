@@ -358,6 +358,7 @@ class PostsController extends AbstractController
             ], Response::HTTP_SEE_OTHER);
         }
         $keyChatGpt = $_ENV['CHATGPT_API_KEY'];
+        
         return $this->render('back/posts/edit.html.twig', [
             'post' => $post,
             'form' => $form,

@@ -63,7 +63,18 @@ input[type='text'],
 textarea {
     width: 100%;
 }
-
+.custom-row {
+    display: inline-block;
+    margin-right: 20px; /* Espacement entre chaque élément */
+    vertical-align: middle;
+    & > input[type="checkbox"] {
+    vertical-align: middle; /* Aligne la case verticalement */
+    }
+    & > label {
+        display: inline-block;
+        vertical-align: middle; /* Aligne le label verticalement */
+    }
+}
 .ck-editor__editable {
     min-height: 250px;
     height: auto;

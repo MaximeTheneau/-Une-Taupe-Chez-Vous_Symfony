@@ -173,7 +173,20 @@ class PostsType extends AbstractType
                 'allow_add' => true,
                 'allow_delete' => true,
                 'by_reference' => false,
-            ]);
+            ])
+            ->add('relatedPosts', EntityType::class, [
+                        'class' => Posts::class,
+                        'required' => false,
+                        'choice_label' => 'title',
+                        'expanded' => true,
+                        'multiple' => true,
+                        'by_reference' => false,
+                        'attr' => [
+                            'class' => 'custom-row',
+                        ],
+                        
+                    ])
+            ;
                 $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {
                     $form = $event->getForm();
                     $listPosts = $event->getData()->getParagraphPosts();

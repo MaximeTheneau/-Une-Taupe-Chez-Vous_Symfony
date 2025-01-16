@@ -133,6 +133,12 @@
                   </svg>
                   Ajouter un lien
             </div>
+
+                <div class="space-y-4">
+                    {% for child in form.relatedPosts %}
+                        {{ form_row(child) }}
+                    {% endfor %}
+                </div>
             <button class="button is-primary ">{{ button_label|default('Save') }}</button>
 
 {{ form_end(form) }}

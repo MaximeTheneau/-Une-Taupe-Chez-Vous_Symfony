@@ -307,5 +307,49 @@ class PostsController extends ApiController
         );
     }
    
+#[Route('/related/{slug}', name: 'related', methods: ['GET'])]
+    public function relatedPosts(EntityManagerInterface $em, string $slug )
+    {
+        $post = $em->getRepository(Posts::class)->findOneBy(['slug' => $slug]);
+
+        if ($post === null)
+        {
+            // on renvoie donc une 404
+            return $this->json(
+                [
+                    "erreur" => "Page non trouvée",
+                    "code_error" => 404
+                ],
+                Response::HTTP_NOT_FOUND,// 404
+            );
+        }
+    $relatedPosts = $post->getRelatedPosts();
+
+    // Si vous voulez seulement certaines données des posts associés, vous pouvez mapper les entités en un tableau d'objets plus simples
+    $relatedPostsData = [];
+    foreach ($relatedPosts as $relatedPost) {
+        $relatedPostsData[] = [
+            'id' => $relatedPost->getId(),
+            'slug' => $relatedPost->getSlug(),
+            'title' => $relatedPost->getTitle(),
+            'altImg' => $relatedPost->getAltImg(),
+            'url' => $relatedPost->getUrl(),
+            'imgPost' => $relatedPost->getImgPost(),
+
+        ];
+    }
+
+    // Retourner la réponse JSON avec les posts associés
+    return $this->json(
+        $relatedPostsData,
+            Response::HTTP_OK,
+            [],
+            [
+                "groups" => 
+                [
+                    "api_posts_related",
+                ]
+            ]);
+    }
 
 }

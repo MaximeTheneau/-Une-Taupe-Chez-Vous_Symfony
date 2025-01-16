@@ -123,12 +123,22 @@ class Posts
     #[ORM\Column(nullable: true)]
     private ?bool $isHomeImage = null;
 
+    #[ORM\ManyToMany(targetEntity: self::class, inversedBy: 'posts', cascade: ['persist'],)]
+    #[ORM\JoinTable(name: 'posts_relations')]
+    #[Groups(['api_posts_related'])]
+    private Collection $relatedPosts;
+    
+    #[ORM\ManyToMany(targetEntity: self::class, mappedBy: 'relatedPosts')]
+    private Collection $posts;
+
     public function __construct()
     {
         $this->listPosts = new ArrayCollection();
         $this->paragraphPosts = new ArrayCollection();
         $this->comments = new ArrayCollection();
         $this->keywords = new ArrayCollection();
+        $this->relatedPosts = new ArrayCollection();
+        $this->posts = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -510,6 +520,57 @@ class Posts
     public function setIsHomeImage(?bool $isHomeImage): static
     {
         $this->isHomeImage = $isHomeImage;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, self>
+     */
+    public function getRelatedPosts(): Collection
+    {
+        return $this->relatedPosts;
+    }
+
+    public function addRelatedPost(self $relatedPost): static
+    {
+        if (!$this->relatedPosts->contains($relatedPost)) {
+            $this->relatedPosts->add($relatedPost);
+        }
+
+        return $this;
+    }
+
+    public function removeRelatedPost(self $relatedPost): static
+    {
+        $this->relatedPosts->removeElement($relatedPost);
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, self>
+     */
+    public function getPosts(): Collection
+    {
+        return $this->posts;
+    }
+
+    public function addPost(self $post): static
+    {
+        if (!$this->posts->contains($post)) {
+            $this->posts->add($post);
+            $post->addRelatedPost($this);
+        }
+
+        return $this;
+    }
+
+    public function removePost(self $post): static
+    {
+        if ($this->posts->removeElement($post)) {
+            $post->removeRelatedPost($this);
+        }
 
         return $this;
     }
