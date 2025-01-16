@@ -124,10 +124,9 @@ class Posts
     private ?bool $isHomeImage = null;
 
     #[ORM\ManyToMany(targetEntity: self::class, inversedBy: 'posts', cascade: ['persist'],)]
-    #[ORM\JoinTable(name: 'posts_relations')]
     #[Groups(['api_posts_related'])]
     private Collection $relatedPosts;
-    
+
     #[ORM\ManyToMany(targetEntity: self::class, mappedBy: 'relatedPosts')]
     private Collection $posts;
 
