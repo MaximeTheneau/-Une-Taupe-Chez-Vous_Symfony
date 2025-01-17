@@ -98,7 +98,7 @@
                 </div>
             </div>
 
-            <ul 
+            <!-- <ul 
                 class="list"
                 data-index="{{ form.listPosts|length > 0 ? form.listPosts|last.vars.name + 0 : 0 }}"
                 data-prototype="{{ form_widget(form.listPosts.vars.prototype)|e('html_attr') }}"
@@ -109,17 +109,17 @@
                     </li>
 
                 {% endfor %}
-            </ul>
+            </ul> -->
 
-            <div class="flex text-lg border-gray-600 border-b button__list pt-4">
+            <!-- <div class="flex text-lg border-gray-600 border-b button__list pt-4">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zM3.75 12h.007v.008H3.75V12zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm-.375 5.25h.007v.008H3.75v-.008zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
                   </svg>
                   Ajouter une liste
-                </div>  
+                </div>   -->
 
 
-            <div class="add__link hidden">
+            <!-- <div class="add__link hidden">
                 
                 {{ form_label(form.links) }}
                 {{ form_widget(form.links) }}
@@ -131,14 +131,14 @@
                     <path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244" />
                   </svg>
                   Ajouter un lien
-            </div>
+            </div> -->
 
                 <div class="space-y-4">
                     {% for child in form.relatedPosts %}
                         {{ form_row(child) }}
                     {% endfor %}
                 </div>
-            <button class="button is-primary ">{{ button_label|default('Save') }}</button>
+            <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full">{{ button_label|default('Save') }}</button>
 
 {{ form_end(form) }}
 
