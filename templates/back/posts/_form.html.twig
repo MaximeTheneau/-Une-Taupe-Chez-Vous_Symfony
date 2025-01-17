@@ -54,6 +54,8 @@
             
             <div class="pt-4">
                 <ul 
+
+                    id="paragraph-container"
                     class="paragraph"
                     data-index="{{ form.paragraphPosts|length > 0 ? form.paragraphPosts|last.vars.name + 1 : 0 }}"
                     data-prototype="{{ form_widget(form.paragraphPosts.vars.prototype)|e('html_attr') }}"
@@ -143,62 +145,8 @@
 
 {{ form_end(form) }}
 
-{% block javascripts %}
-    <script src={{asset('js/posts.js')}}></script>
+<!-- {% block javascripts %}
     <script type="text/javascript">
-
- 
-const textareaContents = document.querySelector('#posts_contents');
-
-textareaContents.addEventListener('input', (e) => {
-    const length = e.target.value.length;
-    console.log(length);
-
-    const textarea = e.target;
-
-    if (length < 135) {
-        // Ajouter un arrière-plan à l'ensemble du texte du textarea
-        textarea.style.background = '#ff5e5e2e';
-    } else {
-        textarea.style.background = '#f5f5f5'; // Changez cette couleur selon vos préférences
-    }
-});
-
-const addParagraphButton = document.querySelector('.button_paragraph');
-
-
-addParagraphButton.addEventListener('click', function() {
-    let collectionHolder = document.querySelector('.paragraph');
-    let index = collectionHolder.dataset.index;
-    
-
-    let newParagraph = collectionHolder.dataset.prototype;
-
-    newParagraph = newParagraph.replace(/__name__/g, index);
-
-    let newParagraphLi = document.createElement('li');
-    newParagraphLi.classList.add('h-auto', 'mb-8', 'border', 'border-gray-200');
-    newParagraphLi.innerHTML = newParagraph;
-
-    collectionHolder.appendChild(newParagraphLi);
-
-    collectionHolder.dataset.index = parseInt(index) + 1;
-});
-
-    const addListButton = document.querySelector('.button__list');
-
-    addListButton.addEventListener('click', function() {
-        let collectionHolder = document.querySelector('.list');
-        let index = collectionHolder.dataset.index;
-        let newList = collectionHolder.dataset.prototype;
-        newList = newList.replace(/__name__/g, index);
-        let newListLi = document.createElement('li');
-        newListLi.innerHTML = newList;
-
-        collectionHolder.appendChild(newListLi);
-
-        collectionHolder.dataset.index = parseInt(index) + 1;
-    });
 
     function submitChatGptForm(keyChatGpt, subtitle, id) {
         event.preventDefault();
@@ -230,4 +178,4 @@ addParagraphButton.addEventListener('click', function() {
         });
     }
     </script>
-{% endblock %}
+{% endblock %} -->

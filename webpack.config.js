@@ -1,5 +1,6 @@
 const Encore = require('@symfony/webpack-encore');
 // const CopyWebpackPlugin = require('copy-webpack-plugin');
+const path = require('path');
 
 // Manually configure the runtime environment if not already configured yet by the "encore" command.
 // It's useful when you use tools that rely on webpack.config.js file.
@@ -10,7 +11,6 @@ if (!Encore.isRuntimeEnvironmentConfigured()) {
 Encore
 
     .enablePostCssLoader()
-
     // directory where compiled assets will be stored
     .setOutputPath('public/build/')
     // public path used by the web server to access the output path
@@ -29,6 +29,8 @@ Encore
      */
     .addEntry('app', './assets/app.js')
     .addEntry('ckeditor-init', './assets/js/ckeditor/ckeditor-init.js')
+    .enableReactPreset() 
+    .addStyleEntry('global', './assets/styles/app.scss')
 
 
     // enables the Symfony UX Stimulus bridge (used in assets/bootstrap.js)
@@ -66,7 +68,7 @@ Encore
     })
 
     // enables Sass/SCSS support
-    //.enableSassLoader()
+    .enableSassLoader()
 
     // uncomment if you use TypeScript
     //.enableTypeScriptLoader()
@@ -81,13 +83,14 @@ Encore
     // uncomment if you're having problems with a jQuery plugin
     //.autoProvidejQuery()
 
-    .enableSassLoader()
 
     // processes files ending in .less
     .enableLessLoader()
 
     // processes files ending in .styl
     .enableStylusLoader()
+
+
 ;
 
 module.exports = Encore.getWebpackConfig();

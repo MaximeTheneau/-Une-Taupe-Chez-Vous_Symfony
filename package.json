@@ -32,6 +32,7 @@
     "clean": "sudo rm -rf public/build node_modules pnpm-lock.yaml"
   },
   "dependencies": {
+    "@babel/preset-react": "^7.0.0",
     "core-js": "^3.37.0",
     "crypto-js": "^4.2.0",
     "dotenv": "^16.4.5",

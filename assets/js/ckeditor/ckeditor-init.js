@@ -204,8 +204,9 @@ const editorConfig = {
 };
 
 
-// ClassicEditor.create(document.querySelector('#posts_contents'), editorConfig);
-document.addEventListener('DOMContentLoaded', () => {
+ClassicEditor.create(document.querySelector('#posts_contents'), editorConfig);
+
+document.addEventListener('turbo:load', () => {
     const initializeEditor = (textarea) => {
         if (textarea.dataset.editorInitialized === 'true') {
             return;
@@ -227,20 +228,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
 setupAddParagraphButton()
 
+
 function setupAddParagraphButton() {
     const addParagraphButton = document.querySelector('.button_paragraph');
     if (addParagraphButton) {
         addParagraphButton.addEventListener('click', function() {
             let collectionHolder = document.querySelector('.paragraph');
             if (!collectionHolder) return; // Si collectionHolder n'existe pas, on sort de la fonction
-			
-            const index = collectionHolder.dataset.index;
-            let newParagraphHtml = collectionHolder.dataset.prototype.replace(/__name__/g, index);
+
+            let index = collectionHolder.dataset.index;
+
+            let newParagraph = collectionHolder.dataset.prototype;
+
             // On crée un nouvel élément <li> et on y ajoute le paragraphe
              let newParagraphLi = document.createElement('li');
             newParagraphLi.classList.add('h-auto', 'mb-8', 'border', 'border-gray-200');
-            newParagraphLi.innerHTML = newParagraphHtml;
-            newParagraphLi.setAttribute('id', `posts_paragraphPosts_${index}`); // Ajout de l'ID unique
+            newParagraphLi.innerHTML = newParagraph;
 
             // On ajoute le nouveau paragraphe au conteneur
             collectionHolder.appendChild(newParagraphLi);
@@ -252,7 +255,6 @@ function setupAddParagraphButton() {
         });
     }
 }
-
 function setupRemoveParagraphButtons() {
     document.addEventListener('click', function (event) {
         if (event.target.classList.contains('remove-paragraph-btn')) {
@@ -277,5 +279,6 @@ function setupRemoveParagraphButtons() {
 }
 
 setupRemoveParagraphButtons();
+
 
 
