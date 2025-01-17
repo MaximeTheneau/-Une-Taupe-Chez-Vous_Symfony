@@ -38,6 +38,7 @@ use App\Service\MarkdownProcessor;
 use App\Service\UrlGeneratorService;
 use Symfony\Component\String\UnicodeString;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use DOMDocument;
 
 
 #[Route('/posts')]
@@ -259,6 +260,23 @@ class PostsController extends AbstractController
                 $post->setImgPost($imgPost);
             }
 
+            // MARKDOWN TO HTML
+
+            $dom = new DOMDocument();
+            @$dom->loadHTML(
+                mb_convert_encoding($post->getContents(), 'HTML-ENTITIES', 'UTF-8'),
+                LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD
+            );
+            $images = $dom->getElementsByTagName('img');
+            
+            /** @var \DOMElement $image */
+            foreach ($images as $image) {
+                $image->setAttribute('loading', 'lazy');
+            }
+
+            $htmlTextWithLazyLoading = $dom->saveHTML();
+
+            $post->setContents($htmlTextWithLazyLoading);    
             // PARAGRAPH
             $paragraphPosts = $form->get('paragraphPosts')->getData();
 
@@ -267,9 +285,26 @@ class PostsController extends AbstractController
                 // MARKDOWN TO HTML
                 $markdownText = $paragraph->getParagraph();
 
+
                 $htmlText = $this->markdownProcessor->processMarkdown($markdownText);
 
-                $paragraph->setParagraph($htmlText);
+                $dom = new DOMDocument('1.0', 'UTF-8');
+
+                @$dom->loadHTML(
+                    mb_convert_encoding($htmlText, 'HTML-ENTITIES', 'UTF-8'),
+                    LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD
+                );
+
+                $images = $dom->getElementsByTagName('img');
+                
+                /** @var \DOMElement $image */
+                foreach ($images as $image) {
+                    $image->setAttribute('loading', 'lazy');
+                }
+
+                $htmlTextWithLazyLoading = $dom->saveHTML();
+
+                $paragraph->setParagraph($htmlTextWithLazyLoading);    
 
                 // LINK
                 $articleLink = $paragraph->getLinkPostSelect();
