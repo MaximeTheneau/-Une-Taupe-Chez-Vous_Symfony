@@ -29,7 +29,8 @@ class ImgForTextController extends AbstractController
         $post = $entityManager->getRepository(Posts::class)->find($id);
 
         if ($file) {
-            $slug = $post->getSlug();
+            $slug = $post->getSlug() . '-' . $post->getId() + 1;
+            
             
             $this->imageOptimizer->setPicture($file, $post , $slug);
 
