@@ -65,7 +65,7 @@ class PostsType extends AbstractType
                 'by_reference' => false,
                 ])
             ->add('heading', TextType::class, [
-                'label' => 'Titre de l\'article',
+                'label' => 'Title ',
                 'required' => true,
                 'attr' => [
                     'class' => 'block p-2.5 w-full text-lg text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500',
@@ -76,7 +76,7 @@ class PostsType extends AbstractType
                     ]
             ])
             ->add('title', TextType::class, [
-                'label' => 'Titre H1',
+                'label' => 'Titre H1 (Title H1 - Slug)',
                 'required' => true,
                 'attr' => [
                     'class' => 'block p-2.5 w-full text-lg text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500',
@@ -126,10 +126,10 @@ class PostsType extends AbstractType
                 ],
             ],)
             ->add('altImg', TextType::class, [
-                'label' => false,
+                'label' => 'Texte alternatif de l\'image',
                 'required' => false,
                 'attr' => [
-                    'class' => 'input mb-3',
+                    'class' => 'block p-2.5 w-full text-lg text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500',
                     'placeholder' => 'Texte alternatif de l\'image (max 165 caractères)',
                     'maxlength' => '165',
                 ]
@@ -184,6 +184,11 @@ class PostsType extends AbstractType
                         'attr' => [
                             'class' => 'custom-row',
                         ],
+                        'query_builder' => function (EntityRepository $er) {
+                                return $er->createQueryBuilder('p')
+                                    ->where('p.draft IS NULL OR p.draft = false');
+                            },
+
                         
                     ])
             ;
