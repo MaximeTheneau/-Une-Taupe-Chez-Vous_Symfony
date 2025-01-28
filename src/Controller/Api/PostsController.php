@@ -217,6 +217,72 @@ class PostsController extends ApiController
             ]);
     }
 
+     #[Route('/blog/{slug}', name: 'read', methods: ['GET'])]
+    public function readArticles(EntityManagerInterface $em, Posts $post, CommentsRepository $commentRepository)
+    { 
+        $comments = $commentRepository->findNonReplyComments($post->getId());
+
+        $commentsCollection = new ArrayCollection($comments);
+
+        $post->setComments($commentsCollection);
+        
+        if ($post === null)
+        {
+            // on renvoie donc une 404
+            return $this->json(
+                [
+                    "erreur" => "Page non trouvée",
+                    "code_error" => 404
+                ],
+                Response::HTTP_NOT_FOUND,// 404
+            );
+        }
+        $latestPosts = $em->getRepository(Posts::class)->findBy([], ['createdAt' => 'DESC'], 3);
+
+        $relatedPosts = $post->getRelatedPosts();
+
+            // Si vous voulez seulement certaines données des posts associés, vous pouvez mapper les entités en un tableau d'objets plus simples
+            $relatedPostsData = [];
+            foreach ($relatedPosts as $relatedPost) {
+                $relatedPostsData[] = [
+                    'id' => $relatedPost->getId(),
+                    'slug' => $relatedPost->getSlug(),
+                    'title' => $relatedPost->getTitle(),
+                    'altImg' => $relatedPost->getAltImg(),
+                    'url' => $relatedPost->getUrl(),
+                    'imgPost' => $relatedPost->getImgPost(),
+
+                ];
+            }
+
+            $latestPostsData = [];
+            foreach ($latestPosts as $latestPost) {
+                $latestPostsData[] = [
+                    'id' => $latestPost->getId(),
+                    'slug' => $latestPost->getSlug(),
+                    'title' => $latestPost->getTitle(),
+                    'url' => $latestPost->getUrl(),
+                    'formattedDate' => $latestPost->getFormattedDate(),
+
+                ];
+            }
+        return $this->json(
+            [
+                'post' => $post,
+                'latestPosts' => $latestPostsData,
+                'relatedPosts' => $relatedPostsData
+            ],
+            Response::HTTP_OK,
+            [],
+            [
+                "groups" => 
+                [
+                    "api_posts_read",
+                ]
+            ]);
+    }
+
+
     #[Route('&filter=subcategory', name: 'allSubcategory', methods: ['GET'])]
     public function allSubcategory(SubcategoryRepository $subcategories ): JsonResponse
     {
