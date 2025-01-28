@@ -43,7 +43,6 @@ class Posts
     private ?string $slug = null;
     
     #[ORM\Column(length: 5000, nullable: true, type: Types::STRING)]
-    #[Type(type: Types::string)]
     #[Groups(['api_posts_read', 'api_posts_home'])]
     private ?string $contents = null;
 
@@ -56,7 +55,7 @@ class Posts
     private ?\DateTime $updatedAt = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['api_posts_read'])]
+    #[Groups(['api_posts_read', 'api_posts_sitemap' ])]
     private ?string $formattedDate = null;
     
     #[ORM\OneToMany(mappedBy: 'posts', targetEntity: ListPosts::class, cascade: ['persist', 'remove'], orphanRemoval: true)]
