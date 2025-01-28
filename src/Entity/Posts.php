@@ -47,15 +47,15 @@ class Posts
     private ?string $contents = null;
 
     #[ORM\Column]
-    #[Groups(['api_posts_read', 'api_posts_category' ])]
+    #[Groups(['api_posts_read', 'api_posts_category', 'api_posts_sitemap' ])]
     private ?\DateTime $createdAt = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['api_posts_read', 'api_posts_category'])]
+    #[Groups(['api_posts_read', 'api_posts_category', 'api_posts_sitemap'])]
     private ?\DateTime $updatedAt = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['api_posts_read', 'api_posts_sitemap' ])]
+    #[Groups(['api_posts_read' ])]
     private ?string $formattedDate = null;
     
     #[ORM\OneToMany(mappedBy: 'posts', targetEntity: ListPosts::class, cascade: ['persist', 'remove'], orphanRemoval: true)]
