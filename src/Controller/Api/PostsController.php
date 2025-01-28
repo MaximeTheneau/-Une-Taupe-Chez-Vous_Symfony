@@ -197,8 +197,9 @@ class PostsController extends ApiController
     }
 
     #[Route('/{slug}', name: 'read', methods: ['GET'])]
-    public function read(Posts $post, CommentsRepository $commentRepository)
+    public function read(EntityManagerInterface $em, string $slug, CommentsRepository $commentRepository)
     { 
+        $post = $em->getRepository(Posts::class)->findOneBy(['slug' => $slug]);
         $comments = $commentRepository->findNonReplyComments($post->getId());
 
         $commentsCollection = new ArrayCollection($comments);
